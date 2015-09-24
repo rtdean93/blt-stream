@@ -5,9 +5,11 @@
  * Drupal site-specific configuration file.
  */
 
-// Include custom sites.php code from factory-hooks/pre-sites-php.
-if (function_exists('acsf_hooks_include')) {
-  acsf_hooks_include('pre-settings-php');
+// Include custom settings.php code from factory-hooks/pre-settings-php.
+if (function_exists('acsf_hooks_includes')) {
+  foreach (acsf_hooks_includes('pre-settings-php') as $pre_hook) {
+    include_once $pre_hook;
+  }
 }
 
 /**
@@ -167,6 +169,14 @@ if (file_exists('/var/www/site-php')) {
       exit;
     }
   }
+  if (isset($_ENV['AH_SITE_ENVIRONMENT'])) {
+    // DG-10819: Enable Migrate background operations by default on all Acquia
+    // hosting environments. See https://drupal.org/node/1958170. The path here
+    // should be valid on all Acquia hosting servers, and will not take effect
+    // on non-Acquia environments since AH_SITE_ENVIRONMENT won't be set in that
+    // case.
+    $conf['migrate_drush_path'] = '/usr/local/bin/drush';
+  }
 
   if (!empty($site_settings['conf'])) {
     foreach ((array) $site_settings['conf'] as $key => $value) {
@@ -175,7 +185,9 @@ if (file_exists('/var/www/site-php')) {
   }
 }
 
-// Include custom sites.php code from factory-hooks/post-sites-php.
-if (function_exists('acsf_hooks_include')) {
-  acsf_hooks_include('post-settings-php');
+// Include custom settings.php code from factory-hooks/post-settings-php.
+if (function_exists('acsf_hooks_includes')) {
+  foreach (acsf_hooks_includes('post-settings-php') as $post_hook) {
+    include_once $post_hook;
+  }
 }

@@ -64,9 +64,9 @@ function acsf_init_drush_command() {
 function drush_acsf_init() {
   // Retrieve the path to the acsf module relative to this file.
   $path = dirname(dirname(dirname(__FILE__)));
-  $relative_path = str_replace(DRUPAL_ROOT . '/', '', $path);
-  $repo_root = str_replace('/docroot', '', DRUPAL_ROOT);
-  $lib_path = sprintf('%s/%s/acsf/acsf_init/lib', DRUPAL_ROOT, $relative_path);
+  $relative_path = str_replace(realpath(DRUPAL_ROOT) . '/', '', realpath($path));
+  $repo_root = str_replace('/docroot', '', realpath(DRUPAL_ROOT));
+  $lib_path = sprintf('%s/%s/acsf/acsf_init/lib', realpath(DRUPAL_ROOT), $relative_path);
 
   drush_print(dt('Installing ACSF requirements.'));
 
@@ -90,7 +90,8 @@ function drush_acsf_init() {
   }
 
   // Copy the required files.
-  foreach (acsf_init_get_required_files($repo_root) as $file => $location) {
+  foreach (acsf_init_get_required_files($repo_root) as $location) {
+    $file = $location['filename'];
     $source = sprintf('%s/%s/%s', $lib_path, $location['source'], $file);
     $dest = sprintf('%s/%s', $location['dest'], $file);
     $mod = isset($location['mod']) ? $location['mod'] : FALSE;
@@ -134,7 +135,6 @@ function drush_acsf_connect_factory() {
   $site_owner_mail = trim(drush_get_option('site-owner-mail'));
   $site_owner_roles = drush_get_option_list('site-owner-roles');
 
-  $site_owner_account = user_load_by_mail($site_owner_mail);
   // Validate email addresses.
   if (!valid_email_address($site_admin_mail)) {
     return drush_set_error(dt('The site-admin-mail value is not a valid email address.'));
@@ -142,6 +142,7 @@ function drush_acsf_connect_factory() {
   if (!valid_email_address($site_owner_mail)) {
     return drush_set_error(dt('The site-owner-mail value is not a valid email address.'));
   }
+
   // Make sure there is no regular user account with the admin email address.
   $site_admin_mail_account = user_load_by_mail($site_admin_mail);
   if ($site_admin_mail_account && $site_admin_mail_account->uid > 1) {
@@ -150,24 +151,33 @@ function drush_acsf_connect_factory() {
       '@uid' => $site_admin_mail_account->uid,
     )));
   }
-  // Make sure there is no user with the same name before creating a new user.
-  if (empty($site_owner_account) && user_load_by_name($site_owner_name)) {
-    return drush_set_error(dt('Unable to create the site owner account, there is already a user account with the name @site-owner-name but with a different email address.', array(
-      '@site-owner-name' => $site_owner_name,
-    )));
-  }
-  // Make sure the name isn't used by another user with a different email.
-  $conflicting_account = user_load_by_name($site_owner_name);
-  if ($conflicting_account && $site_owner_account->uid !== $conflicting_account->uid) {
-    return drush_set_error(dt('Unable to update the site owner account, uid @uid is already using the name @site-owner-name but with a different email address.', array(
-      '@uid' => $conflicting_account->uid,
-      '@site-owner-name' => $site_owner_name,
-    )));
-  }
+
   // If a list of roles was specified, make sure they all exist.
   foreach ($site_owner_roles as $role) {
     if (!user_role_load_by_name($role)) {
       return drush_set_error(dt('The role @role does not exist.', array('@role' => $role)));
+    }
+  }
+
+  // The site owner's email address may have been changed on the factory (for
+  // instance, if the user updated their email address on the factory and the
+  // new email address has not yet been synced to the site). First, try to
+  // locate the user account by site-owner-mail.
+  $site_owner_account = user_load_by_mail($site_owner_mail);
+  if (!empty($site_owner_account) && $site_owner_account->name !== $site_owner_name) {
+    return drush_set_error(dt('The site-owner-name value does not match the name of the user loaded by site-owner-mail.'));
+  }
+  // If the site owner user account is not found, try to locate it by
+  // site-owner-name.
+  if (empty($site_owner_account)) {
+    $site_owner_account = user_load_by_name($site_owner_name);
+  }
+  // If the site owner account is still not found then either the customer has
+  // made a typo or maybe there is going to be a new owner who needs a new
+  // account. Ask for confirmation to create a new account.
+  if (empty($site_owner_account)) {
+    if (!drush_confirm(dt('The site owner name or email address that you provided does not correspond to any account on the site. Do you want to create a new account?'))) {
+      return drush_user_abort();
     }
   }
 
@@ -203,6 +213,10 @@ function drush_acsf_connect_factory() {
 
   // Create or update site owner account.
   // Prepare roles for site owner.
+  if (empty($site_owner_account)) {
+    $site_owner_account = new stdClass();
+    $site_owner_account->is_new = TRUE;
+  }
   $site_owner_account_edit = $default_account_edit;
   foreach ($site_owner_roles as $role) {
     $rid = user_role_load_by_name($role)->rid;
@@ -260,7 +274,8 @@ function drush_acsf_init_verify() {
   $lib_path = sprintf('%s/%s/acsf/acsf_init/lib', $drupal_root, $relative_path);
 
   $error = FALSE;
-  foreach (acsf_init_get_required_files($repo_root) as $file => $location) {
+  foreach (acsf_init_get_required_files($repo_root) as $location) {
+    $file = $location['filename'];
     $source = sprintf('%s/%s/%s', $lib_path, $location['source'], $file);
     $dest = sprintf('%s/%s', $location['dest'], $file);
     if (!file_exists($dest)) {
@@ -291,7 +306,8 @@ function drush_acsf_init_verify() {
 function drush_acsf_uninstall() {
   drush_print('Removing ACSF requirements.');
 
-  foreach (acsf_init_get_required_files($repo_root) as $file => $location) {
+  foreach (acsf_init_get_required_files($repo_root) as $location) {
+    $file = $location['filename'];
     $dest = sprintf('%s/%s', $location['dest'], $file);
     if (file_exists($dest)) {
       $confirm = drush_confirm(dt('Delete !file?', array('!file' => $dest)));
@@ -318,6 +334,7 @@ function acsf_init_get_required_dirs($repo_root) {
     'acquia hook dir' => sprintf('%s/hooks/acquia', $repo_root),
     'cloud hook samples' => sprintf('%s/hooks/samples', $repo_root),
     'site config logic' => sprintf('%s/sites/g', DRUPAL_ROOT),
+    'site env default' => sprintf('%s/sites/default', DRUPAL_ROOT),
   );
 }
 
@@ -326,59 +343,78 @@ function acsf_init_get_required_dirs($repo_root) {
  */
 function acsf_init_get_required_files($repo_root) {
   return array(
-    'README.md' => array(
+    array(
+      'filename' => 'README.md',
       'source' => 'cloud_hooks',
       'dest' => sprintf('%s/hooks', $repo_root),
     ),
-    '000-acquia_required_scrub.php' => array(
+    array(
+      'filename' => '000-acquia_required_scrub.php',
       'source' => 'cloud_hooks/common/post-db-copy',
       'dest' => sprintf('%s/hooks/common/post-db-copy', $repo_root),
       'mod' => 0751,
     ),
-    '000-acquia-deployment.php' => array(
+    array(
+      'filename' => '000-acquia-deployment.php',
       'source' => 'cloud_hooks/common/pre-web-activate',
       'dest' => sprintf('%s/hooks/common/pre-web-activate', $repo_root),
       'mod' => 0751,
     ),
-    'db_connect.php' => array(
+    array(
+      'filename' => 'db_connect.php',
       'source' => 'cloud_hooks/acquia',
       'dest' => sprintf('%s/hooks/acquia', $repo_root),
     ),
-    'uri.php' => array(
+    array(
+      'filename' => 'uri.php',
       'source' => 'cloud_hooks/acquia',
       'dest' => sprintf('%s/hooks/acquia', $repo_root),
     ),
-    'acquia-cloud-site-factory-post-db.sh' => array(
+    array(
+      'filename' => 'acquia-cloud-site-factory-post-db.sh',
       'source' => 'cloud_hooks/samples',
       'dest' => sprintf('%s/hooks/samples', $repo_root),
     ),
-    'hello-world.sh' => array(
+    array(
+      'filename' => 'hello-world.sh',
       'source' => 'cloud_hooks/samples',
       'dest' => sprintf('%s/hooks/samples', $repo_root),
     ),
-    'post-code-deploy.tmpl' => array(
+    array(
+      'filename' => 'post-code-deploy.tmpl',
       'source' => 'cloud_hooks/samples',
       'dest' => sprintf('%s/hooks/samples', $repo_root),
     ),
-    'sites.php' => array(
+    array(
+      'filename' => 'sites.php',
       'source' => 'sites',
       'dest' => sprintf('%s/sites', DRUPAL_ROOT),
     ),
-    'apc_rebuild.php' => array(
+    array(
+      'filename' => 'apc_rebuild.php',
       'source' => 'sites/g',
       'dest' => sprintf('%s/sites/g', DRUPAL_ROOT),
     ),
-    '.gitignore' => array(
+    array(
+      'filename' => '.gitignore',
       'source' => 'sites/g',
       'dest' => sprintf('%s/sites/g', DRUPAL_ROOT),
     ),
-    'settings.php' => array(
+    array(
+      'filename' => 'settings.php',
       'source' => 'sites/g',
       'dest' => sprintf('%s/sites/g', DRUPAL_ROOT),
     ),
-    'sites.inc' => array(
+    array(
+      'filename' => 'sites.inc',
       'source' => 'sites/g',
       'dest' => sprintf('%s/sites/g', DRUPAL_ROOT),
+    ),
+    array(
+      'filename' => 'settings.php',
+      'source' => 'sites/default',
+      'dest' => sprintf('%s/sites/default', DRUPAL_ROOT),
+      'mod' => 0644,
     ),
   );
 
