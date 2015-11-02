@@ -9,6 +9,14 @@ use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
 
 /**
+ * Implements hook_install().
+ */
+function behatrunner_install() {
+
+}
+
+
+/**
  * Implements hook_composer_dependencies_install().
  *
  * This will get called on install, but after composer_manager

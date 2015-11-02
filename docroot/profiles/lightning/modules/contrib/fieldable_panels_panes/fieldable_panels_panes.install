@@ -8,12 +8,15 @@
  * Implements hook_install().
  */
 function fieldable_panels_panes_install() {
-  ctools_include('export');
+  // The included FPP type can be skipped.
+  if (!variable_get('fieldable_panels_panes_skip_default_type', FALSE)) {
+    ctools_include('export');
 
-  $item = ctools_export_crud_new('fieldable_panels_pane_type');
-  $item->name = 'fieldable_panels_pane';
-  $item->title = t('Panels Pane');
-  ctools_export_crud_save('fieldable_panels_pane_type', $item);
+    $item = ctools_export_crud_new('fieldable_panels_pane_type');
+    $item->name = 'fieldable_panels_pane';
+    $item->title = t('Panels Pane');
+    ctools_export_crud_save('fieldable_panels_pane_type', $item);
+  }
 }
 
 
@@ -25,6 +28,9 @@ function fieldable_panels_panes_uninstall() {
   foreach ($results as $type) {
     field_attach_delete_bundle('fieldable_panels_pane', $type->name);
   }
+
+  // Variables.
+  variable_del('fieldable_panels_panes_skip_default_type');
 }
 
 /**
@@ -191,7 +197,7 @@ function fieldable_panels_panes_schema() {
       'name' => array(
         'description' => 'The machine-readable name of this type.',
         'type' => 'varchar',
-        'length' => 32,
+        'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -327,7 +333,7 @@ function fieldable_panels_panes_update_7108() {
       'name' => array(
         'description' => 'The machine-readable name of this type.',
         'type' => 'varchar',
-        'length' => 32,
+        'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
@@ -393,4 +399,17 @@ function fieldable_panels_panes_update_7108() {
   }
 
   return implode('<br />', $messages);
+}
+
+/**
+ * Update the length of the 'name' field in {fieldable_panels_pane}.
+ */
+function fieldable_panels_panes_update_7109() {
+  db_change_field('fieldable_panels_pane_type', 'name', 'name', array(
+    'description' => 'The machine-readable name of this type.',
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '',
+  ));
 }

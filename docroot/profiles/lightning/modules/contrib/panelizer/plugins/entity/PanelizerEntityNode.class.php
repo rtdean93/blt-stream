@@ -25,6 +25,12 @@ class PanelizerEntityNode extends PanelizerEntityDefault {
    * Implement the save function for the entity.
    */
   public function entity_save($entity) {
+    if (module_exists('workbench_moderation') && workbench_moderation_node_type_moderated($entity->type)) {
+      $live_entity = workbench_moderation_node_live_load($entity);
+      if ($live_entity->vid != $entity->vid) {
+        $entity->revision = TRUE;
+      }
+    }
     node_save($entity);
   }
 
@@ -45,35 +51,11 @@ class PanelizerEntityNode extends PanelizerEntityDefault {
     list($entity_id, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
 
     $node_options = variable_get('node_options_' . $bundle, array('status', 'promote'));
-    $retval[0] = TRUE;
+    $retval[0] = in_array('panelizer', $node_options);
     $retval[1] = user_access('administer nodes');
     $retval[2] = in_array('revision', $node_options);
 
     return $retval;
-  }
-
-  public function settings_form(&$form, &$form_state) {
-    parent::settings_form($form, $form_state);
-
-    $warn = FALSE;
-    foreach ($this->plugin['bundles'] as $info) {
-      if (!empty($info['status']) && !empty($info['view modes']['page_manager']['status'])) {
-        $warn = TRUE;
-        break;
-      }
-    }
-
-    if ($warn) {
-      $task = page_manager_get_task('node_view');
-      if (!empty($task['disabled'])) {
-        drupal_set_message(t('The node template page is currently not enabled in page manager. You must enable this for Panelizer to be able to panelize nodes using the "Full page override" view mode.'), 'warning', FALSE);
-      }
-
-      $handler = page_manager_load_task_handler($task, '', 'node_view_panelizer');
-      if (!empty($handler->disabled)) {
-        drupal_set_message(t('The panelizer variant on the node template page is currently not enabled in page manager. You must enable this for Panelizer to be able to panelize nodes using the "Full page override" view mode.'), 'warning', FALSE);
-      }
-    }
   }
 
   function get_default_display($bundle, $view_mode) {
@@ -89,6 +71,33 @@ class PanelizerEntityNode extends PanelizerEntityDefault {
 
     // @todo -- submitted by does not exist as a pane! That's v. sad.
     $display->add_pane($pane, 'center');
+
+    unset($pane);
+
+    // If the content type is enabled for use with Webform, add the custom
+    // submission pane.
+    if (module_exists('webform')) {
+      if ($view_mode == 'page_manager') {
+        if (variable_get('webform_node_' . $bundle)) {
+          $pane = panels_new_pane('entity_field_extra', 'node:webform', TRUE);
+          $pane->configuration['context'] = 'panelizer';
+          $pane->configuration['view_mode'] = 'full';
+          $display->add_pane($pane, 'center');
+          unset($pane);
+        }
+      }
+    }
+
+    // Add a custom pane for the book navigation block for the Page Manager
+    // display.
+    if (module_exists('book')) {
+      if ($view_mode == 'page_manager') {
+        $pane = panels_new_pane('node_book_nav', 'node_book_nav', TRUE);
+        $pane->configuration['context'] = 'panelizer';
+        $display->add_pane($pane, 'center');
+        unset($pane);
+      }
+    }
 
     return $display;
   }
@@ -129,7 +138,28 @@ class PanelizerEntityNode extends PanelizerEntityDefault {
         $bundle = $form['#node_type']->type;
         $this->add_bundle_setting_form($form, $form_state, $bundle, array('type'));
       }
+      // Disable the 'revision' checkbox when the 'moderation' checkbox is checked, so that moderation
+      // can not be enabled unless revisions are enabled.
+      $form['workflow']['node_options']['revision']['#states'] = array(
+        'disabled' => array(':input[name="node_options[panelizer]"]' => array('checked' => TRUE)),
+      );
+
+      // Disable the 'moderation' checkbox when the 'revision' checkbox is not checked, so that
+      // revisions can not be turned off without also turning off moderation.
+      $form['workflow']['node_options']['#options']['panelizer'] = t('Enable panelizer revisions');
+      $form['workflow']['node_options']['panelizer']['#description'] = t('Revisions must be enabled in order to create panelizer revisions.');
+      $form['workflow']['node_options']['panelizer']['#states'] = array(
+        'disabled' => array(':input[name="node_options[revision]"]' => array('checked' => FALSE)),
+      );
     }
+  }
+
+  public function add_bundle_setting_form_validate($form, &$form_state, $bundle, $type_location) {
+    // Ensure that revisions are enabled if panelizer revisions are.
+    if ($form_state['values']['node_options']['panelizer']) {
+      $form_state['values']['node_options']['revision'] = 1;
+    }
+    parent::add_bundle_setting_form_validate($form, $form_state, $bundle, $type_location);
   }
 
   public function hook_page_alter(&$page) {
@@ -185,8 +215,8 @@ class PanelizerEntityNode extends PanelizerEntityDefault {
     }
   }
 
-  function render_entity($entity, $view_mode, $langcode = NULL, $args = array(), $address = NULL) {
-    $info = parent::render_entity($entity, $view_mode, $langcode, $args, $address);
+  function render_entity($entity, $view_mode, $langcode = NULL, $args = array(), $address = NULL, $extra_contexts = array()) {
+    $info = parent::render_entity($entity, $view_mode, $langcode, $args, $address, $extra_contexts);
     if (!empty($entity->promote)) {
       $info['classes_array'][] = 'node-promoted';
     }

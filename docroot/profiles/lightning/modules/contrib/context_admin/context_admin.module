@@ -272,3 +272,19 @@ function context_admin_node_form_wrapper_validate($form, &$form_state) {
   module_load_include('inc', 'node', 'node.pages');
   node_form_validate($form, $form_state);
 }
+
+/**
+ * A helper function for tracking current page_manager page.
+ *
+ * Page Manager provides a function that is identical to this, however certain
+ * context_admin plugin proxy to another page_manager task and the "current page"
+ * can get lost, so this allows those plugins to store another layer of page.
+ */
+function context_admin_get_current_page($page = NULL) {
+  static $current = array();
+  if (isset($page)) {
+    $current = $page;
+  }
+
+  return $current;
+}

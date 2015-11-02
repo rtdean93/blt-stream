@@ -4,6 +4,8 @@ core = 7.x
 package = Lightning
 version = 7.x-1.0
 project = lightning_filter
+dependencies[] = editor
+dependencies[] = entity_embed
 dependencies[] = features
 dependencies[] = filter
 dependencies[] = system
@@ -15,8 +17,8 @@ features[filter][] = plain_text
 features[filter][] = userbase
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

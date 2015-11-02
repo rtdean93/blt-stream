@@ -39,15 +39,6 @@ html {
   }
 }
 
-.horizontal-layout > .panel-pane, .horizontal-layout > .panel-pane:first-child,
-.horizontal-layout > .pane-content > .node,
-.horizontal-layout > .pane-content > .node:first-child,
-.horizontal-layout > .pane-content .views-row,
-.horizontal-layout > .pane-content .views-row:first-child,
-.horizontal-layout div.panels-ipe-portlet-wrapper,
-.horizontal-layout div.panels-ipe-portlet-wrapper:first-child {
-  margin-top: 0.5em;
-}
 @media only screen and (min-width: 400px) {
   .horizontal-layout > .panel-pane,
   .horizontal-layout > .pane-content > .node,

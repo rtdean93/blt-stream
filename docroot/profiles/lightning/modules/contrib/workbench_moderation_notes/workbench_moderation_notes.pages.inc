@@ -6,10 +6,8 @@
 function workbench_moderation_notes_node_history_view($node) {
   global $user;
 
-  // Alert if there is no live node
-  if (!isset($node->workbench_moderation['published'])) {
-    drupal_set_message(t('Currently there is no published revision of this content.'), 'warning');
-  }
+  // Page title.
+  drupal_set_title(t('History of %title', array('%title' => $node->title)), PASS_THROUGH);
 
   // Get all of the node revisions, each with its most recent moderation.
   $query = db_select('node', 'n');
@@ -29,6 +27,8 @@ function workbench_moderation_notes_node_history_view($node) {
   foreach ($revisions as $revision) {
     $row = array(
       'data' => array(
+        'vid' => '',
+        'info' => '',
         'date' => '',
         'revision' => '',
         'moderation' => '',
@@ -48,22 +48,41 @@ function workbench_moderation_notes_node_history_view($node) {
     }
 
     // Add row data.
+    $row['data']['vid'] = $revision->vid;
+    $row['data']['info'] .= '<div class="revision-title">' . check_plain($revision->title) . '</div>';
+    $row['data']['info'] .= '<div class="revision-log description">' . filter_xss($revision->log) . '</div>';
+    $row['data']['info'] .= '<div class="revision-user description">' . t('Revised by !user', array('!user' => theme('username', array('account' => $revision)))) . '</div>';
     $row['data']['date'] = format_date($revision->timestamp, 'short');
 
     // Revision operations.
     $revision_operations = array();
     if (isset($node->workbench_moderation['published']) && $revision->vid == $node->workbench_moderation['published']->vid) {
-      $revision_operations['view'] = workbench_moderation_access_link(t('view'), "node/{$revision->nid}");
+      $revision_operations['view'] = workbench_moderation_access_link(t('View'), "node/{$revision->nid}");
     }
     elseif ($revision->vid == $node->workbench_moderation['current']->vid) {
-      $revision_operations['view'] = workbench_moderation_access_link(t('view'), "node/{$revision->nid}/current-revision");
+      $revision_operations['view'] = workbench_moderation_access_link(t('View'), "node/{$revision->nid}/current-revision");
     }
     else {
-      $revision_operations['view'] = workbench_moderation_access_link(t('view'), "node/{$revision->nid}/revisions/{$revision->vid}/view");
+      $revision_operations['view'] = workbench_moderation_access_link(t('View'), "node/{$revision->nid}/revisions/{$revision->vid}/view");
     }
 
-    $revision_operations['revert'] = workbench_moderation_access_link(t('revert'), "node/{$revision->nid}/revisions/{$revision->vid}/revert");
-    $revision_operations['delete'] = workbench_moderation_access_link(t('delete'), "node/{$revision->nid}/revisions/{$revision->vid}/delete");
+    // Provide a courtesy edit operation if this is the current revision.
+    if ($revision->vid == $node->workbench_moderation['current']->vid) {
+      // The edit operation's default link title, "Edit draft", matches
+      // the logic tree in workbench_moderation_edit_tab_title().
+      $edit_operation_title = t('Edit draft');
+
+      // Modify the edit operation's link title to "New draft", matching the
+      // logic tree in workbench_moderation_edit_tab_title() when the current
+      // revision is the published node.
+      if (isset($node->workbench_moderation['published']) && $revision->vid == $node->workbench_moderation['published']->vid) {
+        $edit_operation_title = t('New draft');
+      }
+      $revision_operations['edit'] = l($edit_operation_title, "node/{$revision->nid}/edit", array('query' => array('destination' => "node/{$revision->nid}/moderation")));
+    }
+
+    $revision_operations['revert'] = workbench_moderation_access_link(t('Revert'), "node/{$revision->nid}/revisions/{$revision->vid}/revert");
+    $revision_operations['delete'] = workbench_moderation_access_link(t('Delete'), "node/{$revision->nid}/revisions/{$revision->vid}/delete");
 
     $row['data']['revision'] = implode(' | ', array_filter($revision_operations));
 
@@ -72,6 +91,7 @@ function workbench_moderation_notes_node_history_view($node) {
     $query->leftJoin('users', 'u', 'm.uid = u.uid');
     $query->condition('m.vid', $revision->vid)
       ->orderBy('m.stamp', 'DESC')
+      ->orderBy('m.hid', 'DESC')
       ->fields('m')
       ->fields('u', array('name'));
 
@@ -90,7 +110,7 @@ function workbench_moderation_notes_node_history_view($node) {
     if (!empty($node->workbench_moderation['published']) && $revision->vid == $node->workbench_moderation['published']->vid) {
       $row['data']['moderation'] = '<div class="moderation-state"><strong>' . t('This is the published revision.') . '</strong></div>';
       // Provide an unpublish link.
-      $next_states = workbench_moderation_states_next(workbench_moderation_state_published(), $user, $node->type);
+      $next_states = workbench_moderation_states_next(workbench_moderation_state_published(), $user, $node);
       if (!empty($next_states)) {
         $row['data']['moderation'] .= '<div class="moderation-actions">' . l(t('Unpublish'), "node/{$revision->nid}/moderation/{$revision->live_revision}/unpublish") . '</div>';
       }
@@ -102,13 +122,12 @@ function workbench_moderation_notes_node_history_view($node) {
     }
 
     // Build a table of the moderation history.
-    $moderation_rows = array();
     $items = array();
     foreach ($moderations as $moderation) {
       if ($moderation->from_state) {
         $note = ($moderation->note)
-                  ?t('<br/><strong>Note:</strong><p>@note</p>', array('@note' => $moderation->note))
-                  : '';
+          ?t('<br/><strong>Note:</strong><p>@note</p>', array('@note' => $moderation->note))
+          : '';
         $items[] = t('From @from_state --> @to_state on %date by !user !note',
           array(
             '@from_state' => workbench_moderation_state_label($moderation->from_state),
@@ -136,7 +155,7 @@ function workbench_moderation_notes_node_history_view($node) {
   }
 
   // Set the table header.
-  $header = array(t('Date'), t('Actions'), t('Moderation notes'));
+  $header = array(t('Revision'), t('Title'), t('Date'), t('Revision actions'), t('Moderation actions'));
 
   // Return properly styled output.
   return array(

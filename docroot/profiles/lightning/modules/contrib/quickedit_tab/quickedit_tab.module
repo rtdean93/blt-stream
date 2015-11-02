@@ -33,6 +33,7 @@ function quickedit_tab_library() {
  * Implements hook_navbar().
  */
 function quickedit_tab_navbar() {
+  // In-place editing permissions check.
   if (!user_access('access in-place editing')) {
     return;
   }
@@ -40,6 +41,16 @@ function quickedit_tab_navbar() {
   // In-place editing is only supported on the front-end.
   if (path_is_admin(current_path())) {
     return;
+  }
+
+  // In-place editing is only supported for Workbench Moderation drafts.
+  if (module_exists('workbench_moderation')) {
+    $menu_object = menu_get_object();
+    if (isset($menu_object->entity_type) && ($menu_object->entity_type == 'node') && isset($menu_object->workbench_moderation) && $path = current_path()) {
+      if (!fnmatch('node/*/draft', $path)) {
+        return;
+      }
+    }
   }
 
   $items['quickedit_tab_navbar'] = array(

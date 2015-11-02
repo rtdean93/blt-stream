@@ -28,3 +28,17 @@ doing so will break any content currently using that bundle. If you do this
 be sure to also fix any content already using it. It is recommended that you
 use the bundle management UI in admin/structure/fieldable-panels-panes so you
 don't have to maintain this yourself.
+
+
+Installation notes
+------------------
+By default a Fieldable Panels Pane type called "Panels pane" will be created. To
+skip this, set the variable "fieldable_panels_panes_skip_default_type" to TRUE
+prior to installing the module.
+
+
+A note about view modes
+-----------------------
+When viewing an FPP object on its own page, e.g.
+admin/structure/fieldable-panels-panes/view/1, the 'preview' view mode will be
+used if it has been customized, otherwise it defaults to 'default'.

@@ -128,7 +128,7 @@
     <!--/.l-off canvas -->
       <section class="off-canvas-wrap">
         <div class="inner-wrap">
-        <a class="left-off-canvas-toggle tiny button" href="#" >Moderate <?php if (($node->type) != null) { ?><?php print $node->type; ?><?php } ?><br /><span class="activestate"></span></a>
+        <a class="left-off-canvas-toggle tiny button" href="#" >Moderate <?php if (($node->type) != null) { ?><?php print node_type_get_name($node->type); ?><?php } ?><br /><span class="activestate"><?php if (isset($activestate)) print '(Currently Viewing: ' . $activestate . ')' ?></span></a>
         <aside class="left-off-canvas-menu">
               <?php if (!empty($tabs)): ?>
               <?php print render($tabs); ?>
@@ -255,11 +255,16 @@
       </div>
     <?php endif; ?>
 
-    <?php if ($site_name) :?>
-      <div class="copyright large-12 columns">
+    <?php if ($site_name): ?>
+      <div class="copyright small-10 columns">
         &copy; <?php print date('Y') . ' ' . check_plain($site_name) . ' ' . t('All rights reserved.'); ?>
       </div>
     <?php endif; ?>
+    <?php if ($logged_in == FALSE): ?>
+      <div class="small-2 columns">
+        <a href="/user" class="right">Login</a>
+      </div>
+    <?php endif ?>
     </div>
   </footer>
   <!--/.footer-->

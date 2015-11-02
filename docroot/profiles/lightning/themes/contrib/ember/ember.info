@@ -10,10 +10,10 @@ stylesheets[screen][] = styles/system.base.css
 stylesheets[screen][] = styles/system.menus.css
 stylesheets[screen][] = styles/system.theme.css
 stylesheets[screen][] = styles/system.messages.css
-stylesheets[screen][] = styles/tables.css
 
 ; Settings
 settings[shortcut_module_link] = 1
+settings[views_ui_override] = 1
 
 ; Regions
 regions[content] = Content
@@ -25,9 +25,9 @@ regions[sidebar_first] = First sidebar
 regions_hidden[] = sidebar_first
 
 
-; Information added by drush on 2014-11-17
-version = "7.x-2.0-alpha2+33-dev"
+; Information added by drush on 2015-10-29
+version = "7.x-2.0-alpha4+0-dev"
 core = "7.x"
 project = "ember"
-datestamp = "1416241060"
+datestamp = "1446085148"
 

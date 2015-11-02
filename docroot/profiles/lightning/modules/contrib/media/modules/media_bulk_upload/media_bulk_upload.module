@@ -83,31 +83,6 @@ function media_bulk_upload_form_alter(&$form, &$form_state, $form_id) {
   if (!empty($form_state['#media_browser'])) {
     $form['#submit'][] = 'media_bulk_upload_browser_form_submit';
   }
-
-  // Nest 'Replace file' and Additional settings into a fieldset.
-  if (strstr($form_id, 'media_edit_')) {
-    $form['more'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Additional settings'),
-      '#weight' => 5,
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    $form['more']['additional_settings'] = $form['additional_settings'];
-    unset($form['additional_settings']);
-    unset($form['replace_upload']);
-  }
-}
-
-/**
- * Implements hook_module_implements_alter()
- */
-function media_bulk_upload_module_implements_alter(&$implementations, $hook) {
-  if ($hook == 'form_alter' && isset($implementations['media_bulk_upload'])) {
-    $group = $implementations['media_bulk_upload'];
-    unset($implementations['media_bulk_upload']);
-    $implementations['media_bulk_upload'] = $group;
-  }
 }
 
 /**

@@ -42,16 +42,22 @@ class panelizer_defaults_ui extends ctools_export_ui {
       }
 
       $this->plugin['menu']['items'][$key]['access callback'] = 'panelizer_has_choice_callback';
-      $this->plugin['menu']['items'][$key]['access arguments'] = array(4, 5, '');
+      $this->plugin['menu']['items'][$key]['access arguments'] = array(3, 4, '');
       $this->plugin['menu']['items'][$key]['page callback'] = 'panelizer_export_ui_switcher_page';
-      array_unshift($this->plugin['menu']['items'][$key]['page arguments'], 5);
       array_unshift($this->plugin['menu']['items'][$key]['page arguments'], 4);
+      array_unshift($this->plugin['menu']['items'][$key]['page arguments'], 3);
     }
 
     parent::hook_menu($items);
   }
 
   function list_page($js, $input) {
+    if ($substitute = $this->entity_handler->get_substitute($this->entity_view_mode, $this->entity_bundle)) {
+      $url = $this->plugin['menu']['menu prefix'] . '/' . $substitute;
+      drupal_set_message(t('This display is managed by the !view_mode display.', array('!view_mode' => l($substitute, $url))), 'status', FALSE);
+      return '';
+    }
+
     drupal_set_title($this->entity_handler->get_bundle_title($this->entity_bundle));
     return parent::list_page($js, $input);
   }
@@ -132,7 +138,7 @@ class panelizer_defaults_ui extends ctools_export_ui {
       ctools_export_crud_delete($this->plugin['schema'], $item);
       $export_key = $this->plugin['export']['key'];
       drupal_set_message(t($this->plugin['strings']['confirmation'][$form_state['op']]['success'], array('%title' => $item->title)));
-      drupal_goto(ctools_export_ui_plugin_base_path($this->plugin) . '/list');
+      drupal_goto(ctools_export_ui_plugin_base_path($this->plugin));
     }
 
     return $output;

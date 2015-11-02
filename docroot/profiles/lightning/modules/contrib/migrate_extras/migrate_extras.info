@@ -17,6 +17,7 @@ files[] = privatemsg.inc
 files[] = profile2.inc
 files[] = rules.inc
 files[] = user_relationships.inc
+files[] = uuid.inc
 files[] = votingapi.inc
 files[] = webform.inc
 files[] = tests/pathauto.test

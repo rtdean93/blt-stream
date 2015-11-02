@@ -43,11 +43,6 @@
   > .pane-content .views-row,
   div.panels-ipe-portlet-wrapper {
 
-    &,
-    &:first-child {
-      margin-top: $base-leader;
-    }
-
     @include respond(small) {
       @include box-sizing(border-box);
       @include inline-block;

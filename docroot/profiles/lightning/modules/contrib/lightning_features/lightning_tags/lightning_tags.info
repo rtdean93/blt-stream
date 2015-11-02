@@ -11,8 +11,8 @@ features[field_base][] = field_tags
 features[taxonomy][] = tags
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

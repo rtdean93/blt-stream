@@ -22,7 +22,15 @@ function quickedit_ctools_render_alter(&$info, &$page, &$context) {
         $entity_type = $page_context->type[2];
         $prefix = '<div data-quickedit-entity-id="' . $entity_type . '/' . $entity_id . '">';
         $suffix = '</div>';
-        $info['content'] = $prefix . $info['content'] . $suffix;
+        // If page_manager is returning a form, this will be an array.
+        // Otherwise it's likely to be a string.
+        if (is_array($info['content'])) {
+          $info['content']['#prefix'] = $prefix;
+          $info['content']['#suffix'] = $suffix;
+        }
+        else {
+          $info['content'] = $prefix . $info['content'] . $suffix;
+        }
 
         // Detect when an entity is being rendered by page_manager, and then set
         // a global (GASP!) variable. This is necessary, because page manager

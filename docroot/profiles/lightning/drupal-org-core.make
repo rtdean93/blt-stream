@@ -3,7 +3,7 @@
 api = 2
 core = 7.x
 projects[drupal][type] = core
-projects[drupal][version] = 7.33
+projects[drupal][version] = 7.41
 
 ; CORE PATCHES
 
@@ -15,7 +15,28 @@ projects[drupal][patch][] = "http://drupal.org/files/drupal-7.x-allow_profile_ch
 ; http://drupal.org/node/1730874
 projects[drupal][patch][] = http://drupal.org/files/1730874_0.patch
 
+; Registry rebuild should not parse the same file twice in the same request
+; http://drupal.org/node/1470656
+projects[drupal][patch][] = "http://drupal.org/files/drupal-1470656-14.patch"
+
 ; user_role_grant_permissions() throws PDOException when used for a disabled
 ; module's permission or with non-existent permissions
 ; http://drupal.org/comment/7285420#comment-7285420
 projects[drupal][patch][] = "http://drupal.org/files/drupal-fix_pdoexception_grant_permissions-737816-36-do-not-test.patch"
+
+; image_get_info always populates file_size, even if already set.
+; http://drupal.org/node/2289493
+projects[drupal][patch][] = "http://drupal.org/files/issues/drupal-2289493-3-image_get_info-filesize-D7.patch"
+
+; Remove all occurences of sourceMappingURL and sourceURL
+; when JS files are aggregated
+; http://drupal.org/node/2400287
+projects[drupal][patch][] = "http://drupal.org/files/issues/Issue-2400287-by-hass-Remove-JS-source-and-source-map-D7_0.patch"
+
+; Pass $page_callback_result through hook_page_delivery_callback_alter().
+; http://drupal.org/node/897504
+projects[drupal][patch][] = "http://drupal.org/files/issues/pass-page-callback-result-897504-2.patch"
+
+; Xss filter() ignores malicious content in data-attributes and mangles image captions.
+; http://drupal.org/node/2105841
+projects[drupal][patch][] = "http://drupal.org/files/issues/do-2105841_no_protocol_filter-90.patch"

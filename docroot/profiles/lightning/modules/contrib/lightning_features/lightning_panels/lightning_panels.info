@@ -4,7 +4,6 @@ core = 7.x
 package = Lightning
 version = 7.x-1.0
 project = lightning_panels
-dependencies[] = context_admin
 dependencies[] = ctools
 dependencies[] = demonstratie_panels
 dependencies[] = ember_support
@@ -13,8 +12,6 @@ dependencies[] = page_manager
 dependencies[] = panelizer
 dependencies[] = panels
 dependencies[] = panels_ipe
-dependencies[] = panopoly_magic
-dependencies[] = panopoly_theme
 dependencies[] = strongarm
 datestamp = 1411763263
 features[ctools][] = page_manager:pages_default:1
@@ -22,14 +19,10 @@ features[ctools][] = panelizer:panelizer:1
 features[ctools][] = panels:layouts:1
 features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
-features[variable][] = page_manager_node_view_disabled
-features[variable][] = panels_page_allowed_layouts
-features[variable][] = panels_page_allowed_types
-features[variable][] = panels_page_default
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

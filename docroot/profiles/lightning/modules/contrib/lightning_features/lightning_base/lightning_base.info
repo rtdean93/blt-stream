@@ -5,14 +5,15 @@ package = Lightning
 version = 7.x-1.0
 project = lightning_base
 dependencies[] = features
+dependencies[] = field_ui
 dependencies[] = text
 features[features_api][] = api:2
 features[field_base][] = body
 features[field_base][] = comment_body
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

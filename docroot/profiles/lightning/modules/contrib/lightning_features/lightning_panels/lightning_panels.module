@@ -7,14 +7,6 @@
 include_once 'lightning_panels.features.inc';
 
 /**
- *  Implements hook_post_features_enable_feature().
- */
-function lightning_panels_post_features_enable_feature($component) {
-  // Log components as they are enabled.
-  watchdog('component', 'lightning_panels enabled ' . $component . ' component');
-}
-
-/**
  * Implements hook_pre_features_rebuild().
  */
 function lightning_panels_pre_features_rebuild($component) {
@@ -23,39 +15,47 @@ function lightning_panels_pre_features_rebuild($component) {
   }
 }
 
-
 /**
- * Implements hook_node_update().
+ * Implements hook_panels_ipe_button_alter().
  */
-function lightning_panels_node_update($node) {
-  if (!empty($node->old_vid)) {
-    $old_did = db_query("SELECT did FROM {panelizer_entity} WHERE entity_id = :nid AND revision_id = :oldvid ORDER BY revision_id DESC",
-        array(":nid" => $node->nid, ":oldvid" => $node->old_vid))
-      ->fetchField();
-    if (!empty($old_did) && !empty($node->panelizer['page_manager']) && empty($node->panelizer['page_manager']->did)) {
-      $node->panelizer['page_manager']->did = $old_did;
-    }
+function lightning_panels_panels_ipe_button_alter(&$button, $op, $cache_key) {
+  list($module, $argument) = explode(':', $cache_key, 2);
+  if ($module == 'panelizer') {
+    list($entity_type, $entity_id, $view_mode, $revision_id) = explode(':', $argument);
+    $cache = panelizer_panels_cache_get($argument);
+    $entity = $cache->display->context['panelizer']->data;
+    list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
+    $handler = panelizer_handler_load($entity_type);
+    $button['#access'] = $handler->panelizer_access($op, $bundle, $view_mode);
   }
 }
 
 /**
- * Implements hook_ctools_render_alter().
- * @todo: Remove this abomination of a hack after resolving
- *        http://www.drupal.org/node/1402860
+ * Implements hook_panelizer_access().
  */
-function lightning_panels_ctools_render_alter(&$info, &$page, &$context) {
-  $data = array_values($context['contexts']);
-  if (isset($data[0]->data)) {
-    $entity = $data[0]->data;
-    if (isset($entity->nid) && isset($entity->panelizer)) {
-      $default_name = 'node:' . $entity->type . ':default';
-      $panelizer_entity = $entity->panelizer['page_manager'];
-      if ($panelizer_entity->name == $default_name && isset($panelizer_entity->did)) {
-        $query = db_query("UPDATE {panelizer_entity} SET did = :def WHERE entity_id = :nid AND revision_id = :vid",
-            array(":def" => "0", ":nid" => $entity->nid, ":vid" => $entity->vid));
-        drupal_goto($_GET['q']);
+function lightning_panels_panelizer_access($op, $entity_type, $bundle, $view_mode) {
+  $ops = array(
+    'panels-ipe-startedit' => 'content',
+    'panels-ipe-change-layout' => 'layout',
+  );
+  // Since no permissions exist explicitly for the IPE buttons, we substitute
+  // the normal layout/content permission checks for this entity bundle.
+  if (!empty($ops[$op])) {
+    return user_access("administer panelizer $entity_type $bundle {$ops[$op]}");
+  }
+}
+
+/**
+ * Implements hook_panelizer_access_alter().
+ */
+function lightning_panels_panelizer_access_alter(&$panelizer_access, $options) {
+  if (in_array($options['op'], array('panels-ipe-startedit', 'panels-ipe-change-layout')) && module_exists('workbench_moderation')) {
+    $item = menu_get_item();
+    if ($item['path'] == 'node/%') {
+      $node = menu_get_object();
+      if (workbench_moderation_node_moderated($node) && isset($node->workbench_moderation['published'])) {
+        $panelizer_access = array();
       }
     }
   }
 }
-

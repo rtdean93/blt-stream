@@ -6,11 +6,13 @@ version = 7.x-1.0
 project = lightning_article
 dependencies[] = comment
 dependencies[] = ctools
+dependencies[] = features
+dependencies[] = field_ui
+dependencies[] = file_entity
 dependencies[] = lightning_base
 dependencies[] = lightning_image
 dependencies[] = lightning_tags
-dependencies[] = features
-dependencies[] = node
+dependencies[] = media
 dependencies[] = path
 dependencies[] = strongarm
 dependencies[] = taxonomy
@@ -30,6 +32,7 @@ features[variable][] = comment_default_per_page_article
 features[variable][] = comment_form_location_article
 features[variable][] = comment_preview_article
 features[variable][] = comment_subject_field_article
+features[variable][] = field_bundle_settings_node__article
 features[variable][] = menu_options_article
 features[variable][] = menu_parent_article
 features[variable][] = node_options_article
@@ -39,8 +42,8 @@ features_exclude[dependencies][lightning_sps] = lightning_sps
 features_exclude[dependencies][image] = image
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

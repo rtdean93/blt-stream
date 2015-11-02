@@ -255,9 +255,26 @@ function defaultconfig_theme() {
 }
 
 /**
- * Implements hook_modules_installed().
+ * Implements hook_module_implements_alter()
  */
-function defaultconfig_modules_installed($modules) {
+function defaultconfig_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'modules_enabled') {
+    $group = $implementations['defaultconfig'];
+    unset($implementations['defaultconfig']);
+    $implementations['defaultconfig'] = $group;
+  }
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function defaultconfig_modules_enabled($modules) {
+  // Allow distributions to disable this behavior and rebuild the features
+  // manually inside a batch.
+  if (!variable_get('features_rebuild_on_module_install', TRUE)) {
+    return;
+  }
+
   // We might not be able to install components while installing, so provide an option to disable
   // this functionality during installation.
   if (is_array($GLOBALS['install_state'])) {
@@ -543,7 +560,7 @@ function defaultconfig_modules($component) {
  */
 function defaultconfig_defaultconfig_component_alter(&$defaults, $component) {
   $optionals = defaultconfig_optional_info();
-  if (isset($optionals[$component['name']])) {
+  if (!empty($optionals) && isset($optionals[$component['name']])) {
     foreach ($optionals[$component['name']] as $optional => $info) {
       if (isset($defaults[$optional])) {
         $optional_name = $component['name'] . ':' . $optional;

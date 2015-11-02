@@ -7,16 +7,14 @@ project = lightning_landing
 dependencies[] = ctools
 dependencies[] = features
 dependencies[] = field_group
+dependencies[] = field_ui
 dependencies[] = lightning_identifiers
 dependencies[] = lightning_metatags
 dependencies[] = lightning_moderation
+dependencies[] = lightning_panels
 dependencies[] = lightning_tags
-dependencies[] = metatag
 dependencies[] = node
 dependencies[] = options
-dependencies[] = page_manager
-dependencies[] = panelizer
-dependencies[] = panels
 dependencies[] = shortcut
 dependencies[] = strongarm
 datestamp = 1411763263
@@ -54,8 +52,8 @@ features[variable][] = workbench_moderation_default_state_landing
 stylesheets[screen][] = styles/style.css
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 

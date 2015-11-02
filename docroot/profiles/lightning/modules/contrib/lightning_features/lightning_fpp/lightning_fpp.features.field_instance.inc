@@ -10,6 +10,57 @@
 function lightning_fpp_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'fieldable_panels_pane-content-field_content'
+  $field_instances['fieldable_panels_pane-content-field_content'] = array(
+    'bundle' => 'content',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => 0,
+          'quickedit' => array(
+            'editor' => 'form',
+          ),
+          'view_mode' => 'featured',
+        ),
+        'type' => 'entityreference_entity_view',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'fieldable_panels_pane',
+    'field_name' => 'field_content',
+    'label' => 'Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference_view_widget',
+      'settings' => array(
+        'allow_duplicates' => 0,
+        'close_modal' => 1,
+        'pass_argument' => 0,
+        'pass_arguments' => '',
+        'rendered_entity' => 0,
+        'view' => 'entity_reference_view_widget_nodes|entityreference_view_widget_1',
+        'view_mode' => 'full',
+      ),
+      'type' => 'entityreference_view_widget',
+      'weight' => -4,
+    ),
+  );
+
   // Exported field_instance: 'fieldable_panels_pane-map-field_map_address'
   $field_instances['fieldable_panels_pane-map-field_map_address'] = array(
     'bundle' => 'map',
@@ -141,13 +192,12 @@ function lightning_fpp_field_default_field_instances() {
       'module' => 'media',
       'settings' => array(
         'allowed_schemes' => array(
+          'oembed' => 'oembed',
           'public' => 'public',
-          'vimeo' => 'vimeo',
-          'youtube' => 'youtube',
         ),
         'allowed_types' => array(
           'audio' => 'audio',
-          'document' => 0,
+          'document' => 'document',
           'image' => 'image',
           'video' => 'video',
         ),
@@ -156,7 +206,6 @@ function lightning_fpp_field_default_field_instances() {
           'media_default--media_browser_my_files' => 'media_default--media_browser_my_files',
           'media_internet' => 'media_internet',
           'upload' => 'upload',
-          'youtube' => 'youtube',
         ),
         'progress_indicator' => 'throbber',
       ),
@@ -165,7 +214,8 @@ function lightning_fpp_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'fieldable_panels_pane-quick_links-field_quick_links_links'
+  // Exported field_instance:
+  // 'fieldable_panels_pane-quick_links-field_quick_links_links'
   $field_instances['fieldable_panels_pane-quick_links-field_quick_links_links'] = array(
     'bundle' => 'quick_links',
     'default_value' => NULL,
@@ -192,6 +242,7 @@ function lightning_fpp_field_default_field_instances() {
     'label' => 'Links',
     'required' => 0,
     'settings' => array(
+      'absolute_url' => 1,
       'attributes' => array(
         'class' => '',
         'configurable_title' => 0,
@@ -204,6 +255,7 @@ function lightning_fpp_field_default_field_instances() {
       ),
       'enable_tokens' => 1,
       'title' => 'optional',
+      'title_label_use_field_label' => FALSE,
       'title_maxlength' => 128,
       'title_value' => '',
       'url' => 0,
@@ -272,10 +324,6 @@ function lightning_fpp_field_default_field_instances() {
           ),
         ),
       ),
-      'linkit' => array(
-        'enable' => 0,
-        'insert_plugin' => '',
-      ),
       'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
@@ -334,6 +382,7 @@ function lightning_fpp_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Address');
+  t('Content');
   t('HTML');
   t('Information');
   t('Links');

@@ -1,13 +1,14 @@
 name = 'Responsive Preview'
 description = 'Provides a component that previews a page in various device dimensions.'
+dependencies[] = libraries
 package = User interface
 core = 7.x
 files[] = responsive_preview.test
 
 
-; Information added by drush on 2014-11-17
-version = "7.x-1.1+5-dev"
+; Information added by drush on 2015-10-29
+version = "7.x-1.1+17-dev"
 core = "7.x"
 project = "responsive_preview"
-datestamp = "1416241095"
+datestamp = "1446085171"
 

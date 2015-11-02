@@ -7,8 +7,8 @@
 
 class ImportBaseUsers extends Migration {
 
-  public function __construct($arguments = array()) {
-    parent::__construct($arguments = array());
+  public function __construct($arguments) {
+    parent::__construct($arguments);
 
     $this->map = new MigrateSQLMap($this->machineName,
       array(
@@ -63,8 +63,8 @@ class ImportBaseUsers extends Migration {
 }
 
 class ImportBaseUserPictures extends Migration {
-  public function __construct($arguments = array()) {
-    parent::__construct($arguments = array());
+  public function __construct($arguments) {
+    parent::__construct($arguments);
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'picture' => array(

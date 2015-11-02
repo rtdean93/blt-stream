@@ -205,17 +205,17 @@ div.panels-ipe-handlebar-wrapper li.edit a:hover span {
 
 div.panels-ipe-handlebar-wrapper li.style a span,
 div.panels-ipe-newblock a.style span {
-  background-image: url(../images/999/pencil_999.png);
+  background-image: url(../images/999/brush_999.png);
 }
 
 div.panels-ipe-handlebar-wrapper li.style a:active span,
 div.panels-ipe-newblock a.style:active span {
-  background-image: url(../images/F05A27/pencil_F05A27.png);
+  background-image: url(../images/F05A27/brush_F05A27.png);
 }
 
 div.panels-ipe-handlebar-wrapper li.style a:hover span,
 div.panels-ipe-newblock a.style:hover span {
-  background-image: url(../images/555/pencil_555.png);
+  background-image: url(../images/555/brush_555.png);
 }
 
 div.panels-ipe-newblock a.add span {
@@ -229,8 +229,6 @@ div.panels-ipe-newblock a.add:active span {
 div.panels-ipe-newblock a.add:hover span {
   background-image: url(../images/555/plus_555.png);
 }
-
-
 
 div.panels-ipe-handlebar-wrapper li.delete a span {
   background-image: url(../images/999/trashcan_999.png);
@@ -262,7 +260,6 @@ span.panels-ipe-draghandle-icon-inner:active {
   background: url(../images/F05A27/grip_F05A27.png) no-repeat center center;
 }
 
-
 div.panels-ipe-handlebar-wrapper li a:active,
 div.panels-ipe-dragtitle span:active,
 div.panels-ipe-newblock a:active,
@@ -292,8 +289,27 @@ div.panels-ipe-draghandle {
   visibility: visible !important;
   height: 50px !important;
 }
+
 .ui-sortable-placeholder * {
   visibility: hidden;
+}
+
+span.panels-ipe-dragbar-admin-title {
+  font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  font-size: 0.9em;
+  color: #FFF;
+  background-color: #999;
+  padding: 0.32em;
+  margin-top: 0.62em;
+  margin-left: 0.6em;
+  display: inline-block;
+  -moz-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
 }
 
 /** ============================================================================
@@ -479,3 +495,39 @@ vertical-align: middle;
 min-width: 20%;
 }
 
+/* make labels full width when on change layout screen so that you can see how wide the columsn are */
+#panels-change-layout #panels-dnd-main div.panel-region h2.label {
+width:100%;
+}
+
+
+/* updates to styling for classy panels */
+#classy-panel-styles-pane-form .description, #panels-edit-style-settings-form .description {
+  width: auto;
+  float: left;
+  clear: both;
+  text-align: left;
+  padding: 0;
+  margin: 5px 2% 4px 0%;
+  font-weight: bold;
+  line-height: 1.1;
+  width: 78%;
+}
+
+#classy-panel-styles-pane-form .form-item label, #panels-edit-style-settings-form .form-item label {
+    width: inherit;
+  float: left;
+  clear: both;
+  font-size: 15px;
+  text-align: left;
+  color: #007fbf;
+  padding: 0;
+  margin: 3px 2% 10px 0;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+#classy-panel-styles-pane-form .form-item, #panels-edit-style-settings-form .form-item {
+  margin-bottom:35px;
+  width:75%;
+  }

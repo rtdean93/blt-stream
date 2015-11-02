@@ -2,18 +2,10 @@
 
   Drupal.behaviors.lightningdemo = {
     attach: function(context, settings) {
-
-    var text = $('.left-off-canvas-menu > .stack.button-group > li.active > a').contents().filter(function() {
-             return this.nodeType == 3;
-           }).text().replace('View','');;
-
-	$( document ).ready(function() {
- 	   $(".activestate").html(document.createTextNode('(Currently Viewing: ' + text + ')'));
-
-   });
-  }
-};
+      //sometimes the page is shorter than the off canvas moderation, so set a min height based on whatever is in the offcanvas
+      var offcanvasheight = 0; $(".left-off-canvas-menu").children().each(function(){ offcanvasheight += $(this).outerHeight(); });
+      $('.off-canvas-wrap, .left-off-canvas-menu').css('min-height', offcanvasheight + 'px');
+    }
+  };
 
 })(jQuery, Drupal);
-
-

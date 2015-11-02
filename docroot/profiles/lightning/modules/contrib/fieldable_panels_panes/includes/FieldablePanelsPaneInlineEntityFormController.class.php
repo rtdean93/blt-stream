@@ -157,4 +157,64 @@ class FieldablePanelsPaneInlineEntityFormController extends EntityInlineEntityFo
 
     return $entity_form;
   }
+
+  /**
+   * Overrides EntityInlineEntityFormController::entityFormSubmit().
+   *
+   * Fixes some of the custom entity values, similar to
+   * fieldable_panels_panes_entity_edit_form_submit().
+   */
+  public function entityFormSubmit(&$entity_form, &$form_state) {
+    $info = entity_get_info($this->entityType);
+    list(, , $bundle) = entity_extract_ids($this->entityType, $entity_form['#entity']);
+    $entity = $entity_form['#entity'];
+    $entity_values = drupal_array_get_nested_value($form_state['values'], $entity_form['#parents']);
+
+    // Some additional adjustments necessary for FPP to save correctly.
+    if (!empty($entity_values['link']['path'])) {
+      $entity_values['path'] = $entity_values['link']['path'];
+    }
+    if (isset($entity_values['link']['link'])) {
+      $entity_values['link'] = $entity_values['link']['link'];
+    }
+    else {
+      $entity_values['link'] = 0;
+    }
+    // The 'reusable' option contains several sub fields.
+    if (isset($entity_values['reusable']['reusable'])) {
+      $reusable = $entity_values['reusable'];
+      $entity_values['reusable'] = FALSE;
+      $entity_values['category'] = '';
+      $entity_values['admin_title'] = '';
+      $entity_values['admin_description'] = '';
+      foreach (array('reusable', 'category', 'admin_title', 'admin_description') as $field) {
+        if (isset($reusable[$field])) {
+          $entity_values[$field] = $reusable[$field];
+        }
+      }
+    }
+    // Only fix the revision log if a revision is being saved.
+    $entity_values['log'] = '';
+    if (isset($entity_values['revision']['revision'])) {
+      if (isset($entity_values['revision']['log'])) {
+        $entity_values['log'] = $entity_values['revision']['log'];
+      }
+      $entity_values['revision'] = $entity_values['revision']['revision'];
+    }
+    else {
+      $entity_values['revision'] = 0;
+    }
+
+    // Copy top-level form values that are not for fields to entity properties,
+    // without changing existing entity properties that are not being edited by
+    // this form. Copying field values must be done using field_attach_submit().
+    $values_excluding_fields = $info['fieldable'] ? array_diff_key($entity_values, field_info_instances($this->entityType, $bundle)) : $entity_values;
+    foreach ($values_excluding_fields as $key => $value) {
+      $entity->$key = $value;
+    }
+
+    if ($info['fieldable']) {
+      field_attach_submit($this->entityType, $entity, $entity_form, $form_state);
+    }
+  }
 }
