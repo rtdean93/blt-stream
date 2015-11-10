@@ -7,9 +7,9 @@ dependencies[] = views_bulk_operations
 
 
 
-; Information added by drush on 2014-11-17
-version = "7.x-1.1+5-dev"
+; Information added by drush on 2015-10-29
+version = "7.x-1.2+3-dev"
 core = "7.x"
 project = "context_admin"
-datestamp = "1416241172"
+datestamp = "1446085184"
 

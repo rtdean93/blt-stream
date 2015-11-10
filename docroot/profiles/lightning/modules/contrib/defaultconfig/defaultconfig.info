@@ -1,15 +1,15 @@
 name = Default config
-description = Use features as default configuration without having to deal with overriden features.
+description = Use features as default configuration without having to deal with overridden features.
 core = 7.x
-package = configuration
+package = Configuration
 dependencies[] = features
 
 
 
 
-; Information added by drush on 2014-11-17
-version = "7.x-1.0-alpha10+1-dev"
+; Information added by drush on 2015-10-29
+version = "7.x-1.0-alpha11+1-dev"
 core = "7.x"
 project = "defaultconfig"
-datestamp = "1416241166"
+datestamp = "1446085183"
 

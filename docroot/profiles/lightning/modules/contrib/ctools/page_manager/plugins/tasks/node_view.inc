@@ -92,25 +92,36 @@ function page_manager_node_view_page($node) {
   drupal_add_html_head_link(array('rel' => 'canonical', 'href' => url($uri['path'], $uri['options'])), TRUE);
   // Set the non-aliased path as a default shortlink.
   drupal_add_html_head_link(array('rel' => 'shortlink', 'href' => url($uri['path'], array_merge($uri['options'], array('alias' => TRUE)))), TRUE);
+
+  // Load all contexts.
   $contexts = ctools_context_handler_get_task_contexts($task, '', array($node));
-
+  // Build the full output using the configured CTools plugin.
   $output = ctools_context_handler_render($task, '', $contexts, array($node->nid));
-  if ($output != FALSE) {
+  if ($output !== FALSE) {
     node_tag_new($node);
-    return $output;
   }
-
-  $function = 'node_page_view';
-  foreach (module_implements('page_manager_override') as $module) {
-    $call = $module . '_page_manager_override';
-    if (($rc = $call('node_view')) && function_exists($rc)) {
-      $function = $rc;
-      break;
+  else {
+    // Otherwise try loading an override plugin with a node_page_view()
+    // fallback.
+    $function = 'node_page_view';
+    foreach (module_implements('page_manager_override') as $module) {
+      $call = $module . '_page_manager_override';
+      if (($rc = $call('node_view')) && function_exists($rc)) {
+        $function = $rc;
+        break;
+      }
     }
+    $output = $function($node);
   }
 
-  // Otherwise, fall back.
-  return $function($node);
+  // Finally, we need to test if the entity view hooks were invoked for this
+  // node already, and invoke them manually if not.
+  $viewed_entities = drupal_static('ctools_entity_view');
+  if (!isset($viewed_entities['node'][$node->nid])) {
+    node_show($node); // Quick way to invoke ALL view hooks.
+  }
+
+  return $output;
 }
 
 /**

@@ -1,18 +1,28 @@
 api = 2
 core = 7.x
 
+projects[admin_views][version] = "1.5"
+projects[admin_views][type] = "module"
+projects[admin_views][subdir] = "contrib"
+
 projects[better_formats][version] = "1.0-beta1"
 projects[better_formats][type] = "module"
 projects[better_formats][subdir] = "contrib"
 
-projects[bean][version] = "1.x-dev"
+projects[bean][version] = "1.9"
 projects[bean][type] = "module"
 projects[bean][subdir] = "contrib"
-projects[bean][download][type] = "git"
-projects[bean][download][revision] = "2d0f262"
-projects[bean][download][branch] = "7.x-1.x"
+; Bean insists we use a tagged release of Entity API
+; http://drupal.org/node/2465267
+projects[bean][patch][2465267] = "http://drupal.org/files/issues/bean-entity-api-version-0.patch"
+; Bean's panelizer integration does not correctly use views_data_alter
+; http://drupal.org/node/2474631
+projects[bean][patch][2474631] = "http://drupal.org/files/issues/2474631-10.patch"
+; Implement migration support for Beans
+; http://www.drupal.org/node/2295973
+projects[bean][patch][2295973] = "http://drupal.org/files/issues/bean-migrate-support-2295973-7.patch"
 
-projects[bean_tax][version] = "2.3"
+projects[bean_tax][version] = "2.7"
 projects[bean_tax][type] = "module"
 projects[bean_tax][subdir] = "contrib"
 
@@ -20,25 +30,27 @@ projects[behatrunner][version] = "1.x-dev"
 projects[behatrunner][type] = "module"
 projects[behatrunner][subdir] = "contrib"
 projects[behatrunner][download][type] = "git"
-projects[behatrunner][download][revision] = "3d74d9b"
+projects[behatrunner][download][revision] = "0714764"
 projects[behatrunner][download][branch] = "7.x"
-; Remove PHP memory_limit ini_set on hook_install as it causes failures
-; http://drupal.org/node/2360825
-projects[behatrunner][patch][2360825] = "http://drupal.org/files/issues/behatrunner-memory_limit-0.patch"
+
+projects[block_class][version] = "2.x-dev"
+projects[block_class][type] = "module"
+projects[block_class][subdir] = "contrib"
+projects[block_class][download][type] = "git"
+projects[block_class][download][revision] = "f062706"
+projects[block_class][download][branch] = "7.x-2.x"
 
 projects[breakpoints][version] = "1.3"
 projects[breakpoints][type] = "module"
 projects[breakpoints][subdir] = "contrib"
 
-projects[ckeditor][version] = "1.x-dev"
-projects[ckeditor][type] = "module"
-projects[ckeditor][subdir] = "contrib"
-projects[ckeditor][download][type] = "git"
-projects[ckeditor][download][revision] = "875a4b1"
-projects[ckeditor][download][branch] = "7.x-1.x"
-; CKEditor accomodate latest Media changes
-; http://drupal.org/node/2159403
-projects[ckeditor][patch][2159403] = "http://drupal.org/files/issues/make_ckeditor_plugin-2159403-107.patch"
+projects[cache_warmer][version] = "4.1"
+projects[cache_warmer][type] = "module"
+projects[cache_warmer][subdir] = "contrib"
+
+projects[classy_panel_styles][version] = "1.0-alpha2"
+projects[classy_panel_styles][type] = "module"
+projects[classy_panel_styles][subdir] = "contrib"
 
 projects[collections][version] = "1.x-dev"
 projects[collections][type] = "module"
@@ -51,7 +63,7 @@ projects[colorbox][version] = "2.x-dev"
 projects[colorbox][type] = "module"
 projects[colorbox][subdir] = "contrib"
 projects[colorbox][download][type] = "git"
-projects[colorbox][download][revision] = "ce90f5d"
+projects[colorbox][download][revision] = "97a4ff1"
 projects[colorbox][download][branch] = "7.x-1.x"
 
 projects[composer_manager][version] = "1.7"
@@ -62,17 +74,21 @@ projects[context_admin][version] = "1.x-dev"
 projects[context_admin][type] = "module"
 projects[context_admin][subdir] = "contrib"
 projects[context_admin][download][type] = "git"
-projects[context_admin][download][revision] = "15a8390"
+projects[context_admin][download][revision] = "0e5bf6a"
 projects[context_admin][download][branch] = "7.x-1.x"
 
-projects[ctools][version] = "1.x-dev"
+projects[ctools][version] = "1.9"
 projects[ctools][type] = "module"
 projects[ctools][subdir] = "contrib"
-projects[ctools][download][type] = "git"
-projects[ctools][download][revision] = "ae66d65"
-projects[ctools][download][branch] = "7.x-1.x"
+; When Ctools modal is open, disable the page scroll behind the modal
+; http://drupal.org/node/2475417
+projects[ctools][patch][2475417] = "http://drupal.org/files/issues/fix-background-scroll-2475417-5.patch"
+; should entity view hooks be triggered unconditionally in node_view, term_view and user_view pages?
+; (AKA hook_node_view and related entity hooks are not being fired when using page manager)
+; http://drupal.org/node/2422123
+projects[ctools][patch][2422123] = "https://www.drupal.org/files/issues/entity_related_hooks-2422123-20.patch"
 
-projects[date][version] = "2.8"
+projects[date][version] = "2.9"
 projects[date][type] = "module"
 projects[date][subdir] = "contrib"
 
@@ -84,82 +100,109 @@ projects[defaultconfig][version] = "1.x-dev"
 projects[defaultconfig][subdir] = "module"
 projects[defaultconfig][subdir] = "contrib"
 projects[defaultconfig][download][type] = "git"
-projects[defaultconfig][download][revision] = "a62d216"
+projects[defaultconfig][download][revision] = "0486149"
 projects[defaultconfig][download][branch] = "7.x-1.x"
 ; Fatal error when adding a permission that doesn't exist
 ; http://drupal.org/node/2008178
-projects[defaultconfig][patch][2008178] = "http://drupal.org/files/issues/defaultconfig-rebuild-2008178-9.patch"
+projects[defaultconfig][patch][2008178] = "http://drupal.org/files/issues/defaultconfig-rebuild-2008178-14.patch"
 
 projects[devel][version] = "1.3"
 projects[devel][type] = "module"
 projects[devel][subdir] = "contrib"
 
+projects[dialog][version] = "2.0-alpha6"
+projects[dialog][type] = "module"
+projects[dialog][subdir] = "contrib"
+
 projects[diff][version] = "3.2"
 projects[diff][type] = "module"
 projects[diff][subdir] = "contrib"
 
+projects[draggableviews][version] = "2.x-dev"
+projects[draggableviews][type] = "module"
+projects[draggableviews][subdir] = "contrib"
+projects[draggableviews][download][type] = "git"
+projects[draggableviews][download][revision] = "4f5ac4c"
+projects[draggableviews][download][branch] = "7.x-2.x"
+
+projects[editor][version] = "1.0-alpha4"
+projects[editor][type] = "module"
+projects[editor][subdir] = "contrib"
+
 projects[ember_support][version] = "1.x-dev"
 projects[ember_support][type] = "module"
 projects[ember_support][subdir] = "contrib"
-projects[ember_support][download][type] = "git"
-projects[ember_support][download][branch] = "7.x-1.x"
 
 projects[entity][version] = "1.x-dev"
 projects[entity][type] = "module"
 projects[entity][subdir] = "contrib"
 projects[entity][download][type] = "git"
-projects[entity][download][revision] = "4d2cc6f"
+projects[entity][download][revision] = "4d76c5c"
 projects[entity][download][branch] = "7.x-1.x"
+
+projects[entity_embed][version] = "3.x-dev"
+projects[entity_embed][type] = "module"
+projects[entity_embed][subdir] = "contrib"
+projects[entity_embed][download][type] = "git"
+projects[entity_embed][download][revision] = "ea69dc8"
+projects[entity_embed][download][branch] = "7.x-3.x"
 
 projects[entityreference][version] = "1.x-dev"
 projects[entityreference][type] = "module"
 projects[entityreference][subdir] = "contrib"
 projects[entityreference][download][type] = "git"
-projects[entityreference][download][revision] = "dc4196b"
+projects[entityreference][download][revision] = "ab62b9a"
 projects[entityreference][download][branch] = "7.x-1.x"
+; Notice : Undefined variable: element.
+; http://drupal.org/node/2550669
+projects[entityreference][patch][2495405] = "http://drupal.org/files/issues/entityreference-2495405-2.patch"
+; Notice : Undefined index: entityreference_field_formatter_prepare_view().
+; http://drupal.org/node/1823406
+projects[entityreference][patch][1823406] = "http://drupal.org/files/undefined_index-1823406-14.patch"
 
 projects[entityreference_prepopulate][version] = "1.5"
 projects[entityreference_prepopulate][type] = "module"
 projects[entityreference_prepopulate][subdir] = "contrib"
 
-projects[escape_admin][version] = "1.x-dev"
+projects[entityreference_view_widget][version] = "2.0-rc6"
+projects[entityreference_view_widget][type] = "module"
+projects[entityreference_view_widget][subdir] = "contrib"
+; Use Dialog instead of Chaos Tools for modal support.
+; http://drupal.org/node/2505107
+projects[entityreference_view_widget][patch][2505107] = "http://drupal.org/files/issues/dialog-api-2505107-1.patch"
+
+projects[escape_admin][version] = "1.2"
 projects[escape_admin][type] = "module"
 projects[escape_admin][subdir] = "contrib"
-projects[escape_admin][download][type] = "git"
-projects[escape_admin][download][revision] = "ecd3f58"
-projects[escape_admin][download][branch] = "7.x-1.x"
 
 projects[fape][version] = "1.2"
 projects[fape][type] = "module"
 projects[fape][subdir] = "contrib"
 
-projects[features][version] = "2.x-dev"
+projects[features][version] = "2.7"
 projects[features][type] = "module"
 projects[features][subdir] = "contrib"
-projects[features][download][type] = "git"
-projects[features][download][revision] = "9f4ecc7"
-projects[features][download][branch] = "7.x-2.x"
 
-projects[field_group][version] = "1.x-dev"
+projects[field_group][version] = "1.4"
 projects[field_group][type] = "module"
 projects[field_group][subdir] = "contrib"
-projects[field_group][download][type] = "git"
-projects[field_group][download][revision] = "9cdde2b"
-projects[field_group][download][branch] = "7.x-1.x"
 
-projects[fieldable_panels_panes][version] = "1.x-dev"
+projects[fieldable_panels_panes][version] = "1.7"
 projects[fieldable_panels_panes][type] = "module"
 projects[fieldable_panels_panes][subdir] = "contrib"
-projects[fieldable_panels_panes][download][type] = "git"
-projects[fieldable_panels_panes][download][revision] = "bfef4bc"
-projects[fieldable_panels_panes][download][branch] = "7.x-1.x"
+; Allow a particular revision of a fieldable panels pane to be placed in a panelized page
+; http://drupal.org/node/1986334
+projects[fieldable_panels_panes][patch][1986334] = "http://drupal.org/files/issues/fieldable_panel_panes-allow_a_particular-1986334-42.patch"
+; Fix bug where clicking "Save and add fields" would redirect to /fields
+; https://www.drupal.org/node/2477421
+projects[fieldable_panels_panes][patch][2477421] = "https://www.drupal.org/files/issues/fieldable_panels_panes-save-continue-redirect-2477421-1.patch"
 
-projects[file_entity][version] = "2.x-dev"
 projects[file_entity][type] = "module"
 projects[file_entity][subdir] = "contrib"
 projects[file_entity][download][type] = "git"
-projects[file_entity][download][revision] = "609fa9f"
+projects[file_entity][download][url] = "http://git.drupal.org/project/file_entity.git"
 projects[file_entity][download][branch] = "7.x-2.x"
+projects[file_entity][download][revision] = "656f387"
 
 projects[file_entity_link][version] = "1.0-alpha3"
 projects[file_entity_link][type] = "module"
@@ -173,27 +216,37 @@ projects[focal_point][version] = "1.0-beta1"
 projects[focal_point][type] = "module"
 projects[focal_point][subdir] = "contrib"
 
-projects[form_builder][version] = "1.x-dev"
+projects[form_builder][version] = "1.13"
 projects[form_builder][type] = "module"
 projects[form_builder][subdir] = "contrib"
-projects[form_builder][download][type] = "git"
-projects[form_builder][download][revision] = "3d904df"
-projects[form_builder][download][branch] = "7.x-1.x"
-; The form editing part rolls to hide, can not be edited
-; http://drupal.org/node/1987332
-projects[form_builder][patch][1987332] = "http://drupal.org/files/rolls-past-editing-form-1987332-4.patch"
+
+projects[httprl][version] = "1.x-dev"
+projects[httprl][type] = "module"
+projects[httprl][subdir] = "contrib"
+projects[httprl][download][type] = "git"
+projects[httprl][download][revision] = "78bc6ad"
+projects[httprl][download][branch] = "7.x-1.x"
 
 projects[iib][version] = "1.x-dev"
 projects[iib][type] = "module"
 projects[iib][subdir] = "contrib"
 projects[iib][download][type] = "git"
-projects[iib][download][revision] = "17a55eb"
+projects[iib][download][revision] = "513fa9d"
 projects[iib][download][branch] = "7.x-1.x"
-; Integrate IIB with the Navbar module and improve Toolbar integration
-; http://drupal.org/node/1737036
-projects[iib][patch][1737036] = "http://drupal.org/files/issues/iib-navbar-toolbar-1737036-51.patch"
 
-projects[jquery_update][version] = "2.4"
+projects[imageinfo_cache][version] = "3.5"
+projects[imageinfo_cache][type] = "module"
+projects[imageinfo_cache][subdir] = "contrib"
+
+projects[import][version] = "1.0-alpha1"
+projects[import][type] = "module"
+projects[import][subdir] = "contrib"
+
+projects[inline_entity_form][version] = "1.6"
+projects[inline_entity_form][type] = "module"
+projects[inline_entity_form][subdir] = "contrib"
+
+projects[jquery_update][version] = "2.6"
 projects[jquery_update][type] = "module"
 projects[jquery_update][subdir] = "contrib"
 
@@ -201,72 +254,64 @@ projects[libraries][version] = "2.2"
 projects[libraries][type] = "module"
 projects[libraries][subdir] = "contrib"
 
-projects[link][version] = "1.2"
+projects[link][version] = "1.3"
 projects[link][type] = "module"
 projects[link][subdir] = "contrib"
-
-projects[linkit][version] = "3.1"
-projects[linkit][type] = "module"
-projects[linkit][subdir] = "contrib"
 
 projects[magic_beans][version] = "1.x-dev"
 projects[magic_beans][type] = "module"
 projects[magic_beans][subdir] = "contrib"
 projects[magic_beans][download][type] = "git"
-projects[magic_beans][download][revision] = "6c5d19e"
+projects[magic_beans][download][revision] = "9113b89"
 projects[magic_beans][download][branch] = "7.x-1.x"
 
 projects[media][version] = "2.x-dev"
 projects[media][type] = "module"
 projects[media][subdir] = "contrib"
 projects[media][download][type] = "git"
-projects[media][download][revision] = "f5db1d1"
+projects[media][download][revision] = "844baf0"
 projects[media][download][branch] = "7.x-2.x"
-; Improve UX for Media Thumbnail and Media Bulk Upload's multiform page 
-; http://drupal.org/node/2166623
-projects[media][patch][2166623] = "http://drupal.org/files/issues/media_bulk_upload-improve-multiform-2166623-2.patch"
-; Media WYSIWYG broken Quickedit module compatibility
-; http://drupal.org/node/2331293
-projects[media][patch][2331293] = "http://drupal.org/files/issues/media_wysiwyg_quickedit-2331293-8.patch"
 
-projects[media_youtube][version] = "2.x-dev"
+projects[media_oembed][version] = "2.4"
+projects[media_oembed][type] = "module"
+projects[media_oembed][subdir] = "contrib"
+
+projects[media_youtube][version] = "3.0"
 projects[media_youtube][type] = "module"
 projects[media_youtube][subdir] = "contrib"
-projects[media_youtube][download][type] = "git"
-projects[media_youtube][download][revision] = "187283f"
-projects[media_youtube][download][branch] = "7.x-2.x"
 
-projects[media_preview_slider][version] = "1.x-dev"
-projects[media_preview_slider][type] = "module"
-projects[media_preview_slider][subdir] = "contrib"
-projects[media_preview_slider][download][type] = "git"
-projects[media_preview_slider][download][branch] = "7.x-1.x"
-projects[media_preview_slider][download][url] = "http://git.drupal.org/sandbox/Brian14/2222597.git"
+projects[metatag][version] = "1.7"
+projects[metatag][type] = "module"
+projects[metatag][subdir] = "contrib"
 
-projects[module_filter][version] = "2.0-alpha2"
+projects[module_filter][version] = "2.0"
 projects[module_filter][type] = "module"
 projects[module_filter][subdir] = "contrib"
+
+projects[migrate][version] = "2.8"
+projects[migrate][type] = "module"
+projects[migrate][subdir] = "contrib"
+
+projects[migrate_extras][version] = "2.5"
+projects[migrate_extras][type] = "module"
+projects[migrate_extras][subdir] = "contrib"
+; Add support for UUID module for 7.x
+; http://drupal.org/node/1870886
+projects[migrate_extras][patch][1870886] = "http://drupal.org/files/migrate_extras-2.5-add_support_for_uuid-1870886-4-do-not-test.patch"
 
 projects[multiform][version] = "1.1"
 projects[multiform][type] = "module"
 projects[multiform][subdir] = "contrib"
 
-projects[metatag][version] = "1.0-rc2"
-projects[metatag][type] = "module"
-projects[metatag][subdir] = "contrib"
-
 projects[navbar][version] = "1.x-dev"
 projects[navbar][type] = "module"
 projects[navbar][subdir] = "contrib"
 projects[navbar][download][type] = "git"
-projects[navbar][download][revision] = "bd3389b"
+projects[navbar][download][revision] = "71972ec"
 projects[navbar][download][branch] = "7.x-1.x"
 ; Menu icons for contrib modules
 ; http://drupal.org/node/1954912
 projects[navbar][patch][1954912] = "http://drupal.org/files/issues/navbar-contrib-icons-1954912-20.patch"
-; JSON Error caused in Views when navbar.tableheader is not loaded
-; http://drupal.org/node/2263205
-projects[navbar][patch][2263205] = "http://drupal.org/files/issues/navbar-tableheader-views.patch"
 
 projects[nra][version] = "1.0-alpha2"
 projects[nra][type] = "module"
@@ -282,12 +327,9 @@ projects[nra_workbench_moderation][download][branch] = "7.x-1.x"
 ; http://drupal.org/node/2163175
 projects[nra_workbench_moderation][patch][2163175] = "http://drupal.org/files/issues/nra_workbench_moderation-no-published-state-2163175-1.patch"
 
-projects[options_element][version] = "1.x-dev"
+projects[options_element][version] = "1.12"
 projects[options_element][type] = "module"
 projects[options_element][subdir] = "contrib"
-projects[options_element][download][type] = "git"
-projects[options_element][download][revision] = "33fa8a7"
-projects[options_element][download][branch] = "git"
 
 projects[pathauto][version] = "1.2"
 projects[pathauto][type] = "module"
@@ -296,32 +338,31 @@ projects[pathauto][subdir] = "contrib"
 projects[panelizer][version] = "3.x-dev"
 projects[panelizer][subdir] = "contrib"
 projects[panelizer][download][type] = "git"
-projects[panelizer][download][revision] = "c8fb90b"
+projects[panelizer][download][revision] = "b696d13"
 projects[panelizer][download][branch] = "7.x-3.x"
+; Better Revision Handling inside and outside of Workbench Moderation
+; http://drupal.org/node/2457113
+projects[panelizer][patch][2457113] = "http://drupal.org/files/issues/2457113-26.patch"
 
-projects[panels][version] = "3.x-dev"
+projects[panels][version] = "3.5"
 projects[panels][type] = "module"
 projects[panels][subdir] = "contrib"
-projects[panels][download][type] = "git"
-projects[panels][download][revision] = "bcda4a6"
-projects[panels][download][branch] = "7.x-3.x"
+; Fix IPE JS alert (Panelizer is Incompatible with Moderation)
+; http://drupal.org/node/1402860#comment-9729091
+projects[panels][patch][1402860] = "http://drupal.org/files/issues/panelizer_is-1402860-82-fix-ipe-end-js-alert.patch"
+; IPE Insufficient for working with Panelizer Revisioning
+; https://www.drupal.org/node/2462331#comment-9778921
+projects[panels][patch][2462331] = "http://www.drupal.org/files/issues/2462331-7.patch"
+; Allow modules to alter IPE buttons w/o hook_page_alter implementation
+; https://www.drupal.org/node/2465193#comment-9791045
+projects[panels][patch][2465193] = "http://www.drupal.org/files/issues/2465193-1.patch"
+; Refresh the Workbench block after editing with Panels IPE
+; https://www.drupal.org/node/2485837
+projects[panels][patch][2485837] = "http://www.drupal.org/files/issues/panels-ipe-workbench-block-2485837-1.patch"
 
-projects[panopoly_magic][version] = "1.x-dev"
-projects[panopoly_magic][type] = "module"
-projects[panopoly_magic][subdir] = "contrib"
-projects[panopoly_magic][download][type] = "git"
-projects[panopoly_magic][download][revision] = "1135fea"
-projects[panopoly_magic][download][branch] = "7.x-1.x"
-
-projects[panopoly_theme][version] = "1.x-dev"
-projects[panopoly_theme][type] = "module"
-projects[panopoly_theme][subdir] = "contrib"
-projects[panopoly_theme][download][type] = "git"
-projects[panopoly_theme][download][revision] = "d409deb"
-projects[panopoly_theme][download][branch] = "7.x-1.x"
-; Remove makefile from Panopoly Theme
-; http://drupal.org/node/1904766
-projects[panopoly_theme][patch][1904766] = "http://drupal.org/files/issues/panopoly_theme-makefile-free-1904766-13.patch"
+projects[panels_preview][version] = "1.0-alpha2"
+projects[panels_preview][type] = "module"
+projects[panels_preview][subdir] = "contrib"
 
 projects[picture][version] = "1.x-dev"
 projects[picture][type] = "module"
@@ -330,16 +371,19 @@ projects[picture][download][type] = "git"
 projects[picture][download][revision] = "3d9fe6c"
 projects[picture][download][branch] = "7.x-1.x"
 
-projects[plupload][version] = "1.6"
+projects[plupload][version] = "1.7"
 projects[plupload][type] = "module"
 projects[plupload][subdir] = "contrib"
 
-projects[quickedit][version] = "1.x-dev"
+projects[quickedit][version] = "1.4"
 projects[quickedit][type] = "module"
 projects[quickedit][subdir] = "contrib"
-projects[quickedit][download][type] = "git"
-projects[quickedit][download][revision] = "28a314d"
-projects[quickedit][download][branch] = "7.x-1.x"
+; Remove data-quickedit-field-id for personalized fields.
+; http://drupal.org/node/2424613#comment-9613695
+projects[quickedit][patch][2424613] = "http://drupal.org/files/issues/quick_edit-personalize-2424613-4.patch"
+; Refresh the Workbench block after editing with Quickedit
+; https://www.drupal.org/node/2485871
+projects[quickedit][patch][2485871] = "http://www.drupal.org/files/issues/quickedit-workbench-block-ajax-2485871-1.patch"
 
 projects[quickedit_tab][version] = "1.x-dev"
 projects[quickedit_tab][type] = "module"
@@ -349,24 +393,21 @@ projects[responsive_preview][version] = "1.x-dev"
 projects[responsive_preview][type] = "module"
 projects[responsive_preview][subdir] = "contrib"
 projects[responsive_preview][download][type] = "git"
-projects[responsive_preview][download][revision] = "d741779"
+projects[responsive_preview][download][revision] = "e89d023"
 projects[responsive_preview][download][branch] = "7.x-1.x"
 ; Before js processing, the phone image incorrectly positioned.
 ; https://drupal.org/node/2276789
 projects[responsive_preview][patch][2276789] = "http://drupal.org/files/issues/responsive_preview-phone_image_incorrectly_positioned-2276789-2.patch"
 
-projects[revision_scheduler][version] = "1.x-dev"
+projects[revision_scheduler][version] = "1.0-rc1"
 projects[revision_scheduler][type] = "module"
 projects[revision_scheduler][subdir] = "contrib"
-projects[revision_scheduler][download][type] = "git"
-projects[revision_scheduler][download][revision] = "bb9fd39"
-projects[revision_scheduler][download][branch] = "7.x-1.x"
 
 projects[role_export][version] = "1.0"
 projects[role_export][type] = "module"
 projects[role_export][subdir] = "contrib"
 
-projects[rules][version] = "2.7"
+projects[rules][version] = "2.9"
 projects[rules][type] = "module"
 projects[rules][subdir] = "contrib"
 
@@ -391,7 +432,7 @@ projects[strongarm][version] = "2.0"
 projects[strongarm][type] = "module"
 projects[strongarm][subdir] = "contrib"
 
-projects[token][version] = "1.5"
+projects[token][version] = "1.6"
 projects[token][type] = "module"
 projects[token][subdir] = "contrib"
 
@@ -409,12 +450,12 @@ projects[ux_elements][download][branch] = "master"
 ; http://drupal.org/node/1224568
 projects[ux_elements][patch][1224568] = "http://drupal.org/files/issues/1224568-ux_elements_redeclare.patch"
 
-projects[views][version] = "3.x-dev"
+projects[views][version] = "3.11"
 projects[views][type] = "module"
 projects[views][subdir] = "contrib"
-projects[views][download][type] = "git"
-projects[views][download][revision] = "82634af"
-projects[views][download][branch] = "7.x-3.x"
+; Call to a member function init_display() on a non-object...
+; http://drupal.org/node/1685144
+projects[views][patch][1685114] = "http://drupal.org/files/views-1685144-localization-bug_1.patch"
 
 projects[views_autocomplete_filters][version] = "1.1"
 projects[views_autocomplete_filters][type] = "module"
@@ -427,18 +468,26 @@ projects[views_field_view][download][type] = "git"
 projects[views_field_view][download][revision] = "bb6cfea"
 projects[views_field_view][download][branch] = "7.x-1.x"
 
-projects[views_bulk_operations][version] = "3.x-dev"
+projects[views_bulk_operations][version] = "3.3"
 projects[views_bulk_operations][type] = "module"
 projects[views_bulk_operations][subdir] = "contrib"
-projects[views_bulk_operations][download][type] = "git"
-projects[views_bulk_operations][download][revision] = "3e27b0b"
-projects[views_bulk_operations][download][branch] = "7.x-3.x"
+
+projects[views_content_cache][version] = "3.x-dev"
+projects[views_content_cache][type] = "module"
+projects[views_content_cache][subdir] = "contrib"
+projects[views_content_cache][download][type] = "git"
+projects[views_content_cache][download][revision] = "45863c3"
+projects[views_content_cache][download][branch] = "7.x-3.x"
+
+projects[views_fieldsets][version] = "1.3"
+projects[views_fieldsets][type] = "module"
+projects[views_fieldsets][subdir] = "contrib"
 
 projects[views_load_more][version] = "1.5"
 projects[views_load_more][type] = "module"
 projects[views_load_more][subdir] = "contrib"
 
-projects[webform][version] = "4.1"
+projects[webform][version] = "4.11"
 projects[webform][type] = "module"
 projects[webform][subdir] = "contrib"
 
@@ -449,28 +498,28 @@ projects[workbench][download][type] = "git"
 projects[workbench][download][revision] = "6856e4a"
 projects[workbench][download][branch] = "7.x-1.x"
 
-projects[workbench_moderation][version] = "1.x-dev"
+projects[workbench_moderation][version] = "1.4"
 projects[workbench_moderation][type] = "module"
 projects[workbench_moderation][subdir] = "contrib"
-projects[workbench_moderation][download][type] = "git"
-projects[workbench_moderation][download][revision] = "b38ac3e"
-projects[workbench_moderation][download][branch] = "7.x-1.x"
-; Panelizer is incompatible with moderation
-; http://www.drupal.org/node/1402860
-projects[workbench_moderation][patch][1402860] = "http://drupal.org/files/issues/workbench_moderation-panelizer_revisions-1402860-59.patch"
+; Workbench Moderation IIB Integration should be optional
+; http://drupal.org/node/2462453
+projects[workbench_moderation][patch][2462453] = "http://drupal.org/files/issues/workbench_moderation-iib-var-2462453-1.patch"
+; Provide an AJAX callback to reload the Workbench block, for inline editing support
+; https://www.drupal.org/node/2485713
+projects[workbench_moderation][patch][2485713] = "http://drupal.org/files/issues/workbench-moderation-ajax-block-2485713-6.patch"
+; Fix warnings on installation and features revert.
+; https://www.drupal.org/node/2360973
+projects[workbench_moderation][patch][2360973] = "http://drupal.org/files/issues/workbench_moderation-install-warnings-2360973-3.patch"
+; restws_page_callback() breaks workbench_moderation
+; https://www.drupal.org/node/1838640
+projects[workbench_moderation][patch][1838640] = "http://drupal.org/files/issues/workbench_moderation-fix_callback_argument-1838640-23.patch"
+; "View draft" opens published version / "Edit draft" opens correctly
+; https://www.drupal.org/node/2447659
+projects[workbench_moderation][patch][2447659] = "http://drupal.org/files/issues/workbench-moderation-show-draft-2447659-19.patch"
 
-projects[workbench_moderation_buttons][version] = "1.x-dev"
+projects[workbench_moderation_buttons][version] = "1.0-alpha3"
 projects[workbench_moderation_buttons][type] = "module"
 projects[workbench_moderation_buttons][subdir] = "contrib"
-projects[workbench_moderation_buttons][download][type] = "git"
-projects[workbench_moderation_buttons][download][revision] = "4a488f7"
-projects[workbench_moderation_buttons][download][branch] = "7.x-1.x"
-; PHP Parse error: syntax error, unexpected '$key'
-; http://drupal.org/node/2353111
-projects[workbench_moderation_buttons][patch][2353111] = "http://drupal.org/files/issues/workbench_moderation_buttons-PHP_parse-2353111-1.patch"
-; Form always thinks current state is "draft"
-; http://drupal.org/node/2365863
-projects[workbench_moderation_buttons][patch][2365863] = "http://drupal.org/files/issues/workbench_moderation_buttons-default_state-2365863-1.patch"
 
 projects[workbench_moderation_notes][version] = "1.x-dev"
 projects[workbench_moderation_notes][type] = "module"
@@ -478,20 +527,21 @@ projects[workbench_moderation_notes][subdir] = "contrib"
 projects[workbench_moderation_notes][download][type] = "git"
 projects[workbench_moderation_notes][download][revision] = "8e5e6f4"
 projects[workbench_moderation_notes][download][branch] = "7.x-1.x"
-; Incorrect status message "...no published revision of this site"
-; http://drupal.org/node/2045407
-projects[workbench_moderation_notes][patch][] = "http://drupal.org/files/workbench_moderation_notes-no_live_node_alert-2045407-1.patch"
+; Sync workbench_moderation_notes_node_history_view output with workbench_moderation_node_history_view
+; https://www.drupal.org/node/2529452
+projects[workbench_moderation_notes][patch][2529452] = "https://www.drupal.org/files/issues/workbench_moderation_notes-node_history_view-sync.patch"
 
 projects[xautoload][version] = "4.5"
 projects[xautoload][type] = "module"
 projects[xautoload][subdir] = "contrib"
 
+projects[shortcutperrole][version] = "1.2"
+projects[shortcutperrole][type] = "module"
+projects[shortcutperrole][subdir] = "contrib"
+
 ; Libraries
 libraries[backbone][download][type] = "get"
 libraries[backbone][download][url] = "https://github.com/jashkenas/backbone/archive/1.1.0.zip"
-
-libraries[ckeditor][download][type] = "get"
-libraries[ckeditor][download][url] = "http://download.cksource.com/CKEditor%20for%20Drupal/edit/ckeditor_4.4.3_edit.zip"
 
 libraries[colorbox][download][type] = "get"
 libraries[colorbox][download][url] = "https://github.com/jackmoore/colorbox/archive/1.x.zip"
@@ -510,3 +560,9 @@ libraries[plupload][patch][1903850] = "http://drupal.org/files/issues/plupload-1
 
 libraries[underscore][download][type] = "get"
 libraries[underscore][download][url] = "https://github.com/jashkenas/underscore/archive/1.5.2.zip"
+
+libraries[tablesaw][download][type] = "get"
+libraries[tablesaw][download][url] = "https://github.com/filamentgroup/tablesaw/releases/download/v1.0.4/tablesaw-1.0.4.zip"
+
+; Lightning Lift
+includes[lightning_lift] = lightning_lift/lightning_lift.make

@@ -9,9 +9,9 @@ dependencies[] = views
 files[] = views_field_view_handler_field_view.inc
 files[] = tests/views_field_view.test
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = "7.x-1.1+2-dev"
 core = "7.x"
 project = "views_field_view"
-datestamp = "1416241082"
+datestamp = "1446085168"
 

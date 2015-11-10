@@ -7,10 +7,32 @@
 include_once 'lightning_moderation.features.inc';
 
 /**
- *  Implements hook_post_features_enable_feature().
+ * Implements hook_migrate_api().
  */
-function lightning_moderation_post_features_enable_feature($component) {
-  // Log components as they are enabled.
-  watchdog('component', 'lightning_moderation enabled ' . $component . ' component');
+function lightning_moderation_migrate_api() {
+  $api = array(
+    'api' => 2,
+    'groups' => array(
+      'lightning' => array(
+        'title' => t('Lightning'),
+      ),
+    ),
+    'migrations' => array(
+      'LightningModerationNodes' => array('class_name' => 'LightningModerationNodes', 'group_name' => 'lightning'),
+    ),
+  );
+  return $api;
+}
+
+/**
+ * Implements hook_block_info_alter().
+ */
+function lightning_moderation_block_info_alter(&$blocks, $theme, $code_blocks) {
+  // Check for offcanvas region.
+  $regions = system_region_list($theme);
+  if (isset($regions['offcanvas'])) {
+    // Move Workbench Moderation Block to offcanvas.
+    $blocks['workbench']['block']['region'] = 'offcanvas';
+  }
 }
 

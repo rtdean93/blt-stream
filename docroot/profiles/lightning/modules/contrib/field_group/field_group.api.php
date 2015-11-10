@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks provided by the Field group module.
+ * Hooks provided by the Field Group module.
  *
  * Fieldgroup is a module that will wrap fields and other fieldgroups. Nothing more, nothing less.
  * For this there are formatters we can create on forms and view modes.
@@ -343,6 +343,18 @@ function hook_ctools_plugin_api($module, $api) {
  */
 function hook_field_group_info() {
 
+}
+
+/**
+ * Alter the field group definitions provided by other modules.
+ *
+ * @param array $groups
+ *   Reference to an array of field group definition objects.
+ */
+function hook_field_group_info_alter(&$groups) {
+  if (!empty($groups['group_issue_metadata|node|project_issue|form'])) {
+    $groups['group_issue_metadata|node|project_issue|form']->data['children'][] = 'taxonomy_vocabulary_9';
+  }
 }
 
 /**

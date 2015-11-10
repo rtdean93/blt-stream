@@ -3,7 +3,7 @@
 $plugin = array(
   'title' => t('Stagger'),
   'icon' => 'demonstratie-stagger-layout.png',
-  'category' => t('Demonstratie'),
+  'category' => t('Demo Layouts'),
   'theme' => 'demonstratie_layout_stagger',
   'regions' => array(
     'header' => t('Header'),

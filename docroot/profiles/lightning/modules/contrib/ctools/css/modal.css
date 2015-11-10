@@ -128,3 +128,7 @@ div.ctools-modal-content .option-text-aligner label.hidden-options {
 div.ctools-modal-content .dependent-options {
   padding-left: 30px;
 }
+
+body.ctools-modal-open {
+  overflow: hidden; /*hide the background body scroll when the modal is open for better UX */
+}

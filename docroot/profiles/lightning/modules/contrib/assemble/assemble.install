@@ -21,12 +21,11 @@ function assemble_enable() {
   $submodules = array(
     'lightning_admin',
     'lightning_blocks',
-    'lightning_breakpoints',
+    'lightning_featured',
     'lightning_forms',
     'lightning_fpp',
     'lightning_identifiers',
     'lightning_landing',
-    'lightning_letterbox',
     'lightning_metatags',
     'lightning_panels',
     'lightning_rules',

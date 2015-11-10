@@ -5,36 +5,43 @@
  */
 
 /**
- * Helper function to define our custom Fielable Panels Panes.
+ * Helper function to define our custom Fieldable Panels Panes.
  */
 function _lightning_fpp_fpp_types() {
+  $icon_path = drupal_get_path('module', 'lightning_fpp') . '/images/';
   $types = array(
+    'content' => array(
+      'title' => 'Content',
+      'icon' => $icon_path . 'icon_content.png',
+      'path' => 'content',
+    ),
     'raw_html' => array(
       'title' => 'HTML',
-      'icon' => 'icon_html.png',
+      'icon' => $icon_path . 'icon_html.png',
       'path' => 'raw-html',
     ),
     'quick_links' => array(
       'title' => 'links',
-      'icon' => 'icon_link.png',
+      'icon' => $icon_path . 'icon_link.png',
       'path' => 'quick-links',
     ),
     'media_pane' => array(
       'title' => 'media',
-      'icon' => 'icon_media.png',
-      'path' => 'media',
+      'icon' => $icon_path . 'icon_media.png',
+      'path' => 'media-pane',
     ),
     'map' => array(
       'title' => 'map',
-      'icon' => 'icon_map.png',
+      'icon' => $icon_path . 'icon_map.png',
       'path' => 'map',
     ),
     'text' => array(
       'title' => 'text',
-      'icon' => 'icon_text.png',
+      'icon' => $icon_path . 'icon_text.png',
       'path' => 'text',
     ),
   );
+  drupal_alter('lightning_fpp_types', $types);
   return $types;
 }
 
@@ -56,7 +63,7 @@ function lightning_fpp_form_alter(&$form, &$form_state, $form_id) {
 
     // Add a custom pre-render method to deal with "Content Settings" fieldset.
     $form['#pre_render'][] = 'lightning_fpp_fieldable_panel_pane_pre_render';
-    
+
     // Remove the revisioning information
     $form['revision']['revision']['#type'] = 'value';
     $form['revision']['log']['#access'] = FALSE;
@@ -78,7 +85,7 @@ function lightning_fpp_form_alter(&$form, &$form_state, $form_id) {
     $form['reusable']['#type'] = 'fieldset';
     $form['reusable']['#process'] = array('ctools_dependent_process');
     $form['reusable']['#id'] = 'reusable-settings';
-    $form['reusable']['category']['#value'] = t("Reusable @name", array('@name' => $fpp_info['title']));
+    $form['reusable']['category']['#value'] = t("Reusable panes");
     $form['reusable']['category']['#type'] = 'value';
     $form['reusable']['admin_description']['#access'] = FALSE;
     // Set the proper dependencies for the reusable markup
@@ -94,7 +101,7 @@ function lightning_fpp_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implement the "Content Settings" fieldset in a pre-render. 
+ * Implement the "Content Settings" fieldset in a pre-render.
  * This fixes issues with image caused by initially doing this in a form_alter.
  *
  * @see http://drupal.org/node/1567704

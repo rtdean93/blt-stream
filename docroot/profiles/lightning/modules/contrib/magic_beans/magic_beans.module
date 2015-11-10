@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_form_alter();
+ * Implements hook_form_alter().
  */
 function magic_beans_form_ctools_block_content_type_edit_form_alter(&$form, &$form_state, $form_id) {
   // Use the pane info to acquire the magical psudeo-delta.
@@ -23,22 +23,17 @@ function magic_beans_form_ctools_block_content_type_edit_form_alter(&$form, &$fo
         $form[$key] = $values;
       }
     }
+    // Do now allow label editing via Panels.
     $form['label']['#access'] = FALSE;
-    unset($form['actions']);
-    if (module_exists('panopoly_magic') && isset($form['#panopoly_magic_preview_info'])) {
-      foreach ($form['#post_render'] as $key => $post_render) {
-        if ($post_render == 'panopoly_magic_form_post_render_preview') {
-          unset($form['#post_render'][$key]);
-        }
-      }
-      unset($form['#panopoly_magic_preview_info']);
-    }
+    // Disable #prefix, actions and live previews.
+    _magic_beans_disable_preview($form);
+    // Add our special submit handler.
     $form['#submit'][] = 'magic_beans_form_submit';
   }
 }
 
 /**
- * Implements hook_module_implements_alter()
+ * Implements hook_module_implements_alter().
  */
 function magic_beans_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'form_alter' && isset($implementations['magic_beans'])) {
@@ -49,7 +44,7 @@ function magic_beans_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
- * Submit function for magic bean form
+ * Submit function for Magic Bean form.
  */
 function magic_beans_form_submit($form, &$form_state) {
   $bean = bean_load($form_state['values']['bean']->bid);
@@ -58,7 +53,7 @@ function magic_beans_form_submit($form, &$form_state) {
     $bean->data[$key] = $form_state['input'][$key];
   }
   $bean->view_mode = $form_state['input']['view_mode'];
-  // Avoid dataloss.
+  // Avoid data loss.
   if (empty($form_state['input']['is_new_revision'])) {
     $bean->default_revision = TRUE;
   }
@@ -77,3 +72,23 @@ function _magic_beans_lookup($delta) {
     ->execute();
   return $result;
 }
+
+/**
+ * Helper function to disable Panels Preview or Panopoly Magic.
+ */
+function _magic_beans_disable_preview(&$form) {
+  unset($form['#prefix']);
+  unset($form['actions']);
+  $modules = array('panopoly_magic', 'panels_preview');
+  foreach ($modules as $module) {
+    if (module_exists($module) && isset($form["#{$module}_preview_info"])) {
+      foreach ($form['#post_render'] as $key => $post_render) {
+        if ($post_render == $module . '_form_post_render_preview') {
+          unset($form['#post_render'][$key]);
+        }
+      }
+      unset($form["#{$module}_preview_info"]);
+    }
+  }
+}
+

@@ -3,7 +3,7 @@
 $plugin = array(
   'title' => t('Full Sidebar'),
   'icon' => 'demonstratie-full-side-layout.png',
-  'category' => t('Demonstratie'),
+  'category' => t('Demo Layouts'),
   'theme' => 'demonstratie_layout_full_side',
   'regions' => array(
     'primary_features' => t('Primary features'),

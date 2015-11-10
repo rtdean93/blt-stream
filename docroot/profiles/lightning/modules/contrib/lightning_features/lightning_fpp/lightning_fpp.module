@@ -8,14 +8,6 @@ include_once 'lightning_fpp.features.inc';
 include_once 'lightning_fpp.widgets.inc';
 
 /**
- *  Implements hook_post_features_enable_feature().
- */
-function lightning_fpp_post_features_enable_feature($component) {
-  // Log components as they are enabled.
-  watchdog('component', 'lightning_fpp enabled ' . $component . ' component');
-}
-
-/**
  * Implements hook_entity_info_alter().
  */
 function lightning_fpp_entity_info_alter(&$entity_info) {
@@ -24,10 +16,10 @@ function lightning_fpp_entity_info_alter(&$entity_info) {
   $fpp_types = _lightning_fpp_fpp_types();
   foreach ($fpp_types as $type => $info) {
     $entity_info['fieldable_panels_pane']['bundles'][$type] = array(
-      'label' => t('Add @title', array('@title' => $info['title'])),
+      'label' => t('@title', array('@title' => ucwords($info['title']))),
       'pane category' => t('Custom'),
       'pane top level' => TRUE,
-      'pane icon' => drupal_get_path('module', 'lightning_fpp') . '/images/' . $info['icon'],
+      'pane icon' => $info['icon'],
       'admin' => array(
         'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
         'bundle argument' => 4,
@@ -39,3 +31,28 @@ function lightning_fpp_entity_info_alter(&$entity_info) {
 
 }
 
+/**
+ * Implements hook_migrate_api().
+ */
+function lightning_fpp_migrate_api() {
+  $api = array(
+    'api' => 2,
+    'migrations' => array(
+      'LightningFPPContent' => array('class_name' => 'LightningFPPContent', 'group_name' => 'Lightning'),
+      'LightningFPPContentNodes' => array('class_name' => 'LightningFPPContentNodes', 'group_name' => 'Lightning'),
+    ),
+  );
+  return $api;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function lightning_fpp_form_views_form_alter(&$form, &$form_state, $form_id) {
+  if (!isset($form['entityreference_view_widget'])) {
+    return;
+  }
+
+  // Change the form submit text from 'Submit' to 'Add'.
+  $form['actions_ervw']['ervw_submit']['#value'] = t('Add');
+}

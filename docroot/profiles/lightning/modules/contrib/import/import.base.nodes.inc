@@ -7,8 +7,8 @@
 
 class ImportBaseNodes extends Migration {
 
-  public function __construct($arguments = array()) {
-    parent::__construct($arguments = array());
+  public function __construct($arguments) {
+    parent::__construct($arguments);
     $this->description = t('Import nodes.');
 
     // Create a map object for tracking the relationships between source rows
@@ -23,12 +23,16 @@ class ImportBaseNodes extends Migration {
       MigrateDestinationNode::getKeySchema()
     );
 
-    $import_path = drupal_get_path('module', 'import') . '/import/';
-
     // Create a MigrateSource object.
-    $this->source = new MigrateSourceCSV($import_path . 'import.base.nodes.csv', $this->csvcolumns(), array('header_rows' => 1));
+    if (isset($arguments['path'])) {
+      $import_path = $arguments['path'];
+    }
+    else {
+      $import_path = drupal_get_path('module', 'import') . '/import/import.base.nodes.csv';
+    }
+    $this->source = new MigrateSourceCSV($import_path, $this->csvcolumns(), array('header_rows' => 1));
 
-    $this->destination = new MigrateDestinationNode('page');
+    $this->destination = new MigrateDestinationNode('article');
 
     $this->addFieldMapping('uid', 'uid')->defaultValue(1);
     $this->addFieldMapping('status', 'status')->defaultValue(1);

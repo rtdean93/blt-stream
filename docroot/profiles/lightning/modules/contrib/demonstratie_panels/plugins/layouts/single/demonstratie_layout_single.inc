@@ -10,7 +10,7 @@
 $plugin = array(
   'title' => t('Single column'),
   'icon' => 'demonstratie-single-layout.png',
-  'category' => t('Demonstratie'),
+  'category' => t('Demo Layouts'),
   'theme' => 'demonstratie_layout_single',
   'regions' => array(
     'primary_features' => t('Primary features'),

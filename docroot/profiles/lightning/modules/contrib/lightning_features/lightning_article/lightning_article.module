@@ -5,8 +5,3 @@
  */
 
 include_once 'lightning_article.features.inc';
-/**
- * @file
- * Code for the lightning_article feature.
- */
-

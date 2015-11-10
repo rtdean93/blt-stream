@@ -102,6 +102,10 @@
             reload = false;
             location.reload();
           }
+          // If the workbench moderation block exists, attempt to refresh it
+          if (Drupal.behaviors.workbenchModerationBlockRefresh && typeof Drupal.behaviors.workbenchModerationBlockRefresh.refreshBlock == 'function') {
+            Drupal.behaviors.workbenchModerationBlockRefresh.refreshBlock();
+          }
           break;
       }
     },

@@ -3,7 +3,7 @@
 $plugin = array(
   'title' => t('Landing page'),
   'icon' => 'demonstratie-landing-layout.png',
-  'category' => t('Demonstratie'),
+  'category' => t('Demo Layouts'),
   'theme' => 'demonstratie_layout_landing',
   'regions' => array(
     'primary_features' => t('Primary features'),

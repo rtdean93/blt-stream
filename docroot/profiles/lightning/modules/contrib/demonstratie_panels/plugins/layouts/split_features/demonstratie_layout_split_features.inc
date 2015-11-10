@@ -3,7 +3,7 @@
 $plugin = array(
   'title' => t('Split features'),
   'icon' => 'demonstratie-split-features-layout.png',
-  'category' => t('Demonstratie'),
+  'category' => t('Demo Layouts'),
   'theme' => 'demonstratie_layout_split_features',
   'regions' => array(
     'primary_features' => t('Primary features'),

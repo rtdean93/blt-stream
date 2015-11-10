@@ -10,6 +10,8 @@ function migrate_extras_migrate_api() {
       'MigratePathautoHandler',
       'MigrateExtrasNodeFlagHandler',
       'MigrateExtrasUserFlagHandler',
+      'MigrateUuidHandler',
+      'MigrateUuidNodeHandler'
     ),
     'field handlers' => array(
       'MigrateAddressFieldHandler',

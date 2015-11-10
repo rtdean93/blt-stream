@@ -1,5 +1,22 @@
-Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
-----------------------------------------------
+Fieldable Panels Panes 7.x-1.7, 2015-09-02
+------------------------------------------
+By Chris Burges, dsnopek, DamienMcKenna: Added "check editable" callback for
+  CTools pane definition, refactored FPP object loading.
+
+
+Fieldable Panels Panes 7.x-1.6, 2015-05-29
+------------------------------------------
+#2427275 by DamienMcKenna: Fixed line_entity_form integration.
+#2463965 by dsnopek: PHP notice when FPP is hidden via visibility rules.
+#2457995 by B-Prod: Fixed compatibility with the Title module.
+#1985894 by DamienMcKenna, tanc: Return FALSE in load function if no entities.
+#2493749 by dsnopek: FPP title always shown as link, even if not requested!
+#2483335 by dsnopek: Improved label in File Entity file usage report.
+#2483335 by DamienMcKenna: Made default labels less technical.
+
+
+Fieldable Panels Panes 7.x-1.6-beta1, 2015-02-02
+------------------------------------------------
 #2283165 by DamienMcKenna: Incorrect variable usage broke 'create' permission.
 #2268531 by DamienMcKenna: Ensure variable exists before running strpos() on it.
 #2204837 by Kirby: Fixed call to undefined function ctools_cleanstring().
@@ -15,9 +32,36 @@ Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
   (https://drupal.org/node/2146479).
 #2074735 by rogical: Added configure link to admin/structure/fieldable-panels
   -panes in the info file.
-#2250383 by DamienMcKenna: Require CToosl 1.4 or newer.
+#2250383 by DamienMcKenna: Require CTools 1.4 or newer.
 #2145209 by primozsusa, eft, DamienMcKenna: Support for the Migrate module.
 #2287015 by eft, DamienMcKenna: Missing deletion callback in hook_entity_info.
+#2283263 by cboyden, DamienMcKenna: Allow FPP description to be overridden.
+#1588882 by jlapp, mcarbone, DamienMcKenna: Use title as the entity label when
+  admin_title isn't present.
+#2246893 by mglaman: Does not properly set pane subtype on content edit form
+  submit.
+#2318033 by mongolito404: Increase FPP 'name' field length to 255 characters.
+#2280457 by magicmyth: Entity API support is broken.
+#2389873 by mkhamash: Add pane config to the entity object.
+#2233363 by mongolito404: Incorrect paths to some FPP admin pages.
+#2098041 by Placinta: Don't call hook_entity_presave twice in one save process.
+#2092477 by rrrob, DamienMcKenna: Make the pane title use the current view mode.
+#2398301 by mglaman: Add hook_fieldable_panels_pane_insert/update/save hooks.
+#2302931 by Adrian Richardson, DamienMcKenna: Fixed PanelsPaneController
+  ->access().
+#2304921 by plopesc: Normalized the entity output.
+#2244541 by DamienMcKenna: The default FPP type can be skipped during
+  installation by assigning a variable, see README.txt for details.
+#2398759 by mglaman: Documented some basic CRUD APIs.
+#2399623 by mglaman: Include original entity when saving an FPP.
+By DamienMcKenna: Document when hook_entity_view_mode_alter() is triggered.
+#2256503 by DamienMcKenna, dsnopek: Title field logic improved, new 'preview'
+  view mode used by default on standalone entity page.
+#2415427 by dsnopek: Avoid loading FPP from database in
+  fieldable_panels_panes_preprocess_panels_pane().
+#2415427 by dsnopek: Follow-up on last commit.
+#2390145 by mrmikedewolf: Add default access callback for admin views.
+#2416001 by DamienMcKenna: Requires the latest releases of CTools and Panels.
 
 
 Fieldable Panels Panes 7.x-1.5, 2013-05-07

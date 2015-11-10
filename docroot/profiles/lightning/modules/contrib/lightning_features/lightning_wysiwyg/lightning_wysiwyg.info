@@ -5,20 +5,14 @@ package = Lightning
 version = 7.x-1.0
 project = lightning_wysiwyg
 dependencies[] = ctools
-dependencies[] = ckeditor
+dependencies[] = editor_ckeditor
 dependencies[] = features
-dependencies[] = linkit
 datestamp = 1408404197
-features[ckeditor_profile][] = Advanced
-features[ckeditor_profile][] = CKEditor Global Profile
-features[ckeditor_profile][] = Full
-features[ckeditor_profile][] = User
-features[ctools][] = linkit:linkit_profiles:1
 features[features_api][] = api:2
 
 
-; Information added by drush on 2014-11-17
+; Information added by drush on 2015-10-29
 version = ""
 project = "lightning_features"
-datestamp = "1416241067"
+datestamp = "1446085148"
 
