@@ -1,0 +1,6 @@
+.DS_Store
+.sass-cache/
+/tests/behat.local.yml
+/tests/bin/
+vendor/
+node_modules/
