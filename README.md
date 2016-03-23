@@ -1,10 +1,12 @@
-sf-d8
+sf-lightning
 =====
 
-Proto d8 with acsf enabled.
+Acquia lightning distro with acsf initited and ready to go!
 
 Usage
 -----
-```./build-sf-d8.sh```
+```./build-sf-lightning.sh```
 
-The above should make a d8 based on rc1 and the head of acsf 8.x-1.x and run the acsf-init commands.
+The above should make a D8 lighthing disto with acsf properly init'd
+If lighting changes versions edit the build-sf-lightning.make
+If acsf changes, edit drupal-org.make
