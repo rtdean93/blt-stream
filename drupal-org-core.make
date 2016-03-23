@@ -1,3 +1,3 @@
-api = 2
+api: 2
 
-core = 8.x
+core: 8.x
