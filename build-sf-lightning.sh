@@ -27,8 +27,8 @@ install_drush () {
   php bin/composer require drush/drush:${DRUSH_VERSION:=8.0.1}
 }
 
-install_d8 () {
-  echo "Building drupal 8"
+install_drupal () {
+  echo "Building drupal"
 # Clean out docroot
   rm -rf docroot
   $DRUSH_PATH/drush make --no-cache --overwrite --working-copy build-sf-lightning.make docroot
@@ -49,7 +49,7 @@ commit_changes () {
 install_composer
 install_drush
 check_drush_version
-install_d8
+install_drupal
 init_acsf
 if [[ -n $COMMIT_CHANGES ]]; then
   commit_changes
