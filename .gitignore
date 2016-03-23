@@ -1,0 +1,13 @@
+# ignore bin, vendor, phpstorm files...
+.idea
+.idea/**
+bin/
+vendor/
+!docroot/**
+!docroot/vendor/**
+!docroot/**/vendor/**
+composer.json
+!docroot/**/composer.json
+composer.lock
+!docroot/**/composer.lock
+.git
