@@ -1,9 +1,0 @@
-# Do not ignore contrib or custom
-#*/contrib/*
-#*/custom/*
-
-# Do not ignore libraries
-#libraries/*
-
-# OSX
-.DS_Store
