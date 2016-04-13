@@ -40,14 +40,15 @@ dependencies:
   - views_ui
   # contrib
   - metatag
+  # Our own core functionality.
+  - lightning_core
 
 themes:
   - bartik
   - seven
 
-
-# Information added by Drupal.org packaging script on 2016-03-21
-version: '8.x-1.0-beta5'
+# Information added by Drupal.org packaging script on 2016-04-07
+version: '8.x-1.00-rc2'
 core: '8.x'
 project: 'lightning'
-datestamp: 1458582842
+datestamp: 1460062116

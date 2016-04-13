@@ -102,7 +102,7 @@ interface FeaturesBundleInterface {
    *   The machine name of a package.
    *
    * @return bool
-   *   TRUE if the machine name is prefixed by the bundle machine name.
+   *   TRUE if the package with $machine_name is the bundle profile.
    */
   public function isProfilePackage($machine_name);
 
@@ -217,7 +217,7 @@ interface FeaturesBundleInterface {
    *
    * @see \Drupal\features\FeaturesBundleInterface::setAssignmentSettings()
    */
-  public function getAssignmentSettings($method_id);
+  public function getAssignmentSettings($method_id = NULL);
 
   /**
    * Sets settings specific to an assignment method.
@@ -231,28 +231,6 @@ interface FeaturesBundleInterface {
    * @see \Drupal\features\FeaturesBundleInterface::getAssignmentSettings()
    */
   public function setAssignmentSettings($method_id, array $settings);
-
-  /**
-   * Gets global settings for a bundle.
-   *
-   * @return array
-   *   An array with the following keys:
-   *   - folder: subfolder to export modules within this package set.
-   *   - profile: boolean to determine if set is a profile.
-   *
-   * @see \Drupal\features\FeaturesBundleInterface::setSettings()
-   */
-  public function getSettings();
-
-  /**
-   * Sets the global settings for a bundle.
-   *
-   * @param array $settings
-   *   An array of setting values.
-   *
-   * @see \Drupal\features\FeaturesBundleInterface::getSettings()
-   */
-  public function setSettings(array $settings);
 
   /**
    * Saves the bundle to the active config.

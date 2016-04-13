@@ -6,14 +6,15 @@ package: Lightning
 dependencies:
   - entity_embed
   - image
+  - lightning_core
   - media_entity
   - rest
   - services
   - user
-# version: 8.x-1.0-beta3
 
-# Information added by Drupal.org packaging script on 2016-03-21
-version: '8.x-1.0-beta5'
+
+# Information added by Drupal.org packaging script on 2016-04-07
+version: '8.x-1.00-rc2'
 core: '8.x'
 project: 'lightning'
-datestamp: 1458582842
+datestamp: 1460062116

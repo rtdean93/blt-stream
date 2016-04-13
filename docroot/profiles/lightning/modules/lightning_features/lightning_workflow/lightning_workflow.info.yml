@@ -5,11 +5,13 @@ description: Tools to improve your content workflow.
 package: Lightning
 dependencies:
   - inline_entity_form
+  - lightning_core
   - scheduled_updates
   - workbench_moderation
 
-# Information added by Drupal.org packaging script on 2016-03-21
-version: '8.x-1.0-beta5'
+
+# Information added by Drupal.org packaging script on 2016-04-07
+version: '8.x-1.00-rc2'
 core: '8.x'
 project: 'lightning'
-datestamp: 1458582842
+datestamp: 1460062116

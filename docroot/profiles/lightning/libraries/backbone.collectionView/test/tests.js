@@ -648,8 +648,7 @@ $(document).ready( function() {
 
 		var emp1View = myCollectionView.viewManager.findByModel( this.emp2 );
 
-		console.log( emp1View.$el.parent().attr("class" ) );
-		equal(emp1View.$el.parent().hasClass( "not-selectable" ), true, "The non-selectable item has the 'not-selectable' class" );
+		equal(emp1View.$el.parent().attr("class"), "not-selectable", "The non-selectable item has the 'not-selectable' class" );
 
 	} );
 

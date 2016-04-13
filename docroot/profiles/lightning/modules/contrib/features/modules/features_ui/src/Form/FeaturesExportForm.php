@@ -300,7 +300,7 @@ class FeaturesExportForm extends FormBase {
     // Except for the 'unpackaged' pseudo-package, display the full name, since
     // that's what will be generated.
     if ($machine_name !== 'unpackaged') {
-      $machine_name = $this->assigner->getBundle($package->getBundle())->getFullName($machine_name);
+      $machine_name = $package->getFullName($machine_name);
     }
     $element['machine_name'] = $machine_name;
     $element['status'] = array(
@@ -340,14 +340,15 @@ class FeaturesExportForm extends FormBase {
         $package_config['missing'][] = array(
           'name' => SafeMarkup::checkPlain($item_name),
           'label' => SafeMarkup::checkPlain($item_name),
-          'class' => 'features-conflict',
+          'class' => 'features-missing',
         );
       }
       elseif (!in_array($item_name, $package->getConfig())) {
         $item = $config_collection[$item_name];
         $conflicts[] = $item_name;
+        $package_name = !empty($item->getPackage()) ? $item->getPackage() : t('PACKAGE NOT ASSIGNED');
         $package_config[$item->getType()][] = array(
-          'name' => SafeMarkup::checkPlain($item_name),
+          'name' => SafeMarkup::checkPlain($package_name),
           'label' => SafeMarkup::checkPlain($item->getLabel()),
           'class' => 'features-conflict',
         );
@@ -364,31 +365,43 @@ class FeaturesExportForm extends FormBase {
     }
 
     $class = '';
-    $label = '';
+    $state_links = [];
     if (!empty($conflicts)) {
-      $url = Url::fromRoute('features.edit', array('featurename' => $package->getMachineName()));
-      $class = 'features-conflict';
-      $label = $this->t('Conflicts');
+      $state_links[] = array(
+        '#type' => 'link',
+        '#title' => $this->t('Conflicts'),
+        '#url' => Url::fromRoute('features.edit', array('featurename' => $package->getMachineName())),
+        '#attributes' => array('class' => array('features-conflict')),
+      );
     }
-    elseif (!empty($overrides)) {
-      $url = Url::fromRoute('features.diff', array('featurename' => $package->getMachineName()));
-      $class = 'features-override';
-      $label = $this->featuresManager->stateLabel(FeaturesManagerInterface::STATE_OVERRIDDEN);
+    if (!empty($overrides)) {
+      $state_links[] = array(
+        '#type' => 'link',
+        '#title' => $this->featuresManager->stateLabel(FeaturesManagerInterface::STATE_OVERRIDDEN),
+        '#url' => Url::fromRoute('features.diff', array('featurename' => $package->getMachineName())),
+        '#attributes' => array('class' => array('features-override')),
+      );
     }
-    elseif (!empty($new_config)) {
-      $url = Url::fromRoute('features.diff', array('featurename' => $package->getMachineName()));
-      $class = 'features-detected';
-      $label = $this->t('New detected');
+    if (!empty($new_config)) {
+      $state_links[] = array(
+        '#type' => 'link',
+        '#title' => $this->t('New detected'),
+        '#url' => Url::fromRoute('features.diff', array('featurename' => $package->getMachineName())),
+        '#attributes' => array('class' => array('features-detected')),
+      );
     }
-    elseif (!empty($missing)) {
-      $url = Url::fromRoute('features.edit', array('featurename' => $package->getMachineName()));
-      $class = 'features-conflict';
-      $label = $this->t('Missing');
+    if (!empty($missing) && ($package->getStatus() == FeaturesManagerInterface::STATUS_INSTALLED)) {
+      $state_links[] = array(
+        '#type' => 'link',
+        '#title' => $this->t('Missing'),
+        '#url' => Url::fromRoute('features.edit', array('featurename' => $package->getMachineName())),
+        '#attributes' => array('class' => array('features-missing')),
+      );
     }
-    if (!empty($class)) {
+    if (!empty($state_links)) {
       $element['state'] = array(
-        'data' => \Drupal::l($label, $url),
-        'class' => array($class, 'column-nowrap'),
+        'data' => $state_links,
+        'class' => array('column-nowrap'),
       );
     }
     else {
@@ -469,7 +482,7 @@ class FeaturesExportForm extends FormBase {
       'version' => '',
     ]);
     foreach ($config_collection as $item_name => $item) {
-      if (!$item->getPackage() && !$item->isExtensionProvided()) {
+      if (!$item->getPackage() && !$item->isExcluded() && !$item->isProviderExcluded()) {
         $packages['unpackaged']->appendConfig($item_name);
       }
     }
@@ -489,11 +502,9 @@ class FeaturesExportForm extends FormBase {
     /** @var \Drupal\features\Package $package */
     foreach ($form['#packages'] as $package) {
       // Remove checkboxes for packages that:
-      // - exist and are uninstalled, or
       // - have no configuration assigned and are not the profile, or
       // - are the "unpackaged" pseudo-package.
-      if ($package->getStatus() == FeaturesManagerInterface::STATUS_UNINSTALLED ||
-        (empty($package->getConfig()) && !($package->getMachineName() == $form['#profile_package'])) ||
+      if ((empty($package->getConfig()) && !($package->getMachineName() == $form['#profile_package'])) ||
         $package->getMachineName() == 'unpackaged') {
         $form['preview'][$package->getMachineName()]['#access'] = FALSE;
       }

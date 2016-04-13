@@ -154,6 +154,20 @@ interface FeaturesManagerInterface {
   public function getPackage($machine_name);
 
   /**
+   * Gets a specific package.
+   * Similar to getPackage but will also match package FullName
+   *
+   * @param string $machine_name
+   *   Full machine name of package.
+   *
+   * @return \Drupal\features\Package
+   *   Package data.
+   *
+   * @see \Drupal\features\FeaturesManagerInterface::getPackages()
+   */
+  public function findPackage($machine_name);
+
+  /**
    * Updates a package definition in the package list.
    *
    * NOTE: This does not "export" the package; it simply updates the internal
@@ -239,6 +253,14 @@ interface FeaturesManagerInterface {
    *   An array representing data in an info.yml file.
    */
   public function getExtensionInfo(Extension $extension);
+
+  /**
+   * Determine if extension is enabled
+   *
+   * @param \Drupal\Core\Extension\Extension $extension
+   * @return bool
+   */
+  public function extensionEnabled(Extension $extension);
 
   /**
    * Initializes a configuration package.
@@ -339,6 +361,14 @@ interface FeaturesManagerInterface {
    *   (optional) Array of package names, passed by reference.
    */
   public function setPackageBundleNames(FeaturesBundleInterface $bundle, array &$package_names = []);
+
+  /**
+   * Assigns dependencies from config items into the package.
+   *
+   * @param \Drupal\features\Package[] $packages
+   *   An array of packages. NULL for all packages
+   */
+  public function assignPackageDependencies(Package $package = NULL);
 
   /**
    * Assigns dependencies between packages based on configuration dependencies.

@@ -46,6 +46,14 @@ function features_drush_command() {
     'aliases' => array('fl'),
   );
 
+  $items['features-import-all'] = array(
+    'description' => 'Import module config from all installed features.',
+    'examples' => array(
+      "drush features-import-all" => 'Import module config from all installed features.',
+    ),
+    'aliases' => array('fra', 'fia', 'fim-all'),
+  );
+
   $items['features-export'] = array(
     'description' => "Export the configuration on your site into a custom module.",
     'arguments' => array(
@@ -245,6 +253,32 @@ function drush_features_list_packages($package_name = '') {
   // If no matching package found, return an error.
   drush_log(dt('Package "@package" not found.', array('@package' => $package_name)), 'warning');
   return FALSE;
+}
+
+/**
+ * Drush command callback for features-import-all.
+ *
+ * @return bool
+ */
+function drush_features_import_all() {
+  _drush_features_options();
+  /** @var \Drupal\features\FeaturesManagerInterface $manager */
+  $manager = \Drupal::service('features.manager');
+  $packages = $manager->getPackages();
+
+  $packages = $manager->filterPackages($packages);
+  $result = array();
+
+  foreach ($packages as $package) {
+    $overrides = $manager->detectOverrides($package);
+
+    if ($package->getStatus() == FeaturesManagerInterface::STATUS_INSTALLED) {
+      drush_print(dt('Reverting @module...', array('@module' => $package->getName())));
+      drush_features_import($package->getMachineName());
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -573,20 +607,21 @@ function drush_features_import() {
     foreach ($modules as $module => $components_needed) {
 
       $dt_args['@module'] = $module;
+      /** @var \Drupal\features\Package $feature */
       $feature = _drush_features_load_feature($module, TRUE);
       if (empty($feature)) {
         drush_log(dt('No such feature is available: @module', $dt_args), 'error');
         return;
       }
 
-      if ($feature['status'] != FeaturesManagerInterface::STATUS_INSTALLED) {
+      if ($feature->getStatus() != FeaturesManagerInterface::STATUS_INSTALLED) {
         drush_log(dt('No such feature is installed: @module', $dt_args), 'error');
         return;
       }
 
       // Forcefully revert all components of a feature.
       if ($force) {
-        $components = $feature['config_orig'];
+        $components = $feature->getConfigOrig();
       }
       // Only revert components that are detected to be Overridden.
       else {
@@ -611,6 +646,7 @@ function drush_features_import() {
           if ($skip_confirmation || drush_confirm(dt($confirmation_message, $dt_args))) {
             if (!isset($config[$component])) {
               // Import missing component.
+              /** @var array $item */
               $item = $manager->getConfigType($component);
               $type = ConfigurationItem::fromConfigStringToConfigType($item['type']);
               $config_revert->import($type, $item['name_short']);
@@ -620,7 +656,7 @@ function drush_features_import() {
               // Revert existing component.
               /** @var \Drupal\features\ConfigurationItem $item */
               $item = $config[$component];
-              $type = ConfigurationItem::fromConfigStringToConfigType($item['type']);
+              $type = ConfigurationItem::fromConfigStringToConfigType($item->getType());
               $config_revert->revert($type, $item->getShortName());
               drush_log(dt('Reverted @module : @component.', $dt_args), 'ok');
             }

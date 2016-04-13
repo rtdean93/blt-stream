@@ -133,11 +133,6 @@ class FeaturesEditForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $featurename = '') {
     $session = $this->getRequest()->getSession();
-    $this->allowConflicts = FALSE;
-    if (isset($session)) {
-      $this->allowConflicts = $session->get('features_allow_conflicts', FALSE);
-    }
-
     $trigger = $form_state->getTriggeringElement();
     if ($trigger['#name'] == 'package') {
       $this->oldBundle = $this->bundle;
@@ -148,12 +143,17 @@ class FeaturesEditForm extends FormBase {
       if (isset($session)) {
         $session->set('features_allow_conflicts', $form_state->getValue('conflicts'));
       }
-      return $this->redirect('features.edit', array($featurename));
+      $bundle = $this->assigner->loadBundle();
     }
     else {
       $bundle = $this->assigner->loadBundle();
     }
     $this->bundle = $bundle->getMachineName();
+
+    $this->allowConflicts = FALSE;
+    if (isset($session)) {
+      $this->allowConflicts = $session->get('features_allow_conflicts', FALSE);
+    }
 
     // Pass the $force argument as TRUE because we want to include any excluded
     // configuration items. These should show up as automatically assigned, but
@@ -238,6 +238,14 @@ class FeaturesEditForm extends FormBase {
       '#required' => FALSE,
       '#default_value' => $this->package->getVersion(),
       '#size' => 30,
+    );
+
+    $require_all = $this->package->getRequiredAll();
+    $form['info']['require_all'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Mark all config as required'),
+      '#default_value' => $this->package->getRequiredAll(),
+      '#description' => $this->t('Required config will be assigned to this feature regardless of other assignment plugins.'),
     );
 
     $form['conflicts'] = array(
@@ -546,8 +554,15 @@ class FeaturesEditForm extends FormBase {
     // Make a map of any config specifically excluded and/or required.
     foreach (array('excluded', 'required') as $constraint) {
       $this->{$constraint} = array();
-      $info = !empty($this->package->getFeaturesInfo()[$constraint]) ? $this->package->getFeaturesInfo()[$constraint] : array();
+      $info = isset($this->package->getFeaturesInfo()[$constraint]) ? $this->package->getFeaturesInfo()[$constraint] : array();
+      if (($constraint == 'required') && (empty($info) || !is_array($info))) {
+        // If required is True or empty array, add all config as required
+        $info = $this->package->getConfigOrig();
+      }
       foreach ($info as $item_name) {
+        if (!isset($config[$item_name])) {
+          continue;
+        }
         $item = $config[$item_name];
         $this->{$constraint}[$item->getType()][$item->getShortName()] = $item->getLabel();
       }
@@ -778,11 +793,13 @@ class FeaturesEditForm extends FormBase {
     }
     if (isset($this->conflicts[$type][$key])) {
       // Show what package the conflict is stored in.
+      $config = $this->featuresManager->getConfigCollection();
+      $config_name = $this->featuresManager->getFullName($type, $key);
+      $package_name = isset($config[$config_name]) ? $config[$config_name]->getPackage() : '';
       // Get the full machine name instead of the short name.
       $packages = $this->featuresManager->getPackages();
-      $package_name = $this->conflicts[$type][$key]['package'];
       if (isset($packages[$package_name])) {
-        $package_name = $packages[$package_name]['machine_name'];
+        $package_name = $packages[$package_name]->getMachineName();
       }
       $value .= '  <span class="config-name">[' . $this->t('in') . ' ' . SafeMarkup::checkPlain($package_name) . ']</span>';
     }
@@ -804,9 +821,16 @@ class FeaturesEditForm extends FormBase {
     // Save it first just to create it in case it's a new package.
     $this->featuresManager->setPackage($this->package);
 
-    $this->package->setConfig($this->updatePackageConfig($form_state));
+    $config = $this->updatePackageConfig($form_state);
+    $this->featuresManager->assignConfigPackage($this->package->getMachineName(), $config, TRUE);
     $this->package->setExcluded($this->updateExcluded());
-    $this->package->setRequired($this->updateRequired());
+    if ($form_state->getValue('require_all')) {
+      $this->package->setRequired(TRUE);
+    }
+    else {
+      $required = $this->updateRequired();
+      $this->package->setRequired($required);
+    }
     // Now save it with the selected config data.
     $this->featuresManager->setPackage($this->package);
 

@@ -1,3 +1,36 @@
+## Release Candidate 2 (RC2)
+* Updated core to 8.0.6. We also lowered the specificity on core releases for
+  Composer-based installs. Core will automatically update to the latest Patch
+  Release when `composer update` is issued regardless of whether there is a new
+  release of Lightning. This was already the case since Drupal Packagist
+  automatically adds a tilde to the drupal/core, but it's now documented and
+  we've added the tilde to our own composer.json file to avoid confusion.
+* Updated the following dependencies:
+  * CTools: alpha24 -> alpha25
+  * Workbench Moderation: beta1 -> beta3
+  * MetaTag: beta5 -> beta7
+  * Acquia Connector: 8.x-1.0 -> 8.x-1.1
+* Fixed an issue where the path to a JS library was duplicated and caused
+  problems when JS aggregation was turned off. (Issue #2700685)
+* Fixed an issue where users editing layouts with the IPE affected other users
+  until the changes were saved. (Issue #2701433)
+
+## Release Candidate 1 (RC1)
+* You can finally create a Lightning-based project entirely with Composer!
+  See the [installer project page](https://github.com/acquia/lightning-project)
+  for more information. (Issue #2693829)
+* It's now possible for Quick Edit to edit content blocks placed in a landing
+  page using Panels IPE. (Issue #2692391)
+* A Lightning Media unit test was missing a @group annotation. (Issue #2695625)
+* Lightning now adds a warning gate to ```drush update```, since Drush's code
+  update mechanisms can destroy a working site. (Issue #2694367)
+* All contributed modules included with Lightning have been moved into a single
+  contrib directory -- no more subfolders for layout modules, media modules, etc.
+  (Issue #2692229)
+* We've adopted a versioning policy that should help bridge the gap between
+  drupal.org (which does not support semantic versioning yet) and Composer. See
+  VERSIONS.md for more information. (Issue #2693897)
+
 ## Beta 5
 * Lightning now automatically provides responsibility-based roles for
   assigning permissions to users. All content types receive their own

@@ -30,7 +30,7 @@ function Enumerator(Constructor, input) {
     makePromise(this.promise);
   }
 
-  if (isArray(input)) {
+  if (Array.isArray(input)) {
     this._input     = input;
     this.length     = input.length;
     this._remaining = input.length;

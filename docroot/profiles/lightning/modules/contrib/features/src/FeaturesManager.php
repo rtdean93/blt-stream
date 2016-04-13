@@ -76,13 +76,6 @@ class FeaturesManager implements FeaturesManagerInterface {
   protected $settings;
 
   /**
-   * The Features assignment settings.
-   *
-   * @var array
-   */
-  protected $assignmentSettings;
-
-  /**
    * The app root.
    *
    * @var string
@@ -143,7 +136,6 @@ class FeaturesManager implements FeaturesManagerInterface {
     $this->moduleHandler = $module_handler;
     $this->configFactory = $config_factory;
     $this->settings = $config_factory->getEditable('features.settings');
-    $this->assignmentSettings = $config_factory->getEditable('features.assignment');
     $this->extensionStorages = new FeaturesExtensionStorages($this->configStorage);
     $this->extensionStorages->addStorage(InstallStorage::CONFIG_INSTALL_DIRECTORY);
     $this->extensionStorages->addStorage(InstallStorage::CONFIG_OPTIONAL_DIRECTORY);
@@ -255,6 +247,23 @@ class FeaturesManager implements FeaturesManagerInterface {
       return $this->packages[$machine_name];
     }
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findPackage($machine_name) {
+    $result = $this->getPackage($machine_name);
+    if (!isset($result)) {
+      // Didn't find direct match, but now go through and look for matching
+      // full name (bundle_machinename)
+      foreach ($this->packages as $name => $package) {
+        if ($package->getFullName() == $machine_name) {
+          return $this->packages[$name];
+        }
+      }
+    }
+    return $result;
   }
 
   /**
@@ -443,16 +452,30 @@ class FeaturesManager implements FeaturesManagerInterface {
         return $features_manager->isFeatureModule($module, $bundle);
       });
     }
+    else {
+      // No bundle filter, but still only return "Feature" modules
+      $features_manager = $this;
+      $modules = array_filter($modules, function ($module) use ($features_manager) {
+        return $features_manager->isFeatureModule($module);
+      });
+    }
 
     // Filtered by installed status.
     if ($installed) {
       $features_manager = $this;
       $modules = array_filter($modules, function ($extension) use ($features_manager) {
-        return $features_manager->moduleHandler->moduleExists($extension->getName());
+        return $features_manager->extensionEnabled($extension);
       });
     }
 
     return $modules;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function extensionEnabled(Extension $extension) {
+    return $this->moduleHandler->moduleExists($extension->getName());
   }
 
   /**
@@ -474,6 +497,38 @@ class FeaturesManager implements FeaturesManagerInterface {
     $bundle = $this->getAssigner()->findBundle($info, $features_info);
     $short_name = $bundle->getShortName($extension->getName());
     return $this->initPackage($short_name, $info['name'], !empty($info['description']) ? $info['description'] : '', $info['type'], $bundle, $extension);
+  }
+
+  /**
+   * Helper function to update dependencies array for a specific config item
+   * @param \Drupal\features\ConfigurationItem $config a config item
+   * @param array $module_list
+   * @return array $dependencies
+   */
+  protected function getConfigDependency(ConfigurationItem $config, $module_list = array()) {
+    $dependencies = [];
+    $type = $config->getType();
+    if ($type != FeaturesManagerInterface::SYSTEM_SIMPLE_CONFIG) {
+      $provider = $this->entityManager->getDefinition($type)
+        ->getProvider();
+      // Ensure the provider is an installed module and not, for example, 'core'
+      if (isset($module_list[$provider])) {
+        $dependencies[] = $provider;
+      }
+
+      // For configuration in the InstallStorage::CONFIG_INSTALL_DIRECTORY
+      // directory, set any module dependencies of the configuration item
+      // as package dependencies.
+      // As its name implies, the core-provided
+      // InstallStorage::CONFIG_OPTIONAL_DIRECTORY should not create
+      // dependencies.
+      if ($config->getSubdirectory() === InstallStorage::CONFIG_INSTALL_DIRECTORY &&
+        isset($config->getData()['dependencies']['module'])
+      ) {
+        $dependencies = array_merge($dependencies, $config->getData()['dependencies']['module']);
+      }
+    }
+    return $dependencies;
   }
 
   /**
@@ -499,41 +554,30 @@ class FeaturesManager implements FeaturesManagerInterface {
         //   - the package hasn't been excluded.
         // - and the item isn't already in the package.
 
-        // Determine if the item is provided by an extension.
-        $extension_provided = ($config_collection[$item_name]->isExtensionProvided() === TRUE);
-        $already_assigned = !empty($config_collection[$item_name]->getPackage());
+        $item = &$config_collection[$item_name];
+        $already_assigned = !empty($item->getPackage());
         // If this is the profile package, we can reassign extension-provided configuration.
-        $assignable = (!$extension_provided || $this->getAssigner()->getBundle($package->getBundle())->isProfilePackage($package->getMachineName()));
-        $excluded_from_package = in_array($package_name, $config_collection[$item_name]->getPackageExcluded());
+        $package_bundle = $this->getAssigner()->getBundle($package->getBundle());
+        $is_profile_package = isset($package_bundle) ? $package_bundle->isProfilePackage($package_name) : FALSE;
+        // An item is assignable if:
+        // - it is not provider excluded or this is the profile package, and
+        // - it is not flagged as excluded.
+        $assignable = (!$item->isProviderExcluded() || $is_profile_package) && !$item->isExcluded();
+        // An item is assignable if it was provided by the current package
+        $assignable = $assignable || ($item->getProvider() == $package->getFullName());
+        $excluded_from_package = in_array($package_name, $item->getPackageExcluded());
         $already_in_package = in_array($item_name, $package->getConfig());
         if (($force || (!$already_assigned && $assignable && !$excluded_from_package)) && !$already_in_package) {
           // Add the item to the package's config array.
           $package->appendConfig($item_name);
           // Mark the item as already assigned.
-          $config_collection[$item_name]->setPackage($package_name);
+          $item->setPackage($package_name);
 
-          $module_dependencies = [];
-          // Add a dependency on the extension that provides this configuration
-          // type.
-          if ($config_collection[$item_name]->getType() != static::SYSTEM_SIMPLE_CONFIG) {
-            $provider = $this->entityManager->getDefinition($config_collection[$item_name]->getType())->getProvider();
-            // Ensure the provider is an installed module and not, for example,
-            // 'core'.
-            if (isset($module_list[$provider])) {
-              $module_dependencies[] = $provider;
-            }
-          }
-          // For configuration in the InstallStorage::CONFIG_INSTALL_DIRECTORY
-          // directory, set any module dependencies of the configuration item
-          // as package dependencies.
-          // As its name implies, the core-provided
-          // InstallStorage::CONFIG_OPTIONAL_DIRECTORY should not create
-          // dependencies.
-          if ($config_collection[$item_name]->getSubdirectory() === InstallStorage::CONFIG_INSTALL_DIRECTORY && isset($config_collection[$item_name]->getData()['dependencies']['module'])) {
-            $module_dependencies = array_merge($module_dependencies, $config_collection[$item_name]->getData()['dependencies']['module']);
-          }
+          $module_dependencies = $this->getConfigDependency($item, $module_list);
           $package->setDependencies($this->mergeUniqueItems($package->getDependencies(), $module_dependencies));
         }
+        // Return memory
+        unset($item);
       }
     }
 
@@ -641,6 +685,31 @@ class FeaturesManager implements FeaturesManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function assignPackageDependencies(Package $package = NULL) {
+    if (is_null($package)) {
+      $packages = $this->getPackages();
+    }
+    else {
+      $packages = array($package);
+    }
+    $module_list = $this->moduleHandler->getModuleList();
+    $config_collection = $this->getConfigCollection();
+
+    foreach ($packages as $package) {
+      $module_dependencies = [];
+      foreach ($package->getConfig() as $item_name) {
+        if (isset($config_collection[$item_name])) {
+          $dependencies = $this->getConfigDependency($config_collection[$item_name], $module_list);
+          $module_dependencies = array_merge($module_dependencies, $dependencies);
+        }
+      }
+      $package->setDependencies($this->mergeUniqueItems($package->getDependencies(), $module_dependencies));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function assignInterPackageDependencies(FeaturesBundleInterface $bundle, array &$packages) {
     if (!$this->packagesPrefixed) {
       throw new \Exception($this->t('The packages have not yet been prefixed with a bundle name.'));
@@ -667,9 +736,10 @@ class FeaturesManager implements FeaturesManagerInterface {
               }
               // Otherwise, if the dependency is provided by an existing
               // feature, add a dependency on that feature.
-              if (!$dependency_set && $extension_name = $config_collection[$dependency_name]->getProvidingFeature()) {
+              if (!$dependency_set && $extension_name = $config_collection[$dependency_name]->getProvider()) {
                 // No extension should depend on the install profile.
-                if ($extension_name != $this->drupalGetProfile()) {
+                $package_name = $bundle->getFullName($package->getMachineName());
+                if ($extension_name != $package_name && $extension_name != $this->drupalGetProfile()) {
                   $package->setDependencies($this->mergeUniqueItems($package->getDependencies(), [$extension_name]));
                 }
               }
@@ -773,7 +843,7 @@ class FeaturesManager implements FeaturesManagerInterface {
       $package->setInfo($info);
       $package->setFeaturesInfo($features_info);
       $package->setConfigOrig($this->listExtensionConfig($extension));
-      $package->setStatus($this->moduleHandler->moduleExists($extension->getName())
+      $package->setStatus($this->extensionEnabled($extension)
         ? FeaturesManagerInterface::STATUS_INSTALLED
         : FeaturesManagerInterface::STATUS_UNINSTALLED);
       $package->setVersion(isset($info['version']) ? $info['version'] : '');
@@ -875,12 +945,14 @@ class FeaturesManager implements FeaturesManagerInterface {
       // Add configuration files.
       foreach ($package->getConfig() as $name) {
         $config = $config_collection[$name];
+        $data = $config->getData();
+        // The _core is site-specific, so don't export it.
+        unset($data['_core']);
         // The UUID is site-specfic, so don't export it.
         if ($entity_type_id = $this->configManager->getEntityTypeIdByName($name)) {
-          $data = $config->getData();
           unset($data['uuid']);
-          $config->setData($data);
         }
+        $config->setData($data);
         // User roles include all permissions currently assigned to them. To
         // avoid extraneous additions, reset permissions.
         if ($config->getType() == 'user_role') {
@@ -1014,7 +1086,7 @@ class FeaturesManager implements FeaturesManagerInterface {
       $config_types = $this->listConfigTypes();
       $dependency_manager = $this->configManager->getConfigDependencyManager();
       // List configuration provided by installed features.
-      $existing_config = $this->listExistingConfig(TRUE);
+      $existing_config = $this->listExistingConfig(NULL);
       foreach (array_keys($config_types) as $config_type) {
         $config = $this->listConfigByType($config_type);
         foreach ($config as $item_name => $label) {
@@ -1046,8 +1118,8 @@ class FeaturesManager implements FeaturesManagerInterface {
             // Default to the install directory.
             'subdirectory' => InstallStorage::CONFIG_INSTALL_DIRECTORY,
             'package' => '',
-            'extensionProvided' => NULL,
-            'providingFeature' => isset($existing_config[$name]) ? $existing_config[$name] : NULL,
+            'providerExcluded' => NULL,
+            'provider' => isset($existing_config[$name]) ? $existing_config[$name] : NULL,
             'packageExcluded' => [],
           ]));
         }

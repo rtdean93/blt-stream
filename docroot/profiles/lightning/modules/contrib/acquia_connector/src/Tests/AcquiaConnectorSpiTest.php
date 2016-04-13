@@ -69,7 +69,7 @@ class AcquiaConnectorSpiTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('acquia_connector', 'toolbar', 'acquia_connector_test', 'node', 'shortcut');
+  public static $modules = array('acquia_connector', 'toolbar', 'acquia_connector_test', 'node');
 
   /**
    *{@inheritdoc}
@@ -369,6 +369,40 @@ class AcquiaConnectorSpiTest extends WebTestBase {
       $this->assertTrue(isset($roles) && array_key_exists('anonymous', $roles), 'Roles array contains anonymous user');
       $this->assertTrue(isset($spi_data['fileinfo']['core/scripts/drupal.sh']), 'Fileinfo contains an expected key');
       $this->assertTrue(strpos($spi_data['fileinfo']['core/scripts/drupal.sh'], 'mt') === 0, 'Fileinfo element begins with expected value');
+    }
+  }
+
+  /**
+   * Validate Acquia SPI data.
+   */
+  public function testNoObjectInSpiData() {
+    // Connect site on non-error key and id.
+    $this->connectSite();
+
+    $edit_fields = array(
+      'name' => $this->acqtest_name,
+      'machine_name' => $this->acqtest_machine_name,
+    );
+    $submit_button = 'Save configuration';
+    $this->drupalPostForm($this->settings_path, $edit_fields, $submit_button);
+
+    $spi = new spiControllerTest();
+    $spi_data = $spi->get();
+
+    $this->assertFalse($this->is_contain_objects($spi_data), 'SPI data does not contain PHP objects.');
+  }
+
+  /**
+   * Helper function determines whether given array contains PHP object.
+   */
+  public function is_contain_objects($arr) {
+    foreach ($arr as $key => $item) {
+      if (is_object($item)) {
+        return TRUE;
+      }
+      if (is_array($item) && $this->is_contain_objects($item)) {
+        return TRUE;
+      }
     }
   }
 

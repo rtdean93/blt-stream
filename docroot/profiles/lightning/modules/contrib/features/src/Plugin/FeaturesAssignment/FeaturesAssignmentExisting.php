@@ -14,19 +14,13 @@ use Drupal\features\FeaturesManagerInterface;
  * Class for assigning existing modules to packages.
  *
  * @Plugin(
- *   id = \Drupal\features\Plugin\FeaturesAssignment\FeaturesAssignmentExisting::METHOD_ID,
+ *   id = "existing",
  *   weight = 12,
  *   name = @Translation("Existing"),
  *   description = @Translation("Add exported config to existing packages."),
  * )
  */
 class FeaturesAssignmentExisting extends FeaturesAssignmentMethodBase {
-
-  /**
-   * The package assignment method id.
-   */
-  const METHOD_ID = 'existing';
-
   /**
    * Calls assignConfigPackage without allowing exceptions to abort us.
    *
@@ -59,7 +53,7 @@ class FeaturesAssignmentExisting extends FeaturesAssignmentMethodBase {
       }
     }
     // Now assign to uninstalled modules.
-    foreach ($packages as $name => $info) {
+    foreach ($packages as $name => $package) {
       if ($package->getStatus() === FeaturesManagerInterface::STATUS_UNINSTALLED) {
         $this->safeAssignConfig($package->getMachineName(), $package->getExtension());
       }
