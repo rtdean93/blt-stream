@@ -16,7 +16,7 @@ services:
     arguments: ['@string_translation', '@workbench_moderation.moderation_information', '@entity_type.manager']
   workbench_moderation.entity_operations:
     class: Drupal\workbench_moderation\EntityOperations
-    arguments: ['@workbench_moderation.moderation_information', '@entity_type.manager', '@form_builder', '@event_dispatcher']
+    arguments: ['@workbench_moderation.moderation_information', '@entity_type.manager', '@form_builder', '@event_dispatcher', '@workbench_moderation.revision_tracker']
   workbench_moderation.inline_editing_disabler:
     class: \Drupal\workbench_moderation\InlineEditingDisabler
     arguments: ['@workbench_moderation.moderation_information']
@@ -28,3 +28,8 @@ services:
     arguments: ['@workbench_moderation.moderation_information']
     tags:
       - { name: access_check, applies_to: _workbench_moderation_latest_version }
+  workbench_moderation.revision_tracker:
+    class: Drupal\workbench_moderation\RevisionTracker
+    arguments: ['@database']
+    tags:
+     - { name: backend_overridable }

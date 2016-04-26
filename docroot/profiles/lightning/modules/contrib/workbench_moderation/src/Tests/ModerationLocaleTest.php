@@ -143,7 +143,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     $edit = [
       'new_state' => 'published',
     ];
-    $this->drupalPostForm('fr/node/' . $english_node->id() . '/latest', [], t('Apply'));
+    $this->drupalPostForm('fr/node/' . $english_node->id() . '/latest', $edit, t('Apply'));
     $this->assertText(t('The moderation state has been updated.'));
     $english_node = $this->drupalGetNodeByTitle('Another node', TRUE);
     $french_node = $english_node->getTranslation('fr');

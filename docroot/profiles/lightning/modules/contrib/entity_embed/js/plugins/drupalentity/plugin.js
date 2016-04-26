@@ -27,8 +27,8 @@
 
       // Generic command for adding/editing entities of all types.
       editor.addCommand('editdrupalentity', {
-        allowedContent: 'drupal-entity[data-entity-type,data-entity-id,data-entity-uuid,data-entity-embed-display,data-entity-embed-settings,data-align,data-caption]',
-        requiredContent: 'drupal-entity[data-entity-type,data-entity-id,data-entity-uuid,data-entity-embed-display,data-entity-embed-settings,data-align,data-caption]',
+        allowedContent: 'drupal-entity[data-embed-button,data-entity-type,data-entity-id,data-entity-uuid,data-entity-embed-display,data-entity-embed-settings,data-align,data-caption]',
+        requiredContent: 'drupal-entity[data-embed-button,data-entity-type,data-entity-id,data-entity-uuid,data-entity-embed-display,data-entity-embed-settings,data-align,data-caption]',
         modes: { wysiwyg : 1 },
         canUndo: true,
         exec: function (editor, data) {
@@ -51,11 +51,9 @@
             }
           }
 
-          var entity_label = data.label ? data.label : existingValues['data-entity-label'];
           var embed_button_id = data.id ? data.id : existingValues['data-embed-button'];
 
           var dialogSettings = {
-            title: existingElement ? 'Edit ' + entity_label : 'Insert ' + entity_label,
             dialogClass: 'entity-select-dialog',
             resizable: false
           };
@@ -107,9 +105,9 @@
           var $element = $(element.$);
           // Use the Ajax framework to fetch the HTML, so that we can retrieve
           // out-of-band assets (JS, CSS...).
-          var entityEmbedPreview = new Drupal.ajax({
+          var entityEmbedPreview = Drupal.ajax({
             base: $element.attr('id'),
-            element: $element,
+            element: $element.get(0),
             url: Drupal.url('embed/preview/' + editor.config.drupal.format + '?' + $.param({
               value: element.getOuterHtml()
             })),
@@ -156,7 +154,7 @@
         });
 
         editor.contextMenu.addListener(function(element) {
-          if (isEmbeddedEntityWidget(editor, element)) {
+          if (isEditableEntityWidget(editor, element)) {
             return { drupalentity: CKEDITOR.TRISTATE_OFF };
           }
         });
@@ -166,7 +164,7 @@
       editor.on('doubleclick', function (evt) {
         var element = getSelectedEmbeddedEntity(editor) || evt.data.element;
 
-        if (isEmbeddedEntityWidget(editor, element)) {
+        if (isEditableEntityWidget(editor, element)) {
           editor.execCommand('editdrupalentity');
         }
       });
@@ -181,7 +179,7 @@
   function getSelectedEmbeddedEntity(editor) {
     var selection = editor.getSelection();
     var selectedElement = selection.getSelectedElement();
-    if (isEmbeddedEntityWidget(editor, selectedElement)) {
+    if (isEditableEntityWidget(editor, selectedElement)) {
       return selectedElement;
     }
 
@@ -189,14 +187,25 @@
   }
 
   /**
-   * Returns whether or not the given element is a drupalentity widget.
+   * Checks if the given element is an editable drupalentity widget.
    *
    * @param {CKEDITOR.editor} editor
    * @param {CKEDITOR.htmlParser.element} element
    */
-  function isEmbeddedEntityWidget (editor, element) {
+  function isEditableEntityWidget (editor, element) {
     var widget = editor.widgets.getByElement(element, true);
-    return widget && widget.name === 'drupalentity';
+    if (!widget || widget.name !== 'drupalentity') {
+      return false;
+    }
+
+    var button = $(element.$.firstChild).attr('data-embed-button');
+    if (!button) {
+      // If there was no data-embed-button attribute, not editable.
+      return false;
+    }
+
+    // The button itself must be valid.
+    return editor.config.DrupalEntity_buttons.hasOwnProperty(button);
   }
 
   /**

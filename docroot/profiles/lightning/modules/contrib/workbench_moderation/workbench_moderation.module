@@ -17,6 +17,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
+use Drupal\node\Plugin\Action\PublishNode;
+use Drupal\node\Plugin\Action\UnpublishNode;
+use Drupal\workbench_moderation\Plugin\Action\ModerationOptOutPublishNode;
+use Drupal\workbench_moderation\Plugin\Action\ModerationOptOutUnpublishNode;
 use Drupal\workbench_moderation\Plugin\Menu\EditTab;
 
 /**
@@ -93,6 +97,20 @@ function workbench_moderation_entity_storage_load(array $entities, $entity_type_
  */
 function workbench_moderation_entity_presave(EntityInterface $entity) {
   return \Drupal::service('workbench_moderation.entity_operations')->entityPresave($entity);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function workbench_moderation_entity_insert(EntityInterface $entity) {
+  return \Drupal::service('workbench_moderation.entity_operations')->entityInsert($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function workbench_moderation_entity_update(EntityInterface $entity) {
+  return \Drupal::service('workbench_moderation.entity_operations')->entityUpdate($entity);
 }
 
 /**
@@ -177,4 +195,43 @@ function workbench_moderation_theme($existing, $type, $theme, $path) {
   ];
 
   return $themes;
+}
+
+/**
+ * Implements hook_action_info_alter().
+ */
+function workbench_moderation_action_info_alter(&$definitions) {
+
+  // The publish/unpublish actions are not valid on moderated entities. So swap
+  // their implementations out for alternates that will become a no-op on a
+  // moderated node. If another module has already swapped out those classes,
+  // though, we'll be polite and do nothing.
+  if (isset($definitions['node_publish_action']['class']) && $definitions['node_publish_action']['class'] == PublishNode::class) {
+    $definitions['node_publish_action']['class'] = ModerationOptOutPublishNode::class;
+  }
+  if (isset($definitions['node_unpublish_action']['class']) && $definitions['node_unpublish_action']['class'] == UnpublishNode::class) {
+    $definitions['node_unpublish_action']['class'] = ModerationOptOutUnpublishNode::class;
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function workbench_moderation_views_data_alter(array &$data) {
+
+  /** @var \Drupal\workbench_moderation\ModerationInformationInterface $mod_info */
+  $mod_info = \Drupal::service('workbench_moderation.moderation_information');
+
+  /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $etm */
+  $etm = \Drupal::service('entity_type.manager');
+
+  $revisionable_types = $mod_info->selectRevisionableEntities($etm->getDefinitions());
+
+  foreach ($revisionable_types as $type) {
+    $data[$type->getRevisionTable()]['latest_revision'] = [
+      'title' => t('Is Latest Revision'),
+      'help' => t('Restrict the view to only revisions that are the latest revision of their entity.'),
+      'filter' => ['id' => 'latest_revision'],
+    ];
+  }
 }
