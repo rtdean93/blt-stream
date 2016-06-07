@@ -7,3 +7,7 @@ dependencies:
   - image
   - user
   - views
+  - entity (>=8.x-1.0-alpha3)
+  - system (>=8.1.0)
+test_dependencies:
+  - entity

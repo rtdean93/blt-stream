@@ -3,14 +3,13 @@ description: 'Twitter support for Lightning Media.'
 type: module
 # core: 8.x
 dependencies:
-  - image
   - lightning_media
   - media_entity_twitter
-# version: 8.x-1.0-beta3
+# version: 8.x-1.0-rc6
 package: Lightning
 
-# Information added by Drupal.org packaging script on 2016-04-20
-version: '8.x-1.00-rc3'
+# Information added by Drupal.org packaging script on 2016-06-05
+version: '8.x-1.00-rc6'
 core: '8.x'
 project: 'lightning'
-datestamp: 1461163160
+datestamp: 1465153841

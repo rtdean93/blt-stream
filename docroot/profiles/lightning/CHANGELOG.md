@@ -1,3 +1,32 @@
+## Release Candidate6 (RC6)
+* Lightning Media no longer depends on or references the Lightning profile
+  directly. [#2692419]
+* Site Builders can now choose to opt out of the user roles that Lightning
+  generates per content type. Visit `admin/config/system/lightning` to change
+  this setting. [#2715517]
+* Added build status to README.md. [#2737655]
+* Updated all dependecies to latest releases. [#2737745]
+* The dependency on Drush has been moved to `require-dev`. [#2716657]
+* Lightning Media has been rewritted to take advantage of Entity Browser. [#2726889]
+* Lightning Media now supports documents (txt, pdf, doc, and docx).
+
+## Release Candidate 5 (RC5)
+* The Media  Entity Embeddable Video module has been deprecated and is replaced
+  by Video Embed Field in this release. (Issue #2700399)
+* Lightning now ships with the stable release of Drush 9 (currently alpha1).
+  This fixes dependency conflicts with the Lightning installer.
+
+## Release Candidate 4 (RC4)
+* Drupal core updated to 8.1.1.
+* Contrib modules updated to latest releases.
+* The CKEditor media library widget was completely refactored. (Issue #2713695)
+* The Rich Text input format now allows BR tags. (Issue #2693793)
+* Under some circumstances, the CKEditor media library widget would trigger an
+  AJAX error. (Issue #2717403)
+* Lightning Layout's README contained incorrect information. (Issue #2711975)
+* Resolved a warning about Options in lightning_workflow_form_node_form_alter
+  (Issue #2703077)
+
 ## Release Candidate 3 (RC3)
 * Update core to 8.1.0
 * Update all contrib modules to their latest releases

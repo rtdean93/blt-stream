@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Contains \Drupal\media_entity\Form\MediaInlineForm.
- */
-
 namespace Drupal\media_entity\Form;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -43,7 +39,7 @@ class MediaInlineForm extends EntityInlineForm {
   /**
    * {@inheritdoc}
    */
-  public function entityFormSubmit(&$entity_form, FormStateInterface $form_state) {
+  public function entityFormSubmit(array &$entity_form, FormStateInterface $form_state) {
     parent::entityFormSubmit($entity_form, $form_state);
 
     /** @var \Drupal\media_entity\MediaInterface $entity */

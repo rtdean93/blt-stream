@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\media_entity\Entity\MediaBundle.
- */
-
 namespace Drupal\media_entity\Entity;
 
+use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
@@ -23,11 +19,14 @@ use Drupal\media_entity\MediaInterface;
  *     "form" = {
  *       "add" = "Drupal\media_entity\MediaBundleForm",
  *       "edit" = "Drupal\media_entity\MediaBundleForm",
- *       "delete" = "Drupal\media_entity\Form\MediaBundleDeleteForm"
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "list_builder" = "Drupal\media_entity\MediaBundleListBuilder",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     }
  *   },
- *   admin_permission = "administer media",
+ *   admin_permission = "administer media bundles",
  *   config_prefix = "bundle",
  *   bundle_of = "media",
  *   entity_keys = {
@@ -40,18 +39,21 @@ use Drupal\media_entity\MediaInterface;
  *     "description",
  *     "type",
  *     "queue_thumbnail_downloads",
+ *     "new_revision",
  *     "third_party_settings",
  *     "type_configuration",
  *     "field_map",
+ *     "status",
  *   },
  *   links = {
+ *     "add-form" = "/admin/structure/media/add",
  *     "edit-form" = "/admin/structure/media/manage/{media_bundle}",
  *     "delete-form" = "/admin/structure/media/manage/{media_bundle}/delete",
  *     "collection" = "/admin/structure/media",
  *   }
  * )
  */
-class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface, EntityWithPluginCollectionInterface {
+class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface, EntityWithPluginCollectionInterface, EntityDescriptionInterface {
 
   /**
    * The machine name of this media bundle.
@@ -89,6 +91,13 @@ class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface
   public $queue_thumbnail_downloads = FALSE;
 
   /**
+   * Default value of the 'Create new revision' checkbox of this media bundle.
+   *
+   * @var bool
+   */
+  protected $new_revision = FALSE;
+
+  /**
    * The type plugin configuration.
    *
    * @var array
@@ -108,6 +117,13 @@ class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface
    * @var array
    */
   public $field_map = array();
+
+  /**
+   * Default status of this media bundle.
+   *
+   * @var array
+   */
+  public $status = TRUE;
 
   /**
    * {@inheritdoc}
@@ -145,6 +161,14 @@ class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface
    */
   public function getDescription() {
     return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
   }
 
   /**
@@ -194,6 +218,27 @@ class MediaBundle extends ConfigEntityBundleBase implements MediaBundleInterface
       $this->typePluginCollection = new DefaultSingleLazyPluginCollection(\Drupal::service('plugin.manager.media_entity.type'), $this->type, $this->type_configuration);
     }
     return $this->typePluginCollection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getStatus() {
+    return $this->status;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function shouldCreateNewRevision() {
+    return $this->new_revision;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNewRevision($new_revision) {
+    $this->new_revision = $new_revision;
   }
 
 }

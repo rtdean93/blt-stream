@@ -1,35 +1,36 @@
-@lightning @media @api
+@media @api
 Feature: Video media assets
   A media asset representing an externally hosted video.
 
-  Scenario: Creating a video
+  @javascript
+  Scenario: Creating a video from a YouTube URL
     Given I am logged in as a user with the media_creator role
-    When I visit "/media/add"
-    And I click "Video"
-    Then I should see "Video"
-    And I should see "Save to my media library"
+    When I visit "/media/add/video"
+    And I enter "https://www.youtube.com/watch?v=zQ1_IbFFbzA" for "Video URL"
+    And I wait for AJAX to finish
+    And I enter "The Pill Scene" for "Media name"
+    And I press "Save and publish"
+    Then I should be visiting a media entity
+    And I should see "The Pill Scene"
+    And I queue the latest media entity for deletion
+
+  @javascript
+  Scenario: Creating a video from a Vimeo URL
+    Given I am logged in as a user with the media_creator role
+    When I visit "/media/add/video"
+    And I enter "https://vimeo.com/14782834" for "Video URL"
+    And I wait for AJAX to finish
+    And I enter "Cache Rules Everything Around Me" for "Media name"
+    And I press "Save and publish"
+    Then I should be visiting a media entity
+    And I should see "Cache Rules Everything Around Me"
+    And I queue the latest media entity for deletion
 
   Scenario: Viewing a video as an anonymous user
-    Given video media from embed code:
+    Given video from embed code:
     """
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/ktCgVopf7D0" frameborder="0" allowfullscreen></iframe>
+    https://www.youtube.com/watch?v=ktCgVopf7D0
     """
     And I am an anonymous user
     When I visit a media entity of type video
     Then I should get a 200 HTTP response
-
-  @javascript
-  Scenario: Creating a video in CKEditor from an embed code
-    Given I am logged in as a user with the page_creator,media_creator roles
-    When I go to "/node/add/page"
-    And I wait for AJAX to finish
-    And I execute the "media_library" command in CKEditor "edit-body-0-value"
-    And I wait for AJAX to finish
-    And I click "Create Embed"
-    And I enter "https://www.youtube.com/watch?v=DyFYUKBEZAg" for "embed_code"
-    # Wait for the server to turn the embed code into an entity.
-    And I wait for AJAX to finish
-    And I press "Place"
-    # Wait for the embed to complete.
-    And I wait for AJAX to finish
-    Then CKEditor "edit-body-0-value" should match "/data-entity-id=.?[0-9]+.?/"

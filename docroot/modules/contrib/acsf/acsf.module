@@ -56,3 +56,15 @@ function acsf_acsf_registry() {
     ),
   );
 }
+
+/**
+ * Implements hook_cron().
+ */
+function acsf_cron() {
+  // Periodically refresh the site data.
+  $site = \Drupal\acsf\AcsfSite::load();
+  $refresh_age = time() - 86400;
+  if ($site->last_sf_refresh < $refresh_age) {
+    $site->refresh();
+  }
+}

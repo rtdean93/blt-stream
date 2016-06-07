@@ -1,19 +1,15 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\media_entity\MediaInterface.
- */
-
 namespace Drupal\media_entity;
 
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 
 /**
  * Provides an interface defining a media entity.
  */
-interface MediaInterface extends ContentEntityInterface, EntityChangedInterface {
+interface MediaInterface extends ContentEntityInterface, EntityChangedInterface, RevisionLogInterface {
 
   /**
    * Returns the media creation timestamp.
