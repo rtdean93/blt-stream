@@ -1,18 +1,15 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\media_entity\Entity\Media.
- */
-
 namespace Drupal\media_entity\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\media_entity\MediaBundleInterface;
 use Drupal\media_entity\MediaInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\user\UserInterface;
 
 /**
  * Defines the media entity class.
@@ -33,7 +30,10 @@ use Drupal\Core\Entity\EntityChangedTrait;
  *     },
  *     "inline_form" = "Drupal\media_entity\Form\MediaInlineForm",
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
- *     "views_data" = "Drupal\media_entity\MediaViewsData"
+ *     "views_data" = "Drupal\media_entity\MediaViewsData",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     }
  *   },
  *   base_table = "media",
  *   data_table = "media_field_data",
@@ -54,6 +54,8 @@ use Drupal\Core\Entity\EntityChangedTrait;
  *   admin_permission = "administer media",
  *   field_ui_base_route = "entity.media_bundle.edit_form",
  *   links = {
+ *     "add-page" = "/media/add",
+ *     "add-form" = "/media/add/{media_bundle}",
  *     "canonical" = "/media/{media}",
  *     "delete-form" = "/media/{media}/delete",
  *     "edit-form" = "/media/{media}/edit",
@@ -158,6 +160,17 @@ class Media extends ContentEntityBase implements MediaInterface {
   /**
    * {@inheritdoc}
    */
+  public function postCreate(EntityStorageInterface $storage) {
+    parent::postCreate($storage);
+
+    /** @var MediaBundleInterface $bundle */
+    $bundle = $this->entityTypeManager()->getStorage('media_bundle')->load($this->bundle());;
+    $this->setPublished($bundle->getStatus());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -201,7 +214,7 @@ class Media extends ContentEntityBase implements MediaInterface {
   public function automaticallySetThumbnail() {
     /** @var \Drupal\media_entity\MediaBundleInterface $bundle */
     if ($this->bundle->entity->getQueueThumbnailDownloads() && $this->isNew()) {
-      $thumbnail_uri = $this->getType()->getDefaultImage();
+      $thumbnail_uri = $this->getType()->getDefaultThumbnail();
     }
     else {
       $thumbnail_uri = $this->getType()->thumbnail($this);
@@ -216,7 +229,9 @@ class Media extends ContentEntityBase implements MediaInterface {
     else {
       /** @var \Drupal\file\FileInterface $file */
       $file = $this->entityManager()->getStorage('file')->create(['uri' => $thumbnail_uri]);
-      $file->setOwner($this->getPublisher());
+      if ($publisher = $this->getPublisher()) {
+        $file->setOwner($publisher);
+      }
       $file->setPermanent();
       $file->save();
       $this->thumbnail->target_id = $file->id();
@@ -411,6 +426,66 @@ class Media extends ContentEntityBase implements MediaInterface {
    */
   public static function getCurrentUserId() {
     return array(\Drupal::currentUser()->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionCreationTime() {
+    return $this->revision_timestamp->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionCreationTime($timestamp) {
+    $this->revision_timestamp->value = $timestamp;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionUser() {
+    return $this->revision_uid->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionUser(UserInterface $account) {
+    $this->revision_uid->entity = $account;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionUserId() {
+    return $this->revision_user->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionUserId($user_id) {
+    $this->revision_user->target_id = $user_id;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionLogMessage() {
+    return $this->revision_log->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionLogMessage($revision_log_message) {
+    $this->revision_log->value = $revision_log_message;
+    return $this;
   }
 
 }

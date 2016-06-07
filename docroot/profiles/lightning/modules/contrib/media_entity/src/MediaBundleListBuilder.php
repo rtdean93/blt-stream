@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\media_entity\MediaBundleListController.
- */
 
 namespace Drupal\media_entity;
 
@@ -47,7 +43,7 @@ class MediaBundleListBuilder extends ConfigEntityListBuilder implements EntityHa
   public function render() {
     $build = parent::render();
     $build['#empty'] = t('No media bundle available. <a href="@link">Add media bundle</a>.', array(
-      '@link' => Url::fromRoute('media.bundle_add')->toString(),
+      '@link' => Url::fromRoute('entity.media_bundle.add_form')->toString(),
     ));
     return $build;
   }

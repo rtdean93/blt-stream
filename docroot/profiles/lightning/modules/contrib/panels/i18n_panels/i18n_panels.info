@@ -8,9 +8,9 @@ package = Multilingual - Internationalization
 core = 7.x
 
 
-; Information added by drush on 2016-04-20
+; Information added by drush on 2016-06-05
 version = "8.x-3.0-beta4"
 core = "8.x"
 project = "panels"
-datestamp = "1461163180"
+datestamp = "1465153865"
 

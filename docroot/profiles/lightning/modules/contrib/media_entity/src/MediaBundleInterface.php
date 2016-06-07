@@ -1,18 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\media_entity\MediaBundleInterface.
- */
-
 namespace Drupal\media_entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\entity\Entity\RevisionableEntityBundleInterface;
 
 /**
  * Provides an interface defining a media bundle entity.
  */
-interface MediaBundleInterface extends ConfigEntityInterface {
+interface MediaBundleInterface extends ConfigEntityInterface, RevisionableEntityBundleInterface {
 
   /**
    * Returns the label.
@@ -83,4 +79,21 @@ interface MediaBundleInterface extends ConfigEntityInterface {
    *   The type configuration.
    */
   public function setTypeConfiguration($configuration);
+
+  /**
+   * Returns the media type status.
+   *
+   * @return bool
+   *   The status.
+   */
+  public function getStatus();
+
+  /**
+   * Sets whether a new revision should be created by default.
+   *
+   * @param bool $new_revision
+   *   TRUE if a new revision should be created by default.
+   */
+  public function setNewRevision($new_revision);
+
 }

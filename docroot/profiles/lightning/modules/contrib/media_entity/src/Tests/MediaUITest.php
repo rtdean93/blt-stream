@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\media_entity\Tests\MediaUITest.
- */
-
 namespace Drupal\media_entity\Tests;
 
 use Drupal\Component\Utility\Xss;
@@ -28,25 +23,17 @@ class MediaUITest extends WebTestBase {
   protected $adminUser;
 
   /**
-   * The test media bundle.
-   *
-   * @var \Drupal\media_entity\MediaBundleInterface
-   */
-  protected $testBundle;
-
-  /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['media_entity', 'field_ui', 'views_ui', 'node', 'block'];
+  public static $modules = ['media_entity', 'field_ui', 'views_ui', 'node', 'block', 'entity'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    $this->testBundle = $this->drupalCreateMediaBundle();
     $this->drupalPlaceBlock('local_actions_block');
     $this->drupalPlaceBlock('local_tasks_block');
     $this->adminUser = $this->drupalCreateUser([
@@ -54,6 +41,7 @@ class MediaUITest extends WebTestBase {
       'administer media fields',
       'administer media form display',
       'administer media display',
+      'administer media bundles',
       // Media entity permissions.
       'view media',
       'create media',
@@ -61,6 +49,7 @@ class MediaUITest extends WebTestBase {
       'update any media',
       'delete media',
       'delete any media',
+      'access media overview',
       // Other permissions.
       'administer views',
       'access content overview',
@@ -73,6 +62,8 @@ class MediaUITest extends WebTestBase {
    * Tests a media bundle administration.
    */
   public function testMediaBundles() {
+    $this->container->get('module_installer')->install(['media_entity_test_type']);
+
     // Test and create one media bundle.
     $bundle = $this->createMediaBundle();
 
@@ -84,22 +75,80 @@ class MediaUITest extends WebTestBase {
 
     // Assert that fields have expected values before editing.
     $this->drupalGet('admin/structure/media/manage/' . $bundle['id']);
-    $this->assertFieldByName('label', $bundle['label']);
-    $this->assertFieldByName('description', $bundle['description']);
-    $this->assertFieldByName('type', $bundle['type']);
+    $this->assertFieldByName('label', $bundle['label'], 'Label field has correct value.');
+    $this->assertFieldByName('description', $bundle['description'], 'Description field has a correct value.');
+    $this->assertFieldByName('type', $bundle['type'], 'Generic plugin is selected.');
+    $this->assertNoFieldChecked('edit-options-new-revision', 'Revision checkbox is not checked.');
+    $this->assertNoFieldChecked('edit-options-queue-thumbnail-downloads', 'Queue thumbnail checkbox is not checked.');
+    $this->assertText('Create new revision', 'Revision checkbox label found.');
+    $this->assertText('Create new revision: Automatically create a new revision of media entities. Users with the Administer media permission will be able to override this option.', 'Revision help text found');
+    $this->assertText('Queue thumbnail downloads: Download thumbnails via a queue.', 'Queue thumbnails help text found');
+    $this->assertText('Published: Entities will be automatically published when they are created.', 'Published help text found');
+    $this->assertText("This type provider doesn't need configuration.");
+    $this->assertText('No metadata fields available.');
+    $this->assertText('Media type plugins can provide metadata fields such as title, caption, size information, credits, ... Media entity can automatically save this metadata information to entity fields, which can be configured blow. Information will only be mapped if the entity field is empty.');
+
+    // Try to change media type and check if new configuration sub-form appears.
+    $commands = $this->drupalPostAjaxForm(NULL, ['type' => 'test_type'], 'type');
+    // WebTestBase::drupalProcessAjaxResponse() won't correctly execute our ajax
+    // commands so we have to do it manually. Code below is based on the logic
+    // in that function.
+    $content = $this->content;
+    $dom = new \DOMDocument();
+    @$dom->loadHTML($content);
+    $xpath = new \DOMXPath($dom);
+    foreach ($commands as $command) {
+      if ($command['command'] == 'insert' && $command['method'] == 'replaceWith') {
+        $wrapperNode = $xpath->query('//*[@id="' . ltrim($command['selector'], '#') . '"]')->item(0);
+        $newDom = new \DOMDocument();
+        @$newDom->loadHTML('<div>' . $command['data'] . '</div>');
+        $newNode = @$dom->importNode($newDom->documentElement->firstChild->firstChild, TRUE);
+        $wrapperNode->parentNode->replaceChild($newNode, $wrapperNode);
+        $content = $dom->saveHTML();
+        $this->setRawContent($content);
+      }
+    }
+    $this->assertFieldByName('type_configuration[test_type][test_config_value]', 'This is default value.');
+    $this->assertText('Field 1', 'First metadata field found.');
+    $this->assertText('Field 2', 'Second metadata field found.');
+    $this->assertFieldByName('field_mapping[field_1]', '_none', 'First metadata field is not mapped by default.');
+    $this->assertFieldByName('field_mapping[field_2]', '_none', 'Second metadata field is not mapped by default.');
 
     // Edit and save media bundle form fields with new values.
     $bundle['label'] = $this->randomMachineName();
     $bundle['description'] = $this->randomMachineName();
-    $bundle['type'] = 'generic';
+    $bundle['type'] = 'test_type';
+    $bundle['type_configuration[test_type][test_config_value]'] = 'This is new config value.';
+    $bundle['field_mapping[field_1]'] = 'name';
+    $bundle['options[new_revision]'] = TRUE;
+    $bundle['options[queue_thumbnail_downloads]'] = TRUE;
     $this->drupalPostForm(NULL, $bundle, t('Save media bundle'));
 
-    // Test if edit worked and if new field values have been saved as
-    // expected.
+    // Test if edit worked and if new field values have been saved as expected.
     $this->drupalGet('admin/structure/media/manage/' . $bundle['id']);
-    $this->assertFieldByName('label', $bundle['label']);
-    $this->assertFieldByName('description', $bundle['description']);
-    $this->assertFieldByName('type', $bundle['type']);
+    $this->assertFieldByName('label', $bundle['label'], 'Label field has correct value.');
+    $this->assertFieldByName('description', $bundle['description'], 'Description field has correct value.');
+    $this->assertFieldByName('type', $bundle['type'], 'Test type is selected.');
+    $this->assertFieldChecked('edit-options-new-revision', 'Revision checkbox is checked.');
+    $this->assertFieldChecked('edit-options-queue-thumbnail-downloads', 'Queue thumbnail checkbox is checked.');
+    $this->assertFieldByName('type_configuration[test_type][test_config_value]', 'This is new config value.');
+    $this->assertText('Field 1', 'First metadata field found.');
+    $this->assertText('Field 2', 'Second metadata field found.');
+    $this->assertFieldByName('field_mapping[field_1]', 'name', 'First metadata field is mapped to the name field.');
+    $this->assertFieldByName('field_mapping[field_2]', '_none', 'Second metadata field is not mapped.');
+
+    /** @var \Drupal\media_entity\MediaBundleInterface $loaded_bundle */
+    $loaded_bundle = $this->container->get('entity_type.manager')
+      ->getStorage('media_bundle')
+      ->load($bundle['id']);
+    $this->assertEqual($loaded_bundle->id(), $bundle['id'], 'Media bundle ID saved correctly.');
+    $this->assertEqual($loaded_bundle->label(), $bundle['label'], 'Media bundle label saved correctly.');
+    $this->assertEqual($loaded_bundle->getDescription(), $bundle['description'], 'Media bundle description saved correctly.');
+    $this->assertEqual($loaded_bundle->getType()->getPluginId(), $bundle['type'], 'Media bundle type saved correctly.');
+    $this->assertEqual($loaded_bundle->getType()->getConfiguration()['test_config_value'], $bundle['type_configuration[test_type][test_config_value]'], 'Media bundle type configuration saved correctly.');
+    $this->assertTrue($loaded_bundle->shouldCreateNewRevision(), 'New revisions are configured to be created.');
+    $this->assertTrue($loaded_bundle->getQueueThumbnailDownloads(), 'Thumbnails are created through queues.');
+    $this->assertEqual($loaded_bundle->field_map, ['field_1' => $bundle['field_mapping[field_1]']], 'Field mapping was saved correctly.');
 
     // Tests media bundle delete form.
     $this->clickLink(t('Delete'));
@@ -114,6 +163,9 @@ class MediaUITest extends WebTestBase {
    * Tests the media actions (add/edit/delete).
    */
   public function testMediaWithOnlyOneBundle() {
+    /** @var \Drupal\media_entity\MediaBundleInterface $bundle */
+    $bundle = $this->drupalCreateMediaBundle();
+
     // Assert that media item list is empty.
     $this->drupalGet('admin/content/media');
     $this->assertResponse(200);
@@ -121,16 +173,23 @@ class MediaUITest extends WebTestBase {
 
     $this->drupalGet('media/add');
     $this->assertResponse(200);
-    $this->assertUrl('media/add/' . $this->testBundle->id());
+    $this->assertUrl('media/add/' . $bundle->id());
+    $this->assertFieldChecked('edit-revision', 'New revision should always be created when a new entity is being created.');
 
     // Tests media item add form.
     $edit = [
       'name[0][value]' => $this->randomMachineName(),
+      'revision_log' => $this->randomString(),
     ];
-    $this->drupalPostForm('media/add', $edit, t('Save'));
+    $this->drupalPostForm('media/add', $edit, t('Save and publish'));
     $this->assertTitle($edit['name[0][value]'] . ' | Drupal');
-    $media_id = \Drupal::entityQuery('media')->execute();
+    $media_id = $this->container->get('entity.query')->get('media')->execute();
     $media_id = reset($media_id);
+    /** @var \Drupal\media_entity\MediaInterface $media */
+    $media = $this->container->get('entity_type.manager')
+      ->getStorage('media')
+      ->loadUnchanged($media_id);
+    $this->assertEqual($media->getRevisionLogMessage(), $edit['revision_log'], 'Revision log was saved.');
 
     // Test if the media list contains exactly 1 media bundle.
     $this->drupalGet('admin/content/media');
@@ -139,14 +198,30 @@ class MediaUITest extends WebTestBase {
 
     // Tests media edit form.
     $this->drupalGet('media/' . $media_id . '/edit');
+    $this->assertNoFieldChecked('edit-revision', 'New revisions are disabled by default.');
     $edit['name[0][value]'] = $this->randomMachineName();
-    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
     $this->assertTitle($edit['name[0][value]'] . ' | Drupal');
 
     // Assert that the media list updates after an edit.
     $this->drupalGet('admin/content/media');
     $this->assertResponse(200);
     $this->assertText($edit['name[0][value]']);
+
+    // Enable revisions by default.
+    $bundle->setNewRevision(TRUE);
+    $bundle->save();
+    $this->drupalGet('media/' . $media_id . '/edit');
+    $this->assertFieldChecked('edit-revision', 'New revisions are disabled by default.');
+    $edit['name[0][value]'] = $this->randomMachineName();
+    $edit['revision_log'] = $this->randomString();
+    $this->drupalPostForm(NULL, $edit, t('Save and keep published'));
+    $this->assertTitle($edit['name[0][value]'] . ' | Drupal');
+    /** @var \Drupal\media_entity\MediaInterface $media */
+    $media = $this->container->get('entity_type.manager')
+      ->getStorage('media')
+      ->loadUnchanged($media_id);
+    $this->assertEqual($media->getRevisionLogMessage(), $edit['revision_log'], 'Revision log was saved.');
 
     // Tests media delete form.
     $this->drupalPostForm('media/' . $media_id . '/delete', array(), t('Delete'));
@@ -164,10 +239,10 @@ class MediaUITest extends WebTestBase {
    * Tests the views wizards provided by the media module.
    */
   public function testMediaViewsWizard() {
-
+    $bundle = $this->drupalCreateMediaBundle();
     $data = [
       'name' => $this->randomMachineName(),
-      'bundle' => $this->testBundle->id(),
+      'bundle' => $bundle->id(),
       'type' => 'Unknown',
       'uid' => $this->adminUser->id(),
       'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
@@ -303,7 +378,7 @@ class MediaUITest extends WebTestBase {
       'name[0][value]' => $name,
     ];
     // Save it and retrieve new media item ID, then return all information.
-    $this->drupalPostForm('media/add/' . $media_bundle['id'], $edit, t('Save'));
+    $this->drupalPostForm('media/add/' . $media_bundle['id'], $edit, t('Save and publish'));
     $this->assertTitle($edit['name[0][value]'] . ' | Drupal');
     $media_id = \Drupal::entityQuery('media')->execute();
     $media_id = reset($media_id);
