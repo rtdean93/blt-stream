@@ -144,14 +144,6 @@ if (file_exists('/var/www/site-php')) {
     }
   }
 }
-
-// Include custom settings.php code from factory-hooks/post-settings-php.
-if (function_exists('acsf_hooks_includes')) {
-  foreach (acsf_hooks_includes('post-settings-php') as $post_hook) {
-    include_once $post_hook;
-  }
-}
-
 /**
  * Location of the site configuration files.
  *
@@ -182,5 +174,14 @@ if (isset($config_directories['vcs'])) {
   // directory is removed for now.
   // @see https://backlog.acquia.com/browse/CL-11815
   // @see https://github.com/drush-ops/drush/pull/1711
-  unset($config_directories['vcs']);
+  if (function_exists('drush_get_command') && drush_get_command()['command'] === 'site-install') {
+    unset($config_directories['vcs']);
+  }
+}
+
+// Include custom settings.php code from factory-hooks/post-settings-php.
+if (function_exists('acsf_hooks_includes')) {
+  foreach (acsf_hooks_includes('post-settings-php') as $post_hook) {
+    include_once $post_hook;
+  }
 }
