@@ -2,13 +2,11 @@
 
 namespace Drupal\entity_browser\Form;
 
-use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\entity_browser\DisplayAjaxInterface;
 use Drupal\entity_browser\EntityBrowserFormInterface;
 use Drupal\entity_browser\EntityBrowserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The entity browser form.
@@ -16,37 +14,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EntityBrowserForm extends FormBase implements EntityBrowserFormInterface {
 
   /**
-   * UUID generator service.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface
-   */
-  protected $uuidGenerator;
-
-  /**
    * The entity browser object.
    *
    * @var \Drupal\entity_browser\EntityBrowserInterface
    */
   protected $entity_browser;
-
-  /**
-   * Constructs a EntityBrowserForm object.
-   *
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_generator
-   *   The UUID generator service.
-   */
-  public function __construct(UuidInterface $uuid_generator) {
-    $this->uuidGenerator = $uuid_generator;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('uuid')
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -71,12 +43,7 @@ class EntityBrowserForm extends FormBase implements EntityBrowserFormInterface {
   protected function init(FormStateInterface $form_state) {
     // Flag that this form has been initialized.
     $form_state->set('entity_form_initialized', TRUE);
-    if ($this->getRequest()->query->has('uuid')) {
-      $form_state->set(['entity_browser', 'instance_uuid'], $this->getRequest()->query->get('uuid'));
-    }
-    else {
-      $form_state->set(['entity_browser', 'instance_uuid'], $this->uuidGenerator->generate());
-    }
+    $form_state->set(['entity_browser', 'instance_uuid'], \Drupal::service('uuid')->generate());
     $form_state->set(['entity_browser', 'selected_entities'], []);
     $form_state->set(['entity_browser', 'selection_completed'], FALSE);
   }
