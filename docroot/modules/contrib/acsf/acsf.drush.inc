@@ -35,12 +35,12 @@ function acsf_drush_command() {
       'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
     ),
     'go-offline' => array(
-      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_DATABASE,
+      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
       'description' => dt('Set a site offline.'),
       'aliases' => array('go-off'),
     ),
     'go-online' => array(
-      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_DATABASE,
+      'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
       'description' => dt('Set a site online.'),
       'aliases' => array('go-on'),
     ),

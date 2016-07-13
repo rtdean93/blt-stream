@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\video_embed_field\Kernel;
 
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\video_embed_field\Plugin\Field\FieldFormatter\Thumbnail;
@@ -83,6 +84,40 @@ class FieldOutputTest extends KernelTestBase {
             'autoplay' => '1',
             'start' => '100',
             'rel' => '0',
+          ],
+          '#attributes' => [
+            'width' => '100',
+            'height' => '100',
+            'frameborder' => '0',
+            'allowfullscreen' => 'allowfullscreen',
+          ],
+          '#cache' => [
+            'contexts' => [
+              'user.permissions',
+            ],
+          ],
+        ],
+      ],
+      'YouTube: Language Specified Embed Code' => [
+        'https://www.youtube.com/watch?v=fdbFVWupSsw&hl=fr',
+        [
+          'type' => 'video_embed_field_video',
+          'settings' => [
+            'width' => 100,
+            'height' => 100,
+            'autoplay' => TRUE,
+            'responsive' => FALSE,
+          ],
+        ],
+        [
+          '#type' => 'video_embed_iframe',
+          '#provider' => 'youtube',
+          '#url' => 'https://www.youtube.com/embed/fdbFVWupSsw',
+          '#query' => [
+            'autoplay' => '1',
+            'start' => '0',
+            'rel' => '0',
+            'cc_lang_pref' => 'fr',
           ],
           '#attributes' => [
             'width' => '100',
@@ -193,6 +228,11 @@ class FieldOutputTest extends KernelTestBase {
               'video_embed_field/responsive-video',
             ],
           ],
+          '#cache' => [
+            'contexts' => [
+              'user.permissions',
+            ],
+          ],
           'children' => [
             '#type' => 'link',
             '#title' => [
@@ -228,6 +268,11 @@ class FieldOutputTest extends KernelTestBase {
             'library' => [
               'video_embed_field/colorbox',
               'video_embed_field/responsive-video',
+            ],
+          ],
+          '#cache' => [
+            'contexts' => [
+              'user.permissions',
             ],
           ],
           'children' => [
@@ -344,7 +389,9 @@ class FieldOutputTest extends KernelTestBase {
     $entity->{$this->fieldName}->value = $url;
     $entity->save();
 
-    $field_output = $entity->{$this->fieldName}->view($settings);
+    $field_output = $this->container->get('renderer')->executeInRenderContext(new RenderContext(), function() use ($entity, $settings) {
+      return $entity->{$this->fieldName}->view($settings);
+    });
 
     // Prepare the field output to make it easier to compare our test data
     // values against.

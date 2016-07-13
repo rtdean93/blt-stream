@@ -84,7 +84,7 @@ class VideoEmbedWysiwyg extends FilterBase implements ContainerFactoryPluginInte
         }
 
         // Replace the JSON settings with a video.
-        $text = str_replace($matches[0][$delta], $this->renderer->renderRoot($embed_code), $text);
+        $text = str_replace($matches[0][$delta], $this->renderer->render($embed_code), $text);
       }
     }
 

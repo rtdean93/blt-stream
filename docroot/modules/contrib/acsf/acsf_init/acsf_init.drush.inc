@@ -326,14 +326,6 @@ function drush_acsf_connect_factory() {
     )));
   }
 
-  // If a list of roles was specified, make sure they all exist.
-  foreach ($site_owner_roles as $site_owner_role) {
-    $role = Role::load($site_owner_role);
-    if (is_null($role)) {
-      return drush_set_error(dt('The role @role does not exist.', array('@role' => $site_owner_role)));
-    }
-  }
-
   // The site owner's email address may have been changed on the factory (for
   // instance, if the user updated their email address on the factory and the
   // new email address has not yet been synced to the site). First, try to
@@ -395,9 +387,13 @@ function drush_acsf_connect_factory() {
   if (!$site_owner_account) {
     $site_owner_account = User::create();
   }
-  // We already checked if these roles exist.
   foreach ($site_owner_roles as $owner_role) {
-    $site_owner_account->addRole($owner_role);
+    if (Role::load($owner_role)) {
+      $site_owner_account->addRole($owner_role);
+    }
+    else {
+      drush_log(dt('The role @role does not exist; not adding it to the site owner.', array('@role' => $owner_role)), 'warning');
+    }
   }
   // Site owners also get the default administrator role.
   $site_owner_account->addRole(reset($admin_role_ids));

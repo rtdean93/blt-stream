@@ -7,7 +7,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Integration test for the field configuration form.
  *
- * @group video_embed_form
+ * @group video_embed_field
  */
 class FieldConfigurationTest extends BrowserTestBase {
 

@@ -146,17 +146,7 @@ class Panelizer implements PanelizerInterface {
   }
 
   /**
-   * Gets the entity view display for the entity type, bundle and view mode.
-   *
-   * @param $entity_type_id
-   *   The entity type id.
-   * @param $bundle
-   *   The bundle.
-   * @param $view_mode
-   *   The view mode.
-   *
-   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface|NULL
-   *   The entity view display if one exists; NULL otherwise.
+   * {@inheritdoc}
    */
   public function getEntityViewDisplay($entity_type_id, $bundle, $view_mode) {
     // Check the existence and status of:
@@ -219,16 +209,57 @@ class Panelizer implements PanelizerInterface {
       }
       if (isset($values[$view_mode])) {
         $panelizer_item = $values[$view_mode];
-        if (!empty($panelizer_item->default)) {
-          return $this->getDefaultPanelsDisplay($panelizer_item->default, $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $display);
+        // Check for a customized display first and use that if present.
+        if (!empty($panelizer_item->panels_display)) {
+          // @todo: validate schema after https://www.drupal.org/node/2392057 is fixed.
+          return $this->panelsManager->importDisplay($panelizer_item->panels_display, FALSE);
         }
-
-        // @todo: validate schema after https://www.drupal.org/node/2392057 is fixed.
-        return $this->panelsManager->importDisplay($panelizer_item->panels_display, FALSE);
+        // If not customized, use the specified default.
+        if (!empty($panelizer_item->default)) {
+          // If we're using this magic key use the settings default.
+          if ($panelizer_item->default == '__bundle_default__') {
+            $default = $settings['default'];
+          }
+          else {
+            $default = $panelizer_item->default;
+            // Ensure the default still exists and if not fallback sanely.
+            $displays = $this->getDefaultPanelsDisplays($entity->getEntityTypeId(), $entity->bundle(), $view_mode);
+            if (!isset($displays[$default])) {
+              $default = $settings['default'];
+            }
+          }
+          $panels_display = $this->getDefaultPanelsDisplay($default, $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $display);
+          $this->setCacheTags($panels_display, $entity, $display, $default, $settings);
+          return $panels_display;
+        }
       }
     }
+    // If the field has no input to give us, use the settings default.
+    $panels_display = $this->getDefaultPanelsDisplay($settings['default'], $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $display);
+    $this->setCacheTags($panels_display, $entity, $display, $settings['default'], $settings);
+    return $panels_display;
+  }
 
-    return $this->getDefaultPanelsDisplay($settings['default'], $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $display);
+  /**
+   * Properly determine the cache tags for a display and set them.
+   *
+   * @param \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant $panels_display
+   *   The panels display variant.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity being viewed through the panels display
+   * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+   *   The entity display that this panels display is overriding
+   * @param $default
+   *   The name of the panels display we are about to render.
+   * @param array $settings
+   *   The default panelizer settings for this EntityViewDisplay.
+   */
+  protected function setCacheTags(PanelsDisplayVariant $panels_display, EntityInterface $entity, EntityViewDisplayInterface $display, $default, array $settings) {
+    if ($default == $settings['default']) {
+      $tags = ["{$panels_display->getStorageType()}:{$entity->getEntityTypeId()}:{$entity->bundle()}:{$display->getMode()}"];
+    }
+    $tags[] = "{$panels_display->getStorageType()}:{$entity->getEntityTypeId()}:{$entity->bundle()}:{$display->getMode()}:$default";
+    $panels_display->addCacheTags($tags);
   }
 
   /**

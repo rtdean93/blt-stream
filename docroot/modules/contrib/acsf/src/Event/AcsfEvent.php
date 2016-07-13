@@ -158,10 +158,6 @@ class AcsfEvent {
    * @throws \Drupal\acsf\Event\AcsfEventHandlerIncompatibleException
    */
   public function pushHandler(AcsfEventHandler $handler, $type = 'incomplete') {
-    if (!is_subclass_of($handler, '\Drupal\acsf\Event\AcsfEventHandler')) {
-      throw new AcsfEventHandlerIncompatibleException(sprintf('The handler class "%s" is incompatible with this event, must subclass AcsfEventHandler.', get_class($handler)));
-    }
-
     if (array_key_exists($type, $this->handlers)) {
       $this->handlers[$type][] = $handler;
     }

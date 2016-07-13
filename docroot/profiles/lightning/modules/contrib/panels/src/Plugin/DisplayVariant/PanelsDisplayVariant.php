@@ -19,7 +19,6 @@ use Drupal\Core\Utility\Token;
 use Drupal\ctools\Plugin\DisplayVariant\BlockDisplayVariant;
 use Drupal\ctools\Plugin\PluginWizardInterface;
 use Drupal\layout_plugin\Plugin\Layout\LayoutInterface;
-use Drupal\layout_plugin\Plugin\Layout\LayoutPluginManager;
 use Drupal\layout_plugin\Plugin\Layout\LayoutPluginManagerInterface;
 use Drupal\panels\Form\LayoutChangeRegions;
 use Drupal\panels\Form\LayoutChangeSettings;

@@ -18,7 +18,7 @@ class YouTube extends ProviderPluginBase {
    * {@inheritdoc}
    */
   public function renderEmbedCode($width, $height, $autoplay) {
-    return [
+    $embed_code = [
       '#type' => 'video_embed_iframe',
       '#provider' => 'youtube',
       '#url' => sprintf('https://www.youtube.com/embed/%s', $this->getVideoId()),
@@ -34,14 +34,32 @@ class YouTube extends ProviderPluginBase {
         'allowfullscreen' => 'allowfullscreen',
       ],
     ];
+    if ($language = $this->getLanguagePreference()) {
+      $embed_code['#query']['cc_lang_pref'] = $language;
+    }
+    return $embed_code;
   }
 
   /**
    * Get the time index for when the given video starts.
+   *
+   * @return int
+   *   The time index where the video should start based on the URL.
    */
   protected function getTimeIndex() {
-    preg_match('/[&\?]t=(?<timeindex>\d*)/', $this->getInput(), $matches);
+    preg_match('/[&\?]t=(?<timeindex>\d+)/', $this->getInput(), $matches);
     return isset($matches['timeindex']) ? $matches['timeindex'] : 0;
+  }
+
+  /**
+   * Extract the language preference from the URL for use in closed captioning.
+   *
+   * @return string|FALSE
+   *   The language preference if one exists or FALSE if one could not be found.
+   */
+  protected function getLanguagePreference() {
+    preg_match('/[&\?]hl=(?<language>[a-z\-]*)/', $this->getInput(), $matches);
+    return isset($matches['language']) ? $matches['language'] : FALSE;
   }
 
   /**

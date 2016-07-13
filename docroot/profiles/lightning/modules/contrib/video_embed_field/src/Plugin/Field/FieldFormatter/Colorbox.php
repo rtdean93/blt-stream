@@ -68,7 +68,7 @@ class Colorbox extends FormatterBase implements ContainerFactoryPluginInterface 
       $element[$delta] = [
         '#type' => 'container',
         '#attributes' => [
-          'data-video-embed-field-modal' => (string) $this->renderer->renderRoot($videos[$delta]),
+          'data-video-embed-field-modal' => (string) $this->renderer->render($videos[$delta]),
           'class' => ['video-embed-field-launch-modal'],
         ],
         '#attached' => [
@@ -76,6 +76,11 @@ class Colorbox extends FormatterBase implements ContainerFactoryPluginInterface 
             'video_embed_field/colorbox',
             'video_embed_field/responsive-video',
           ],
+        ],
+        // Ensure the cache context from the video formatter which was rendered
+        // early still exists in the renderable array for this formatter.
+        '#cache' => [
+          'contexts' => ['user.permissions'],
         ],
         'children' => $thumbnails[$delta],
       ];

@@ -9,5 +9,5 @@ includes:
 projects:
   lightning:
     type: core
-    version: 8.x-1.00
+    version: 8.x-1.01
 

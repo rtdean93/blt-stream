@@ -4,14 +4,14 @@ description: 'This is the module that connects a Drupal codebase to Acquia Cloud
 package: Acquia Cloud Site Factory
 # version: VERSION
 # core: 8.x
-acsf_version: 1.25.0
+acsf_version: 1.26.0
 dependencies:
  - acsf_duplication
  - acsf_theme
  - acsf_variables
 
-# Information added by Drupal.org packaging script on 2016-06-09
-version: '8.x-1.25'
+# Information added by Drupal.org packaging script on 2016-06-29
+version: '8.x-1.26'
 core: '8.x'
 project: 'acsf'
-datestamp: 1465460648
+datestamp: 1467210974

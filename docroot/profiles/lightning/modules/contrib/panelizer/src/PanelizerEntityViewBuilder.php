@@ -395,8 +395,8 @@ class PanelizerEntityViewBuilder implements EntityViewBuilderInterface, EntityHa
     }
 
     // @todo: I'm sure more is necessary to get the cache contexts right...
-    CacheableMetadata::createFromObject($entity)
-      ->applyTo($build);
+    $entity_metadata = CacheableMetadata::createFromObject($entity);
+    CacheableMetadata::createFromObject($panels_display)->merge($entity_metadata)->applyTo($build);
 
     $this->getPanelizerPlugin()->alterBuild($build, $entity, $panels_display, $view_mode);
 

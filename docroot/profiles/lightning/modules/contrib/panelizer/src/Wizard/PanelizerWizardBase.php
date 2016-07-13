@@ -126,12 +126,15 @@ abstract class PanelizerWizardBase extends FormWizardBase {
     // data of the display mode for this entity+bundle+display.
     /** @var \Drupal\panelizer\Panelizer $panelizer */
     $panelizer = \Drupal::service('panelizer');
+    /** @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface $invalidator */
+    $invalidator = \Drupal::service('cache_tags.invalidator');
     list($entity_type, $bundle, $view_mode, $display_id) = explode('__', $cached_values['id']);
     $panelizer->setDefaultPanelsDisplay($display_id, $entity_type, $bundle, $view_mode, $cached_values['plugin']);
     $panelizer->setDisplayStaticContexts($display_id, $entity_type, $bundle, $view_mode, $cached_values['contexts']);
 
     parent::finish($form, $form_state);
     $form_state->setRedirect('panelizer.wizard.edit', ['machine_name' => $cached_values['id']]);
+    $invalidator->invalidateTags(["panelizer_default:$entity_type:$bundle:$view_mode:$display_id"]);
   }
 
   /**
