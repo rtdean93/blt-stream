@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\entity_browser\Plugin\views\field\SelectForm.
- */
-
 namespace Drupal\entity_browser\Plugin\views\field;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -98,7 +93,9 @@ class SelectForm extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function clickSortable() { return FALSE; }
+  public function clickSortable() {
+    return FALSE;
+  }
 
   /**
    * {@inheritdoc}

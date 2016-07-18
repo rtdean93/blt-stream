@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\DisplayBase;
@@ -71,15 +72,17 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
    *   Event dispatcher service.
    * @param \Drupal\Component\Uuid\UuidInterface
    *   UUID generator interface.
-   * @param \Drupal\Core\Routing\RouteMatchInterface
+   * @parem \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $selection_storage
+   *   The selection storage.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
    *   The currently active route match object.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   Current request.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path
    *   The current path.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, UuidInterface $uuid, RouteMatchInterface $current_route_match, CurrentPathStack $current_path, Request $request) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $uuid);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, UuidInterface $uuid, KeyValueStoreExpirableInterface $selection_storage, RouteMatchInterface $current_route_match, CurrentPathStack $current_path, Request $request) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $uuid, $selection_storage);
     $this->currentRouteMatch = $current_route_match;
     $this->currentPath = $current_path;
     $this->request = $request;
@@ -95,6 +98,7 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
       $plugin_definition,
       $container->get('event_dispatcher'),
       $container->get('uuid'),
+      $container->get('entity_browser.selection_storage'),
       $container->get('current_route_match'),
       $container->get('path.current'),
       $container->get('request_stack')->getCurrentRequest()
@@ -115,24 +119,25 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
   /**
    * {@inheritdoc}
    */
-  public function displayEntityBrowser(FormStateInterface $form_state) {
-    $uuid = $this->getUuid();
-    $js_event_object = new RegisterJSCallbacks($this->configuration['entity_browser_id'], $uuid);
+  public function displayEntityBrowser(FormStateInterface $form_state, array $entities = []) {
+    parent::displayEntityBrowser($form_state, $entities);
+    $js_event_object = new RegisterJSCallbacks($this->configuration['entity_browser_id'], $this->getUuid());
     $js_event_object->registerCallback('Drupal.entityBrowser.selectionCompleted');
-    $js_event = $this->eventDispatcher->dispatch(Events::REGISTER_JS_CALLBACKS, $js_event_object );
+    $js_event = $this->eventDispatcher->dispatch(Events::REGISTER_JS_CALLBACKS, $js_event_object);
     $original_path = $this->currentPath->getPath();
+
     $data = [
       'query_parameters' => [
         'query' => [
-          'uuid' => $uuid,
+          'uuid' => $this->getUuid(),
           'original_path' => $original_path,
         ],
       ],
       'attributes' => [
-        'data-uuid' => $uuid,
+        'data-uuid' => $this->getUuid(),
       ],
     ];
-    $event_object = new AlterEntityBrowserDisplayData($this->configuration['entity_browser_id'], $uuid, $this->getPluginDefinition(), $form_state, $data);
+    $event_object = new AlterEntityBrowserDisplayData($this->configuration['entity_browser_id'], $this->getUuid(), $this->getPluginDefinition(), $form_state, $data);
     $event = $this->eventDispatcher->dispatch(Events::ALTER_BROWSER_DISPLAY_DATA, $event_object);
     $data = $event->getData();
     return [
@@ -146,19 +151,19 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
         '#value' => $this->configuration['link_text'],
         '#limit_validation_errors' => [],
         '#submit' => [],
-        '#name' => Html::getId('op_' . $this->configuration['entity_browser_id'] . '_' . $uuid),
+        '#name' => Html::getId('op_' . $this->configuration['entity_browser_id'] . '_' . $this->getUuid()),
         '#ajax' => [
           'callback' => [$this, 'openModal'],
           'event' => 'click',
         ],
         '#attributes' => $data['attributes'],
         '#attached' => [
-          'library' => ['core/drupal.dialog.ajax',  'entity_browser/modal'],
+          'library' => ['core/drupal.dialog.ajax', 'entity_browser/modal'],
           'drupalSettings' => [
             'entity_browser' => [
               'modal' => [
-                $uuid => [
-                  'uuid' => $uuid,
+                $this->getUuid() => [
+                  'uuid' => $this->getUuid(),
                   'js_callbacks' => $js_event->getCallbacks(),
                   'original_path' => $original_path,
                 ],
@@ -201,7 +206,7 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
         'height' => $this->configuration['height'] - 90,
         'frameborder' => 0,
         'style' => 'padding:0',
-        'name' => 'entity_browser_iframe_' . Html::cleanCssIdentifier($element_name)
+        'name' => 'entity_browser_iframe_' . Html::cleanCssIdentifier($element_name),
       ],
     ];
     $html = drupal_render($content);
@@ -283,7 +288,9 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
    *   An array of ajax commands.
    */
   public function getAjaxCommands(FormStateInterface $form_state) {
-    $entities = array_map(function(EntityInterface $item) {return [$item->id(), $item->uuid(), $item->getEntityTypeId()];}, $form_state->get(['entity_browser', 'selected_entities']));
+    $entities = array_map(function(EntityInterface $item) {
+      return [$item->id(), $item->uuid(), $item->getEntityTypeId()];
+    }, $form_state->get(['entity_browser', 'selected_entities']));
 
     $commands = [];
     $commands[] = new SelectEntitiesCommand($this->uuid, $entities);
@@ -303,13 +310,17 @@ class Modal extends DisplayBase implements DisplayRouterInterface {
   public function propagateSelection(FilterResponseEvent $event) {
     $render = [
       'labels' => [
-        '#markup' => 'Labels: ' . implode(', ', array_map(function (EntityInterface $item) {return $item->label();}, $this->entities)),
+        '#markup' => 'Labels: ' . implode(', ', array_map(function (EntityInterface $item) {
+          return $item->label();
+        }, $this->entities)),
         '#attached' => [
           'library' => ['entity_browser/modal_selection'],
           'drupalSettings' => [
             'entity_browser' => [
               'modal' => [
-                'entities' => array_map(function (EntityInterface $item) {return [$item->id(), $item->uuid(), $item->getEntityTypeId()];}, $this->entities),
+                'entities' => array_map(function (EntityInterface $item) {
+                  return [$item->id(), $item->uuid(), $item->getEntityTypeId()];
+                }, $this->entities),
                 'uuid' => $this->request->query->get('uuid'),
               ],
             ],

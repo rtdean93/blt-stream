@@ -1,17 +1,25 @@
 <?php
 
+/**
+ * @file
+ * Hook implementations for entity_browser_entity_form.module.
+ *
+ * Provides integration with the Inline entity form module.
+ */
+
+use Drupal\entity_browser\Events\RegisterJSCallbacks;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\WidgetInterface;
 use Drupal\Core\Url;
-use \Drupal\entity_browser\Events\Events;
-use \Drupal\Core\Form\FormStateInterface;
-use \Drupal\Component\Utility\NestedArray;
+use Drupal\entity_browser\Events\Events;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Implements hook_inline_entity_form_reference_form_alter().
  */
-function entity_browser_entity_form_inline_entity_form_reference_form_alter(&$reference_form, \Drupal\Core\Form\FormStateInterface &$form_state) {
-  $entity_manager = \Drupal::entityManager();
+function entity_browser_entity_form_inline_entity_form_reference_form_alter(&$reference_form, FormStateInterface &$form_state) {
+  $entity_type_manager = \Drupal::entityTypeManager();
   \Drupal::service('event_dispatcher')
     ->addListener(
       Events::REGISTER_JS_CALLBACKS,
@@ -25,14 +33,14 @@ function entity_browser_entity_form_inline_entity_form_reference_form_alter(&$re
   $entity_form_id = $instance->getTargetEntityTypeId() . '.' . $instance->getTargetBundle() . '.default';
   // TODO - 'default' might become configurable or something else in the future.
   // See https://www.drupal.org/node/2510274
-  $form_display = $entity_manager->getStorage('entity_form_display')->load($entity_form_id);
+  $form_display = $entity_type_manager->getStorage('entity_form_display')->load($entity_form_id);
 
   $widget = $form_display->getRenderer($instance->getName());
 
   if (!empty($widget->getThirdPartySetting('entity_browser_entity_form', 'entity_browser_id')) &&
     $widget->getThirdPartySetting('entity_browser_entity_form', 'entity_browser_id') !== '_none') {
     $entity_browser_id = $widget->getThirdPartySetting('entity_browser_entity_form', 'entity_browser_id');
-    if ($browser = $entity_manager->getStorage('entity_browser')->load($entity_browser_id)) {
+    if ($browser = $entity_type_manager->getStorage('entity_browser')->load($entity_browser_id)) {
       /** @var \Drupal\entity_browser\EntityBrowserInterface $browser */
       $display = $browser->getDisplay();
 
@@ -61,7 +69,7 @@ function entity_browser_entity_form_inline_entity_form_reference_form_alter(&$re
  * Registers JS callback that gets entities from entity browser and updates
  * form values accordingly.
  */
-function entity_browser_entity_form_reference_register_js(\Drupal\entity_browser\Events\RegisterJSCallbacks $event) {
+function entity_browser_entity_form_reference_register_js(RegisterJSCallbacks $event) {
   $event->registerCallback('Drupal.entityBrowser.selectionCompleted');
 }
 
@@ -73,7 +81,7 @@ function entity_browser_entity_form_reference_register_js(\Drupal\entity_browser
  * @see inline_entity_form_reference_form_validate()
  *
  * @param $reference_form
- *  The reference entity form.
+ *   The reference entity form.
  * @param $form_state
  *   The form state of the parent form.
  */
@@ -111,7 +119,7 @@ function entity_browser_entity_form_reference_form_validate(&$reference_form, Fo
  * @see inline_entity_form_reference_form_submit()
  *
  * @param $reference_form
- *  The reference entity form.
+ *   The reference entity form.
  * @param $form_state
  *   The form state of the parent form.
  */

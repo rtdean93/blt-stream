@@ -46,6 +46,19 @@ class Extender {
   }
 
   /**
+   * Returns the list of Lightning Extensions to enable.
+   *
+   * @return string[]
+   *   The modules to enable.
+   */
+  public function getLightningExtensions() {
+    $info = $this->getInfo();
+    // Return FALSE instead of empty array because empty array means "don't
+    // enable _any_ extensions" in this case.
+    return isset($info['lightning_extensions']) ? $info['lightning_extensions'] : FALSE;
+  }
+
+  /**
    * Returns the list of additional modules to enable.
    *
    * @return string[]
@@ -65,10 +78,10 @@ class Extender {
   public function getRedirect() {
     $info = $this->getInfo();
 
-    if ($info['redirect']) {
+    if (!empty($info['redirect'])) {
       $redirect = $info['redirect']['path'];
 
-      if ($info['redirect']['query']) {
+      if (!empty($info['redirect']['query'])) {
         $redirect .= '?' . UrlHelper::buildQuery($info['redirect']['query']);
       }
       return $redirect;
