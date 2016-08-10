@@ -6,7 +6,7 @@ core: 8.x
 projects:
   acsf:
     type: module
-    version: '1.26'
+    version: '1.27'
     subdir: contrib
 
 
