@@ -23,7 +23,7 @@ if (!function_exists('acsf_hooks_includes')) {
 
 // Include custom sites.php code from factory-hooks/pre-sites-php.
 foreach (acsf_hooks_includes('pre-sites-php') as $pre_hook) {
-  include_once $pre_hook;
+  include $pre_hook;
 }
 
 if (!function_exists('is_acquia_host')) {
@@ -111,5 +111,5 @@ $sites[$dir] = $data['dir'];
 
 // Include custom sites.php code from factory-hooks/pre-sites-php.
 foreach (acsf_hooks_includes('post-sites-php') as $post_hook) {
-  include_once $post_hook;
+  include $post_hook;
 }

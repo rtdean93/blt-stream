@@ -67,12 +67,40 @@ function lightning_install_module($module) {
  *
  * @param array $install_state
  *   The current install state.
+ *
+ * @return array
+ *   A renderable array with a success message and a redirect header, if the
+ *   extender is configured with one.
  */
 function lightning_post_install_redirect(array &$install_state) {
   $redirect = \Drupal::service('lightning.extender')->getRedirect();
-  if ($redirect) {
-    install_goto($redirect);
-  }
+
+  $output = [
+    '#title' => t('Ready to rock'),
+    'info' => [
+      '#markup' => t('Congratulations, you installed Lightning! If you are not redirected in 5 seconds, <a href="@url">click here</a> to proceed to your site.', [
+        '@url' => $redirect,
+      ]),
+    ],
+    '#attached' => [
+      'http_header' => [
+        ['Cache-Control', 'no-cache'],
+      ],
+    ],
+  ];
+
+  // The installer doesn't make it easy (possible?) to return a redirect
+  // response, so set a redirection META tag in the output.
+  $meta_redirect = [
+    '#tag' => 'meta',
+    '#attributes' => [
+      'http-equiv' => 'refresh',
+      'content' => '0;url=' . $redirect,
+    ],
+  ];
+  $output['#attached']['html_head'][] = [$meta_redirect, 'meta_redirect'];
+
+  return $output;
 }
 
 /**
@@ -90,6 +118,29 @@ function lightning_rebuild_container() {
  */
 function lightning_preprocess_block(array &$variables) {
   $variables['attributes']['data-block-plugin-id'] = $variables['elements']['#plugin_id'];
+}
+
+/**
+ * Creates a config entity from default configuration.
+ *
+ * @param string $entity_type
+ *   The config entity type ID.
+ * @param string $id
+ *   The unprefixed entity ID.
+ * @param string $module
+ *   (optional) The module which has the default configuration.
+ */
+function lightning_create_config($entity_type, $id, $module = 'lightning') {
+  $values = lightning_read_config(
+    \Drupal::entityTypeManager()->getDefinition($entity_type)->getConfigPrefix() . '.' . $id,
+    $module
+  );
+  if ($values) {
+    \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->create($values)
+      ->save();
+  }
 }
 
 /**
