@@ -24,8 +24,7 @@
         "drupal/externalauth": "1.x-dev",
         "drupal/samlauth": "dev-8.x-2.x",
         "acquia/acsf": "dev-2.48-RC-NIGHTLY-d8",
-        "drush/drush": "^8.1",
-        "drupal/console": "^1.0@dev"
+        "drush/drush": "^8.1"
     },
     "repositories": [
         {
