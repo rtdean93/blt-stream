@@ -6,9 +6,9 @@ bin/
 !docroot/**
 !docroot/vendor/**
 !docroot/**/vendor/**
-composer.json
+!composer.json
 !docroot/**/composer.json
-composer.lock
+!composer.lock
 !docroot/**/composer.lock
 !docroot/modules/**
 .git
