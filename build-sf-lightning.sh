@@ -30,7 +30,9 @@ install_d8 () {
   cd docroot/modules
   find . -type d -name '.git' | xargs rm -rvf
   cd -
+  set +e
   git rm --cached -r docroot/modules/
+  set -e
 }
 
 init_acsf () {
