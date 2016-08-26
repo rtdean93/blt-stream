@@ -3,7 +3,7 @@ set -o xtrace
 set -e
 
 # Builds some version of d8 with acsf initialized
-DRUSH_PATH="./vendor/bin"
+DRUSH_PATH="./bin"
 DRUSH_VERSION='8.1.3'
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -35,7 +35,7 @@ install_d8 () {
 
 init_acsf () {
   echo "Initializing acsf"
-  ./vendor/bin/drush --root=$(pwd)/docroot --include=$(pwd)/docroot/modules/contrib/acsf/acsf_init -y acsf-init
+  ./bin/drush --root=$(pwd)/docroot --include=$(pwd)/docroot/modules/contrib/acsf/acsf_init -y acsf-init
 }
 
 commit_changes () {
