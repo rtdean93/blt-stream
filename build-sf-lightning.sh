@@ -14,11 +14,6 @@ install_composer () {
   curl -sS https://getcomposer.org/installer | php -- --install-dir=bin --filename=composer
 }
 
-install_drush () {
-  echo "Installing drush"
-  php bin/composer require drush/drush:${DRUSH_VERSION:=8.1.3}
-}
-
 check_drush_version () {
   DRUSH_VERSION=`$DRUSH_PATH/drush --version --pipe`
   if ! [[ $DRUSH_VERSION =~ ^[8]\.[0-9].+$ ]]; then
@@ -30,8 +25,8 @@ check_drush_version () {
 install_d8 () {
   echo "Building drupal 8"
   # clean up
-  rm -f docroot/composer.lock
-  php bin/composer install -d docroot
+  rm -f composer.lock
+  php bin/composer install -n --no-dev
   cd docroot/modules
   find . -type d -name '.git' | xargs rm -rvf
   cd -
@@ -51,9 +46,8 @@ commit_changes () {
 }
 
 install_composer
-install_drush
-check_drush_version
 install_d8
+check_drush_version
 init_acsf
 if [[ -n $COMMIT_CHANGES ]]; then
   commit_changes
