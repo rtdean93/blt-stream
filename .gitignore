@@ -1,8 +1,8 @@
-# ignore bin, vendor, phpstorm files...
+# deal with irnoring or not  bin, vendor, phpstorm files...
 .idea
 .idea/**
 bin/
-vendor/
+!vendor/
 !docroot/**
 !docroot/vendor/**
 !docroot/**/vendor/**
