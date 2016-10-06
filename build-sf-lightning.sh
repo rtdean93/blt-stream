@@ -26,6 +26,10 @@ install_d8 () {
   echo "Building drupal 8"
   # clean up
   rm -f composer.lock
+  rm -rf docroot/core
+  rm -rf docroot/modules
+  rm -rf docroot/profiles
+  rm -rf docroot/sites
   php bin/composer install -n --no-dev
   cd docroot/modules
   find . -type d -name '.git' | xargs rm -rvf
