@@ -14,6 +14,10 @@ Source: https://www.drupal.org/files/issues/panelizer-ipe-url-root-handling.patc
 
 
 2664682 - Implement admin UI for editing Panelizer defaults
-Source: https://www.drupal.org/files/issues/2664682-49.patch
+Source: https://www.drupal.org/files/issues/2664682-55.patch
+
+
+2793841 - Properly integrate with Panels IPE
+Source: https://www.drupal.org/files/issues/panelizer-panels-ipe-tempstore-id.patch
 
 

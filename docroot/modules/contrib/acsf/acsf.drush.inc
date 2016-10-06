@@ -76,6 +76,9 @@ function drush_acsf_build_registry() {
 /**
  * Command callback. Scrubs the site database and/or other storage.
  *
+ * Note that 'scrubbing' in our case doesn't mean just clearing configuration
+ * values but also initializing them for use in a new website.
+ *
  * drush acsf-site-scrub is called by a 'db-copy' hosting task, which in turn
  * seems to be called (only?) by the staging process.
  */
@@ -128,30 +131,23 @@ function drush_acsf_site_scrub() {
   // Reset the drupal private key.
   \Drupal::service('private_key')->set('');
 
-  // Reset site specific config info used for the site in SAML SSO
-  // authentication (in the module we support by default: samlauth); only if the
-  // ACSF SSO module is enabled; otherwise it's not our business. Notes:
-  // - Without this info SAML SSO is unusable, but another process (drush
-  //   acsf-site-sync) will repopulate it.
-  // - We could overwrite (repopulate) data here because effectively this
-  //   command is only used for staging, but we'll adhere to the concept of this
-  //   being a 'scrubbing' process only, that could run on a 'db-copy' hosting
-  //   task used for any purpose.
-  // - We don't scrub the users' authmap data; it's fine if they retain the IDs
-  //   used in live site-factory communication.
+  // Reset the local site data and run acsf-site-sync to fetch factory data
+  // about the site.
+  $site = AcsfSite::load();
+  $site->clean();
+  drush_acsf_site_sync();
+  drush_log(dt('Executed acsf-site-sync to gather site data from factory and reset all acsf variables.'), 'ok');
+
   if (\Drupal::moduleHandler()->moduleExists('acsf_sso')) {
-    $config = \Drupal::configFactory()->getEditable('samlauth.authentication');
-    // The entity ID contains the tangle's group/env, and factory site nid.
-    $config->clear('sp_entity_id');
-    // The IdP URLs and cert are specific to the factory. (This is not private
-    // info but at this moment the database is disconnected from that factory.)
-    $config->clear('idp_single_sign_on_service');
-    $config->clear('idp_single_log_out_service');
-    $config->clear('idp_x509_certificate');
-    // The SP cert/key might be private / regenerated per site or tangle (in the
-    // future; it is actually static at first release of this feature).
-    $config->clear('sp_x509_certificate');
-    $config->clear('sp_private_key');
+    // Repopulate/overwrite the subset of SAML auth data which is factory /
+    // sitegroup/env/factory-site-nid specific. Notes:
+    // - This indeed also overwrites values which have not changed, since the
+    //   site nid did not change - at least not if this is called while staging.
+    //   But we want to reuse code without introducing more granularity.)
+    // - We don't scrub the users' authmap data; it's fine if they retain the
+    //   IDs used in live site-factory communication.
+    module_load_include('install', 'acsf_sso');
+    acsf_sso_install_set_env_dependent_config();
   }
 
   // Trigger a rebuild of router paths (formerly 'menu paths').
@@ -245,26 +241,6 @@ function drush_acsf_site_sync() {
   else {
     // If no data was sent, we'll request it.
     $site->refresh($stats);
-  }
-
-  if (\Drupal::moduleHandler()->moduleExists('acsf_sso')) {
-    // Repopulate/overwrite the subset of SAML auth data which is factory /
-    // sitegroup/env/factory-site-nid specific. Implication: we effectively take
-    // control away from the site owners by forcing these values, as long as
-    // acsf_sso is enabled. This is a subset of required values; if site owners
-    // mess with static settings on a live site, they can still destroy the SSO
-    // process. This is not in an AcsfEvent because it's not really a "act on
-    // received data" thing but more a "repopulate whatever was scrubbed" thing.
-    // It's in this command because at least the staging process does not seem
-    // to have another spot for this than acsf-site-sync; putting it here
-    // additionally makes it act on site duplication and restore. (It is outside
-    // above 'if' construct for the restore operation.)
-    module_load_include('install', 'acsf_sso');
-    // This operation is 'safe' in the sense that re-saving a config entity does
-    // not introduce a window of time where it's unreadable/inconsistent. So
-    // rewriting it regularly should not be a problem; we don't introduce
-    // special measures to prevent that.
-    acsf_sso_install_set_env_dependent_config();
   }
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains \Drupal\layout_plugin\Plugin\Layout\LayoutPluginManager\Layout.

@@ -104,8 +104,13 @@ function acsf_sso_install() {
  * Changes and saves 'environment' dependent config; not other standard config.
  *
  * This can get called when a site changes 'environment' (e.g. on staging,
- * duplication, restore of backup). Which means anything could be new: factory,
- * site ID, sitegroup/env.
+ * duplication, restore from backup). Which means anything could be new:
+ * factory, site ID, sitegroup/env.
+ *
+ * Implication: we effectively take control away from the site owners by forcing
+ * these values, as long as acsf_sso is enabled. The below are not all the
+ * required values; if site owners mess with static settings on a live site,
+ * they can still destroy the SSO process.
  */
 function acsf_sso_install_set_env_dependent_config() {
   $sitegroup = $_ENV['AH_SITE_GROUP'];

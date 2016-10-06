@@ -182,8 +182,11 @@ if (isset($config_directories['vcs'])) {
   // directory is removed for now.
   // @see https://backlog.acquia.com/browse/CL-11815
   // @see https://github.com/drush-ops/drush/pull/1711
-  if (function_exists('drush_get_command') && drush_get_command()['command'] === 'site-install') {
-    unset($config_directories['vcs']);
+  if (function_exists('drush_get_command')) {
+    $command = drush_get_command();
+    if (!empty($command['command']) && $command['command'] === 'site-install') {
+      unset($config_directories['vcs']);
+    }
   }
 }
 

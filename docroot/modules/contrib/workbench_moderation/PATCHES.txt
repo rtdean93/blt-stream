@@ -5,3 +5,7 @@ Patches applied to this directory:
 Source: https://www.drupal.org/files/issues/2668006-2.patch
 
 
+2780691 - Incorrect EntityRevision paramconverter service definition causes a fatal error
+Source: https://www.drupal.org/files/issues/workbench_moderation-invalid_service_definition.patch
+
+

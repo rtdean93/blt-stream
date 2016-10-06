@@ -97,12 +97,6 @@ class PanelizerWidget extends WidgetBase {
           ];
         }
       }
-      // If our default isn't empty and is not set to __bundle_default__ and
-      // our panels_display is not empty, empty the panels_display so that the
-      // documented default will properly display.
-      elseif ((!empty($values[$view_mode]['default']) && $values[$view_mode]['default'] != '__bundle_default__') && !empty($values[$view_mode]['panels_display'])) {
-        $values[$view_mode]['panels_display'] = [];
-      }
     }
 
     // Add elements to the form for each view mode.

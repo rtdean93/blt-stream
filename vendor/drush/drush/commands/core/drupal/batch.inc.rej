@@ -1,0 +1,95 @@
+***************
+*** 50,63 ****
+  
+      drush_include_engine('drupal', 'environment');
+      // Store the batch.
+-     db_insert('batch')
+-       ->fields(array(
+-         'bid' => $batch['id'],
+-         'timestamp' => REQUEST_TIME,
+-         'token' => drush_get_token($batch['id']),
+-         'batch' => serialize($batch),
+-       ))
+-       ->execute();
+      $finished = FALSE;
+  
+      // Not used in D8+ and possibly earlier.
+--- 50,70 ----
+  
+      drush_include_engine('drupal', 'environment');
+      // Store the batch.
++     if (drush_drupal_major_version() >= 8) {
++       /** @var \Drupal\Core\Batch\BatchStorage $batch_storage */
++       $batch_storage = Drupal::service('batch.storage');
++       $batch_storage->create($batch);
++     }
++     else {
++       db_insert('batch')
++         ->fields(array(
++           'bid' => $batch['id'],
++           'timestamp' => REQUEST_TIME,
++           'token' => drush_get_token($batch['id']),
++           'batch' => serialize($batch),
++         ))
++         ->execute();
++     }
+      $finished = FALSE;
+  
+      // Not used in D8+ and possibly earlier.
+***************
+*** 242,250 ****
+    }
+  
+    // Clean up the batch table and unset the static $batch variable.
+-   db_delete('batch')
+-     ->condition('bid', $batch['id'])
+-     ->execute();
+    foreach ($batch['sets'] as $batch_set) {
+      if ($queue = _batch_queue($batch_set)) {
+        $queue->deleteQueue();
+--- 249,265 ----
+    }
+  
+    // Clean up the batch table and unset the static $batch variable.
++   if (drush_drupal_major_version() >= 8) {
++     /** @var \Drupal\Core\Batch\BatchStorage $batch_storage */
++     $batch_storage = Drupal::service('batch.storage');
++     $batch_storage->delete($batch['id']);
++   }
++   else {
++     db_delete('batch')
++       ->condition('bid', $batch['id'])
++       ->execute();
++   }
++ 
+    foreach ($batch['sets'] as $batch_set) {
+      if ($queue = _batch_queue($batch_set)) {
+        $queue->deleteQueue();
+***************
+*** 261,269 ****
+   */
+  function _drush_batch_shutdown() {
+   if ($batch = batch_get()) {
+-     db_update('batch')
+-       ->fields(array('batch' => serialize($batch)))
+-       ->condition('bid', $batch['id'])
+-       ->execute();
+    }
+  }
+--- 276,291 ----
+   */
+  function _drush_batch_shutdown() {
+   if ($batch = batch_get()) {
++    if (drush_drupal_major_version() >= 8) {
++      /** @var \Drupal\Core\Batch\BatchStorage $batch_storage */
++      $batch_storage = Drupal::service('batch.storage');
++      $batch_storage->update($batch);
++    }
++    else {
++      db_update('batch')
++        ->fields(array('batch' => serialize($batch)))
++        ->condition('bid', $batch['id'])
++        ->execute();
++    }
+    }
+  }
