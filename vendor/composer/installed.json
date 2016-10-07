@@ -5354,13 +5354,13 @@
         "source": {
             "type": "git",
             "url": "git@github.com:acquia/acsf.git",
-            "reference": "b916ab4facc3dc4dc3484859dc20e2d823a18629"
+            "reference": "d931900ef04ed7676a058a17f86f0d2ce852ee3a"
         },
         "require-dev": {
             "mockery/mockery": "dev-master",
             "phpunit/phpunit": "~5.3"
         },
-        "time": "2016-10-06 04:24:18",
+        "time": "2016-10-07 04:25:39",
         "type": "drupal-module",
         "installation-source": "source",
         "autoload": {

@@ -13,7 +13,7 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:acquia/acsf.git",
-                "reference": "b916ab4facc3dc4dc3484859dc20e2d823a18629"
+                "reference": "d931900ef04ed7676a058a17f86f0d2ce852ee3a"
             },
             "require-dev": {
                 "mockery/mockery": "dev-master",
@@ -32,7 +32,7 @@
                 }
             ],
             "description": "Connects a site with Acquia Cloud Site Factory.",
-            "time": "2016-10-06 04:24:18"
+            "time": "2016-10-07 04:25:39"
         },
         {
             "name": "asm89/stack-cors",
