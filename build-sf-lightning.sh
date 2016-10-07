@@ -32,7 +32,7 @@ install_d8 () {
   rm -rf docroot/sites
   php bin/composer install -n --no-dev
   mkdir -p docroot/sites/all
-  cp -rpv acquia/lightning_extension/lightning.extend.yml docroot/sites/all/lightning.extend.yml
+  cp -rpv acquia/lightning_extensions/lightning.extend.yml docroot/sites/all/lightning.extend.yml
   cd docroot/modules
   find . -type d -name '.git' | xargs rm -rvf
   cd -
