@@ -42,9 +42,6 @@ dependencies:
   - metatag
   # Our own core functionality.
   - lightning_core
-  # contrib
-  - acsf
-  - acsf_sso
 
 themes:
   - bartik
