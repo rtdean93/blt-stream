@@ -211,70 +211,6 @@
         ]
     },
     {
-        "name": "guzzlehttp/guzzle",
-        "version": "6.2.1",
-        "version_normalized": "6.2.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/guzzle/guzzle.git",
-            "reference": "3f808fba627f2c5b69e2501217bf31af349c1427"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/3f808fba627f2c5b69e2501217bf31af349c1427",
-            "reference": "3f808fba627f2c5b69e2501217bf31af349c1427",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/promises": "^1.0",
-            "guzzlehttp/psr7": "^1.3.1",
-            "php": ">=5.5"
-        },
-        "require-dev": {
-            "ext-curl": "*",
-            "phpunit/phpunit": "^4.0",
-            "psr/log": "^1.0"
-        },
-        "time": "2016-07-15 17:22:37",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "6.2-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "files": [
-                "src/functions_include.php"
-            ],
-            "psr-4": {
-                "GuzzleHttp\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Michael Dowling",
-                "email": "mtdowling@gmail.com",
-                "homepage": "https://github.com/mtdowling"
-            }
-        ],
-        "description": "Guzzle is a PHP HTTP client library",
-        "homepage": "http://guzzlephp.org/",
-        "keywords": [
-            "client",
-            "curl",
-            "framework",
-            "http",
-            "http client",
-            "rest",
-            "web service"
-        ]
-    },
-    {
         "name": "symfony/polyfill-mbstring",
         "version": "v1.2.0",
         "version_normalized": "1.2.0.0",
@@ -2298,55 +2234,6 @@
         "homepage": "https://symfony.com"
     },
     {
-        "name": "psr/log",
-        "version": "1.0.1",
-        "version_normalized": "1.0.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-fig/log.git",
-            "reference": "5277094ed527a1c4477177d102fe4c53551953e0"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-fig/log/zipball/5277094ed527a1c4477177d102fe4c53551953e0",
-            "reference": "5277094ed527a1c4477177d102fe4c53551953e0",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2016-09-19 16:02:08",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.0.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Psr\\Log\\": "Psr/Log/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "PHP-FIG",
-                "homepage": "http://www.php-fig.org/"
-            }
-        ],
-        "description": "Common interface for logging libraries",
-        "homepage": "https://github.com/php-fig/log",
-        "keywords": [
-            "log",
-            "psr",
-            "psr-3"
-        ]
-    },
-    {
         "name": "symfony/debug",
         "version": "v2.8.12",
         "version_normalized": "2.8.12.0",
@@ -3494,58 +3381,6 @@
         ]
     },
     {
-        "name": "zendframework/zend-diactoros",
-        "version": "1.3.6",
-        "version_normalized": "1.3.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/zendframework/zend-diactoros.git",
-            "reference": "a60da179c37f2c4e44ef734d0b92824a58943f7f"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/a60da179c37f2c4e44ef734d0b92824a58943f7f",
-            "reference": "a60da179c37f2c4e44ef734d0b92824a58943f7f",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^5.4 || ^7.0",
-            "psr/http-message": "~1.0"
-        },
-        "provide": {
-            "psr/http-message-implementation": "~1.0.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^4.6 || ^5.5",
-            "squizlabs/php_codesniffer": "^2.3.1"
-        },
-        "time": "2016-09-07 17:57:29",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.3-dev",
-                "dev-develop": "1.4-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Zend\\Diactoros\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-2-Clause"
-        ],
-        "description": "PSR HTTP Message implementations",
-        "homepage": "https://github.com/zendframework/zend-diactoros",
-        "keywords": [
-            "http",
-            "psr",
-            "psr-7"
-        ]
-    },
-    {
         "name": "composer/semver",
         "version": "1.4.2",
         "version_normalized": "1.4.2.0",
@@ -3881,18 +3716,183 @@
         "homepage": "https://symfony.com"
     },
     {
-        "name": "drupal/core",
-        "version": "8.2.0",
-        "version_normalized": "8.2.0.0",
+        "name": "psr/log",
+        "version": "1.0.2",
+        "version_normalized": "1.0.2.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/drupal-composer/drupal-core.git",
-            "reference": "2fde0cab6c55bf613ca2eb94bb9038bb0ee44b25"
+            "url": "https://github.com/php-fig/log.git",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/drupal-composer/drupal-core/zipball/2fde0cab6c55bf613ca2eb94bb9038bb0ee44b25",
-            "reference": "2fde0cab6c55bf613ca2eb94bb9038bb0ee44b25",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-10-10 12:19:37",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Log\\": "Psr/Log/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for logging libraries",
+        "homepage": "https://github.com/php-fig/log",
+        "keywords": [
+            "log",
+            "psr",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "zendframework/zend-diactoros",
+        "version": "1.3.7",
+        "version_normalized": "1.3.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/zendframework/zend-diactoros.git",
+            "reference": "969ff423d3f201da3ff718a5831bb999bb0669b0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/969ff423d3f201da3ff718a5831bb999bb0669b0",
+            "reference": "969ff423d3f201da3ff718a5831bb999bb0669b0",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.4 || ^7.0",
+            "psr/http-message": "~1.0"
+        },
+        "provide": {
+            "psr/http-message-implementation": "~1.0.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^4.6 || ^5.5",
+            "squizlabs/php_codesniffer": "^2.3.1"
+        },
+        "time": "2016-10-11 13:25:21",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.3-dev",
+                "dev-develop": "1.4-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Zend\\Diactoros\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "description": "PSR HTTP Message implementations",
+        "homepage": "https://github.com/zendframework/zend-diactoros",
+        "keywords": [
+            "http",
+            "psr",
+            "psr-7"
+        ]
+    },
+    {
+        "name": "guzzlehttp/guzzle",
+        "version": "6.2.2",
+        "version_normalized": "6.2.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/guzzle.git",
+            "reference": "ebf29dee597f02f09f4d5bbecc68230ea9b08f60"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ebf29dee597f02f09f4d5bbecc68230ea9b08f60",
+            "reference": "ebf29dee597f02f09f4d5bbecc68230ea9b08f60",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/promises": "^1.0",
+            "guzzlehttp/psr7": "^1.3.1",
+            "php": ">=5.5"
+        },
+        "require-dev": {
+            "ext-curl": "*",
+            "phpunit/phpunit": "^4.0",
+            "psr/log": "^1.0"
+        },
+        "time": "2016-10-08 15:01:37",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "6.2-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "src/functions_include.php"
+            ],
+            "psr-4": {
+                "GuzzleHttp\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Dowling",
+                "email": "mtdowling@gmail.com",
+                "homepage": "https://github.com/mtdowling"
+            }
+        ],
+        "description": "Guzzle is a PHP HTTP client library",
+        "homepage": "http://guzzlephp.org/",
+        "keywords": [
+            "client",
+            "curl",
+            "framework",
+            "http",
+            "http client",
+            "rest",
+            "web service"
+        ]
+    },
+    {
+        "name": "drupal/core",
+        "version": "8.2.1",
+        "version_normalized": "8.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/drupal-composer/drupal-core.git",
+            "reference": "a5549f2a541c0fbb0565e1576a63b917813fadba"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/drupal-composer/drupal-core/zipball/a5549f2a541c0fbb0565e1576a63b917813fadba",
+            "reference": "a5549f2a541c0fbb0565e1576a63b917813fadba",
             "shasum": ""
         },
         "require": {
@@ -4034,7 +4034,7 @@
             "phpunit/phpunit": "~4.8",
             "symfony/css-selector": "~2.8"
         },
-        "time": "2016-10-05 09:36:15",
+        "time": "2016-10-11 10:18:49",
         "type": "drupal-core",
         "installation-source": "dist",
         "autoload": {
@@ -5348,33 +5348,313 @@
         }
     },
     {
-        "name": "acquia/acsf",
-        "version": "dev-2.50-RC-NIGHTLY-d8",
-        "version_normalized": "dev-2.50-RC-NIGHTLY-d8",
+        "name": "drupal/acsf",
+        "version": "1.32.0",
+        "version_normalized": "1.32.0.0",
         "source": {
             "type": "git",
-            "url": "git@github.com:acquia/acsf.git",
-            "reference": "d931900ef04ed7676a058a17f86f0d2ce852ee3a"
+            "url": "https://git.drupal.org/project/acsf",
+            "reference": "8.x-1.32"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/acsf-8.x-1.32.zip",
+            "reference": null,
+            "shasum": "e04bb2587c8c5b45387eb024827e3facb8f15106"
+        },
+        "require": {
+            "drupal/acsf_duplication": "*",
+            "drupal/acsf_theme": "*",
+            "drupal/acsf_variables": "*",
+            "drupal/core": "~8.0"
         },
         "require-dev": {
             "mockery/mockery": "dev-master",
             "phpunit/phpunit": "~5.3"
         },
-        "time": "2016-10-07 04:25:39",
+        "suggest": {
+            "drupal/acsf_variables": "Required by drupal/acsf_theme",
+            "drupal/samlauth": "Required by drupal/acsf_sso"
+        },
         "type": "drupal-module",
-        "installation-source": "source",
+        "extra": {
+            "branch-alias": {
+                "dev-1.x": "1.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-1.32",
+                "datestamp": "1475573639"
+            }
+        },
+        "installation-source": "dist",
         "autoload": {
             "psr-4": {
                 "Drupal\\acsf\\": "src/"
             }
         },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
         "authors": [
             {
                 "name": "Acquia",
+                "homepage": "https://www.drupal.org/user/14023",
                 "email": "support@acquia.com"
+            },
+            {
+                "name": "Kevin Hankens",
+                "homepage": "https://www.drupal.org/user/78090"
+            },
+            {
+                "name": "Rok Žlender",
+                "homepage": "https://www.drupal.org/user/61873"
+            },
+            {
+                "name": "acquia.sf.ci",
+                "homepage": "https://www.drupal.org/user/3285763"
+            },
+            {
+                "name": "attila.fekete",
+                "homepage": "https://www.drupal.org/user/762986"
+            },
+            {
+                "name": "nagba",
+                "homepage": "https://www.drupal.org/user/21231"
+            },
+            {
+                "name": "nikgregory",
+                "homepage": "https://www.drupal.org/user/419643"
+            },
+            {
+                "name": "paul.lovvik",
+                "homepage": "https://www.drupal.org/user/289213"
+            },
+            {
+                "name": "psynaptic",
+                "homepage": "https://www.drupal.org/user/93429"
+            },
+            {
+                "name": "scor",
+                "homepage": "https://www.drupal.org/user/52142"
             }
         ],
-        "description": "Connects a site with Acquia Cloud Site Factory."
+        "description": "Connects a site with Acquia Cloud Site Factory.",
+        "homepage": "https://www.drupal.org/project/acsf",
+        "support": {
+            "source": "http://cgit.drupalcode.org/acsf"
+        }
+    },
+    {
+        "name": "drupal/acsf_variables",
+        "version": "1.32.0",
+        "version_normalized": "1.32.0.0",
+        "require": {
+            "drupal/acsf": "self.version",
+            "drupal/core": "~8.0"
+        },
+        "type": "metapackage",
+        "extra": {
+            "branch-alias": {
+                "dev-1.x": "1.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-1.32",
+                "datestamp": "1475573639"
+            }
+        },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Alan Evans",
+                "homepage": "https://www.drupal.org/user/14023"
+            },
+            {
+                "name": "Kevin Hankens",
+                "homepage": "https://www.drupal.org/user/78090"
+            },
+            {
+                "name": "Rok Žlender",
+                "homepage": "https://www.drupal.org/user/61873"
+            },
+            {
+                "name": "acquia.sf.ci",
+                "homepage": "https://www.drupal.org/user/3285763"
+            },
+            {
+                "name": "attila.fekete",
+                "homepage": "https://www.drupal.org/user/762986"
+            },
+            {
+                "name": "nagba",
+                "homepage": "https://www.drupal.org/user/21231"
+            },
+            {
+                "name": "nikgregory",
+                "homepage": "https://www.drupal.org/user/419643"
+            },
+            {
+                "name": "paul.lovvik",
+                "homepage": "https://www.drupal.org/user/289213"
+            },
+            {
+                "name": "psynaptic",
+                "homepage": "https://www.drupal.org/user/93429"
+            },
+            {
+                "name": "scor",
+                "homepage": "https://www.drupal.org/user/52142"
+            }
+        ],
+        "description": "Stores sensitive variables in a single place for easy scrubbing.",
+        "homepage": "https://www.drupal.org/project/acsf",
+        "support": {
+            "source": "http://cgit.drupalcode.org/acsf"
+        }
+    },
+    {
+        "name": "drupal/acsf_theme",
+        "version": "1.32.0",
+        "version_normalized": "1.32.0.0",
+        "require": {
+            "drupal/acsf": "self.version",
+            "drupal/acsf_variables": "*",
+            "drupal/core": "~8.0"
+        },
+        "type": "metapackage",
+        "extra": {
+            "branch-alias": {
+                "dev-1.x": "1.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-1.32",
+                "datestamp": "1475573639"
+            }
+        },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Alan Evans",
+                "homepage": "https://www.drupal.org/user/14023"
+            },
+            {
+                "name": "Kevin Hankens",
+                "homepage": "https://www.drupal.org/user/78090"
+            },
+            {
+                "name": "Rok Žlender",
+                "homepage": "https://www.drupal.org/user/61873"
+            },
+            {
+                "name": "acquia.sf.ci",
+                "homepage": "https://www.drupal.org/user/3285763"
+            },
+            {
+                "name": "attila.fekete",
+                "homepage": "https://www.drupal.org/user/762986"
+            },
+            {
+                "name": "nagba",
+                "homepage": "https://www.drupal.org/user/21231"
+            },
+            {
+                "name": "nikgregory",
+                "homepage": "https://www.drupal.org/user/419643"
+            },
+            {
+                "name": "paul.lovvik",
+                "homepage": "https://www.drupal.org/user/289213"
+            },
+            {
+                "name": "psynaptic",
+                "homepage": "https://www.drupal.org/user/93429"
+            },
+            {
+                "name": "scor",
+                "homepage": "https://www.drupal.org/user/52142"
+            }
+        ],
+        "description": "Handles VCS-based themes on Acquia Cloud Site Factory.",
+        "homepage": "https://www.drupal.org/project/acsf",
+        "support": {
+            "source": "http://cgit.drupalcode.org/acsf"
+        }
+    },
+    {
+        "name": "drupal/acsf_duplication",
+        "version": "1.32.0",
+        "version_normalized": "1.32.0.0",
+        "require": {
+            "drupal/acsf": "self.version",
+            "drupal/core": "~8.0"
+        },
+        "type": "metapackage",
+        "extra": {
+            "branch-alias": {
+                "dev-1.x": "1.x-dev"
+            },
+            "drupal": {
+                "version": "8.x-1.32",
+                "datestamp": "1475573639"
+            }
+        },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Alan Evans",
+                "homepage": "https://www.drupal.org/user/14023"
+            },
+            {
+                "name": "Kevin Hankens",
+                "homepage": "https://www.drupal.org/user/78090"
+            },
+            {
+                "name": "Rok Žlender",
+                "homepage": "https://www.drupal.org/user/61873"
+            },
+            {
+                "name": "acquia.sf.ci",
+                "homepage": "https://www.drupal.org/user/3285763"
+            },
+            {
+                "name": "attila.fekete",
+                "homepage": "https://www.drupal.org/user/762986"
+            },
+            {
+                "name": "nagba",
+                "homepage": "https://www.drupal.org/user/21231"
+            },
+            {
+                "name": "nikgregory",
+                "homepage": "https://www.drupal.org/user/419643"
+            },
+            {
+                "name": "paul.lovvik",
+                "homepage": "https://www.drupal.org/user/289213"
+            },
+            {
+                "name": "psynaptic",
+                "homepage": "https://www.drupal.org/user/93429"
+            },
+            {
+                "name": "scor",
+                "homepage": "https://www.drupal.org/user/52142"
+            }
+        ],
+        "description": "Helper module for duplicating Acquia Cloud Site Factory sites.",
+        "homepage": "https://www.drupal.org/project/acsf",
+        "support": {
+            "source": "http://cgit.drupalcode.org/acsf"
+        }
     },
     {
         "name": "drupal/samlauth",
