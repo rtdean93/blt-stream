@@ -15,7 +15,7 @@ Prod Builds
 Pull the acsf module from d.o. The composer segment for acsf should look like:
 ```json
  "drupal/acsf": "1.32",
- ```
+```
 
 Dev Builds
 ----------
