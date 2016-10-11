@@ -23,7 +23,7 @@
         "drupal/lightning": "8.1.06",
         "drupal/externalauth": "1.x-dev",
         "drupal/samlauth": "dev-8.x-2.x",
-        "acquia/acsf": "dev-2.50-RC-NIGHTLY-d8",
+        "drupal/acsf": "1.32",
         "drush/drush": "^8.1"
     },
     "repositories": [
