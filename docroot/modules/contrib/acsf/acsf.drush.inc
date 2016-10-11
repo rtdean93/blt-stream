@@ -75,6 +75,12 @@ function drush_acsf_build_registry() {
 
 /**
  * Command callback. Scrubs the site database and/or other storage.
+ *
+ * Note that 'scrubbing' in our case doesn't mean just clearing configuration
+ * values but also initializing them for use in a new website.
+ *
+ * drush acsf-site-scrub is called by a 'db-copy' hosting task, which in turn
+ * seems to be called (only?) by the staging process.
  */
 function drush_acsf_site_scrub() {
   $connection = \Drupal::database();
@@ -124,6 +130,25 @@ function drush_acsf_site_scrub() {
 
   // Reset the drupal private key.
   \Drupal::service('private_key')->set('');
+
+  // Reset the local site data and run acsf-site-sync to fetch factory data
+  // about the site.
+  $site = AcsfSite::load();
+  $site->clean();
+  drush_acsf_site_sync();
+  drush_log(dt('Executed acsf-site-sync to gather site data from factory and reset all acsf variables.'), 'ok');
+
+  if (\Drupal::moduleHandler()->moduleExists('acsf_sso')) {
+    // Repopulate/overwrite the subset of SAML auth data which is factory /
+    // sitegroup/env/factory-site-nid specific. Notes:
+    // - This indeed also overwrites values which have not changed, since the
+    //   site nid did not change - at least not if this is called while staging.
+    //   But we want to reuse code without introducing more granularity.)
+    // - We don't scrub the users' authmap data; it's fine if they retain the
+    //   IDs used in live site-factory communication.
+    module_load_include('install', 'acsf_sso');
+    acsf_sso_install_set_env_dependent_config();
+  }
 
   // Trigger a rebuild of router paths (formerly 'menu paths').
   \Drupal::service("router.builder")->rebuild();

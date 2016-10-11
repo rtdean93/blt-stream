@@ -1,13 +1,14 @@
-# ignore bin, vendor, phpstorm files...
+# deal with irnoring or not  bin, vendor, phpstorm files...
 .idea
 .idea/**
 bin/
-vendor/
+!vendor/
 !docroot/**
 !docroot/vendor/**
 !docroot/**/vendor/**
-composer.json
+!composer.json
 !docroot/**/composer.json
-composer.lock
+!composer.lock
 !docroot/**/composer.lock
+!docroot/modules/**
 .git
