@@ -22,7 +22,7 @@
         "cweagans/composer-patches": "1.5.0",
         "drupal/lightning": "~2.06",
         "drupal/externalauth": "1.x-dev",
-        "drupal/samlauth": "dev-8.x-2.x",
+        "drupal/samlauth": "~2.0",
         "drupal/acsf": "~1.32",
         "drush/drush": "^8.1"
     },
@@ -34,12 +34,7 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/rmuit/samlauth.git"
         }
-
     ],
     "scripts": {
       "post-install-cmd": [
