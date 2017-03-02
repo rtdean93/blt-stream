@@ -586,10 +586,13 @@ function _core_site_status_table($project = '') {
         $status_table['db-port'] = isset($db_spec['port']) ? $db_spec['port'] : NULL;
         if ($phase > DRUSH_BOOTSTRAP_DRUPAL_CONFIGURATION) {
           $status_table['install-profile'] = $boot_object->get_profile();
-          if ($phase > DRUSH_BOOTSTRAP_DRUPAL_FULL) {
-            $status_table['bootstrap'] = dt('Successful');
-            if ($phase == DRUSH_BOOTSTRAP_DRUPAL_LOGIN) {
-              $status_table['user'] = drush_user_get_class()->getCurrentUserAsSingle()->getUsername();
+          if ($phase > DRUSH_BOOTSTRAP_DRUPAL_DATABASE) {
+            $status_table['db-status'] = dt('Connected');
+            if ($phase > DRUSH_BOOTSTRAP_DRUPAL_FULL) {
+              $status_table['bootstrap'] = dt('Successful');
+              if ($phase == DRUSH_BOOTSTRAP_DRUPAL_LOGIN) {
+                $status_table['user'] = drush_user_get_class()->getCurrentUserAsSingle()->getUsername();
+              }
             }
           }
         }
@@ -826,6 +829,9 @@ function drush_core_requirements() {
     $requirements[$key]['severity'] = $severities[$severity];
     if ($severity < $min_severity) {
       unset($requirements[$key]);
+    }
+    if (isset($requirements[$key]['description'])) {
+      $requirements[$key]['description'] = drush_render($requirements[$key]['description']);
     }
   }
   return $requirements;
@@ -1357,7 +1363,7 @@ function drush_core_twig_compile() {
   foreach ($themes as $name => $theme) {
     $searchpaths[] = $theme->getPath();
   }
-  
+
   foreach ($searchpaths as $searchpath) {
     foreach ($file = drush_scan_directory($searchpath, '/\.html.twig/', array('tests')) as $file) {
       $relative = str_replace(drush_get_context('DRUSH_DRUPAL_ROOT'). '/', '', $file->filename);

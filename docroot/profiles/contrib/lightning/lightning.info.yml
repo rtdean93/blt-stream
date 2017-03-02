@@ -1,7 +1,8 @@
 name: Lightning
+core: 8.x
 type: profile
 description: 'A fast and feature-rich Drupal distribution.'
-# core: 8.x
+version: '8.x-2.03'
 distribution:
   name: Lightning
 
@@ -13,7 +14,6 @@ dependencies:
   - ckeditor
   - config
   - contextual
-  - contact
   - menu_link_content
   - datetime
   - block_content
@@ -39,6 +39,7 @@ dependencies:
   - views
   - views_ui
   # contrib
+  - diff
   - metatag
   # Our own core functionality.
   - lightning_core
@@ -46,9 +47,3 @@ dependencies:
 themes:
   - bartik
   - seven
-
-# Information added by Drupal.org packaging script on 2016-10-05
-version: '8.x-1.06'
-core: '8.x'
-project: 'lightning'
-datestamp: 1475683320

@@ -4,7 +4,7 @@ namespace Drupal\externalauth\Plugin\migrate\destination;
 
 use Drupal\externalauth\AuthmapInterface;
 use Drupal\user\Entity\User;
-use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;

@@ -22,6 +22,11 @@ abstract class AbstractCommandDocBlockParser
     protected $reflection;
 
     /**
+     * @var string
+     */
+    protected $optionParamName;
+
+    /**
      * @var array
      */
     protected $tagProcessors = [
@@ -70,7 +75,7 @@ abstract class AbstractCommandDocBlockParser
      */
     protected function processGenericTag($tag)
     {
-        $this->commandInfo->addOtherAnnotation($tag->getName(), $this->getTagContents($tag));
+        $this->commandInfo->addAnnotation($tag->getName(), $this->getTagContents($tag));
     }
 
     /**
@@ -78,10 +83,11 @@ abstract class AbstractCommandDocBlockParser
      */
     protected function processCommandTag($tag)
     {
-        $this->commandInfo->setName($this->getTagContents($tag));
+        $commandName = $this->getTagContents($tag);
+        $this->commandInfo->setName($commandName);
         // We also store the name in the 'other annotations' so that is is
         // possible to determine if the method had a @command annotation.
-        $this->processGenericTag($tag);
+        $this->commandInfo->addAnnotation($tag->getName(), $commandName);
     }
 
     /**
@@ -101,7 +107,10 @@ abstract class AbstractCommandDocBlockParser
      */
     protected function processArgumentTag($tag)
     {
-        $this->addOptionOrArgumentTag($tag, $this->commandInfo->arguments());
+        if (!$this->pregMatchNameAndDescription((string)$tag->getDescription(), $match)) {
+            return;
+        }
+        $this->addOptionOrArgumentTag($tag, $this->commandInfo->arguments(), $match);
     }
 
     /**
@@ -109,16 +118,16 @@ abstract class AbstractCommandDocBlockParser
      */
     protected function processOptionTag($tag)
     {
-        $this->addOptionOrArgumentTag($tag, $this->commandInfo->options());
-    }
-
-    protected function addOptionOrArgumentTag($tag, DefaultsWithDescriptions $set)
-    {
-        if (!$this->pregMatchNameAndDescription((string)$tag->getDescription(), $match)) {
+        if (!$this->pregMatchOptionNameAndDescription((string)$tag->getDescription(), $match)) {
             return;
         }
-        $variableName = $this->commandInfo->findMatchingOption($match['name']);
-        $desc = $match['description'];
+        $this->addOptionOrArgumentTag($tag, $this->commandInfo->options(), $match);
+    }
+
+    protected function addOptionOrArgumentTag($tag, DefaultsWithDescriptions $set, $nameAndDescription)
+    {
+        $variableName = $this->commandInfo->findMatchingOption($nameAndDescription['name']);
+        $desc = $nameAndDescription['description'];
         $description = static::removeLineBreaks($desc);
         $set->add($variableName, $description);
     }
@@ -164,6 +173,34 @@ abstract class AbstractCommandDocBlockParser
         $this->commandInfo->setAliases((string)$tag->getDescription());
     }
 
+    protected function lastParameterName()
+    {
+        $params = $this->commandInfo->getParameters();
+        $param = end($params);
+        if (!$param) {
+            return '';
+        }
+        return $param->name;
+    }
+
+    /**
+     * Return the name of the last parameter if it holds the options.
+     */
+    public function optionParamName()
+    {
+        // Remember the name of the last parameter, if it holds the options.
+        // We will use this information to ignore @param annotations for the options.
+        if (!isset($this->optionParamName)) {
+            $this->optionParamName = '';
+            $options = $this->commandInfo->options();
+            if (!$options->isEmpty()) {
+                $this->optionParamName = $this->lastParameterName();
+            }
+        }
+
+        return $this->optionParamName;
+    }
+
     /**
      * Store the data from a @param annotation in our argument descriptions.
      */
@@ -172,7 +209,7 @@ abstract class AbstractCommandDocBlockParser
         $variableName = $tag->getVariableName();
         $variableName = str_replace('$', '', $variableName);
         $description = static::removeLineBreaks((string)$tag->getDescription());
-        if ($variableName == $this->commandInfo->optionParamName()) {
+        if ($variableName == $this->optionParamName()) {
             return;
         }
         $this->commandInfo->arguments()->add($variableName, $description);
@@ -207,6 +244,21 @@ abstract class AbstractCommandDocBlockParser
     protected function pregMatchNameAndDescription($source, &$match)
     {
         $nameRegEx = '\\$(?P<name>[^ \t]+)[ \t]+';
+        $descriptionRegEx = '(?P<description>.*)';
+        $optionRegEx = "/{$nameRegEx}{$descriptionRegEx}/s";
+
+        return preg_match($optionRegEx, $source, $match);
+    }
+
+    /**
+     * Given a docblock description in the form "$variable description",
+     * return the variable name and description via the 'match' parameter.
+     */
+    protected function pregMatchOptionNameAndDescription($source, &$match)
+    {
+        // Strip type and $ from the text before the @option name, if present.
+        $source = preg_replace('/^[a-zA-Z]* ?\\$/', '', $source);
+        $nameRegEx = '(?P<name>[^ \t]+)[ \t]+';
         $descriptionRegEx = '(?P<description>.*)';
         $optionRegEx = "/{$nameRegEx}{$descriptionRegEx}/s";
 

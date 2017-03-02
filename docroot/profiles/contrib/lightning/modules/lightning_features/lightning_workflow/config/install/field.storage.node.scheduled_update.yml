@@ -4,8 +4,6 @@ dependencies:
   module:
     - node
     - scheduled_updates
-_core:
-  default_config_hash: 96C_n8O06F-YdI1bYCxqWc6Qt5LUhGopvsYBIY9E1Mo
 id: node.scheduled_update
 field_name: scheduled_update
 entity_type: node
@@ -14,7 +12,7 @@ settings:
   target_type: scheduled_update
 module: core
 locked: false
-cardinality: 1
+cardinality: -1
 translatable: false
 indexes: {  }
 persist_with_no_fields: false

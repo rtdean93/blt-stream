@@ -6,17 +6,39 @@
  */
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
-use Drupal\DrupalExtension\Context\DrupalSubContextInterface;
 
 /**
  * Sub context for Lightning step definitions.
  */
-class LightningSubContext extends DrupalSubContextBase implements DrupalSubContextInterface {
+class LightningSubContext extends DrupalSubContextBase {
+
+  /**
+   * Installs the Lightning Test module before a @test_module scenario.
+   *
+   * @BeforeScenario @test_module
+   */
+  public function installTestModule() {
+    $driver = $this->getDriver();
+    if ($driver->isBootstrapped() === FALSE) {
+      $driver->bootstrap();
+    }
+    \Drupal::service('module_installer')->install(['lightning_test']);
+  }
+
+  /**
+   * Uninstalls the Lighting Test module after a @test_module scenario.
+   *
+   * @AfterScenario @test_module
+   */
+  public function uninstallTestModule() {
+    \Drupal::service('module_installer')->uninstall(['lightning_test']);
+  }
 
   /**
    * The Mink context.
@@ -24,6 +46,13 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
    * @var \Drupal\DrupalExtension\Context\MinkContext
    */
   protected $minkContext;
+
+  /**
+   * Start time for each scenario.
+   *
+   * @var int
+   */
+  protected $startTime;
 
   /**
    * Pre-scenario hook.
@@ -34,6 +63,39 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
     $environment = $scope->getEnvironment();
 
     $this->minkContext = $environment->getContext('Drupal\DrupalExtension\Context\MinkContext');
+  }
+
+  /**
+   * Store current time.
+   *
+   * @BeforeScenario ~@errors
+   */
+  public function setStartTime() {
+    $this->startTime = time();
+  }
+
+  /**
+   * Check for errors since the scenario started.
+   *
+   * @AfterScenario ~@errors
+   */
+  public function checkWatchdog(AfterScenarioScope $scope) {
+    if (db_table_exists('watchdog')) {
+      $log = db_select('watchdog', 'w')
+        ->fields('w')
+        ->condition('w.type', 'php', '=')
+        ->condition('w.timestamp', $this->startTime, '>=')
+        ->execute()
+        ->fetchAll();
+      if (!empty($log)) {
+        foreach ($log as $error) {
+          // Make the substitutions easier to read in the log.
+          $error->variables = unserialize($error->variables);
+          print_r($error);
+        }
+        throw new \Exception('PHP errors logged to watchdog in this scenario.');
+      }
+    }
   }
 
   /**
@@ -233,7 +295,7 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
    * @param int $seconds
    *   How long to wait.
    *
-   * @When I wait :seconds seconds
+   * @When I wait :seconds second(s)
    */
   public function wait($seconds) {
     sleep($seconds);
@@ -339,7 +401,11 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
    * @BeforeScenario
    */
   public function setFilePath() {
-    $this->minkContext->setMinkParameter('files_path', __DIR__ . '/../../files');
+
+    $existing = $this->minkContext->getMinkParameter('files_path');
+    if (empty($existing)) {
+      $this->minkContext->setMinkParameter('files_path', __DIR__ . '/../../files');
+    }
   }
 
   /**
@@ -386,13 +452,16 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
   }
 
   /**
-   * Submits the image browser.
+   * Asserts that a link is not present.
    *
-   * @When I submit the entity browser
+   * @param string $locator
+   *   The link title, ID, or text.
+   *
+   * @Then I should not see a(n) :locator link
    */
-  public function submitEntityBrowser() {
-    $this->getSession()
-      ->executeScript('window.frames["entity_browser_iframe_image_browser"].document.forms[0].op.click()');
+  public function assertLinkNotExists($locator) {
+    $this->assertSession()
+      ->elementNotExists('named', ['link', $locator]);
   }
 
   /**
@@ -405,6 +474,28 @@ class LightningSubContext extends DrupalSubContextBase implements DrupalSubConte
    */
   public function switchToFrame($name) {
     $this->getSession()->switchToIFrame($name);
+  }
+
+  /**
+   * Schedules a node for publication.
+   *
+   * @param string $when
+   *   The date and time at which to publish the node, in the format
+   *   YYYY-MM-DD HH:MM:SS.
+   *
+   * @When I schedule the node to be published at :when
+   */
+  public function schedulePublication($when) {
+    $this->minkContext->pressButton('Add new scheduled update');
+    $this->minkContext->iWaitForAjaxToFinish();
+
+    list ($date, $time) = explode(' ', $when, 2);
+    $this->minkContext->fillField('scheduled_update[form][inline_entity_form][update_timestamp][0][value][date]', $date);
+    $this->minkContext->fillField('scheduled_update[form][inline_entity_form][update_timestamp][0][value][time]', $time);
+    $this->minkContext->selectOption('scheduled_update[form][inline_entity_form][field_moderation_state]', 'published');
+
+    $this->minkContext->pressButton('Create scheduled update');
+    $this->minkContext->iWaitForAjaxToFinish();
   }
 
 }

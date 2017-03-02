@@ -5,13 +5,14 @@
  * Contains \MediaLibrarySubContext.
  */
 
+use Acquia\LightningExtension\Context\CkEditorContext;
+use Acquia\LightningExtension\Context\EntityBrowserContext;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
-use Drupal\DrupalExtension\Context\DrupalSubContextInterface;
 
 /**
  * Contains step definitions for testing the CKEditor media widget.
  */
-class MediaLibrarySubContext extends DrupalSubContextBase implements DrupalSubContextInterface {
+class MediaLibrarySubContext extends DrupalSubContextBase {
 
   /**
    * The Mink context.
@@ -61,9 +62,9 @@ class MediaLibrarySubContext extends DrupalSubContextBase implements DrupalSubCo
    * @When I open the media browser
    */
   public function openMediaBrowser($button = 'media_browser') {
-    /** @var \CkEditorSubContext $ck_context */
-    $ck_context = $this->getContext('\CkEditorSubContext');
-    $ck_context->execute('editdrupalentity', NULL, ['id' => $button]);
+    $this
+      ->getContext(CkEditorContext::class)
+      ->execute('editdrupalentity', NULL, ['id' => $button]);
 
     $this->minkContext->iWaitForAjaxToFinish();
     $frame = 'entity_browser_iframe_' . $button;
@@ -81,13 +82,10 @@ class MediaLibrarySubContext extends DrupalSubContextBase implements DrupalSubCo
    */
   public function selectNthItem($n) {
     sleep(5);
-    $row = floor($n / 4) + 1;
-    $column = ($n % $row) + 1;
 
-    $selector = '.view-media .row-' . $row . ' .col-' . $column;
-    /** @var \LightningSubContext $lightning */
-    $lightning = $this->getContext('\LightningSubContext');
-    $lightning->clickElementBySelector($selector);
+    $this
+      ->getContext(EntityBrowserContext::class)
+      ->selectItem($n, 'media_browser');
   }
 
   /**
@@ -112,7 +110,7 @@ class MediaLibrarySubContext extends DrupalSubContextBase implements DrupalSubCo
    */
   protected function awaitEntityForm() {
     $this->minkContext->iWaitForAjaxToFinish();
-    $this->awaitExpression('document.getElementById("ief-target").textContent.length');
+    $this->awaitExpression('jQuery("#entity").children().length');
   }
 
   /**
@@ -138,8 +136,14 @@ class MediaLibrarySubContext extends DrupalSubContextBase implements DrupalSubCo
    * @When I enter embed code :code
    */
   public function embed($code) {
-    $this->minkContext->clickLink('Create Embed');
-    $this->minkContext->fillField('embed_code', $code);
+    // Activate the 'Create embed' tab. We cannot use the link text because it
+    // may change between versions of Lightning (as in commit 48fa57e), but the
+    // UUID won't.
+    $this->assertSession()
+      ->elementExists('css', 'nav.eb-tabs ul li a[data-button-id="edit-tab-selector-8b142f33-59d1-47b1-9e3a-4ae85d8376fa"]')
+      ->click();
+
+    $this->minkContext->fillField('input', $code);
     // The change event, which triggers AJAX, is fired automatically after 600
     // milliseconds.
     sleep(1);

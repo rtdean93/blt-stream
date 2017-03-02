@@ -8,12 +8,11 @@
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
-use Drupal\DrupalExtension\Context\DrupalSubContextInterface;
 
 /**
  * Contains step definitions for working with Panels and panelized pages.
  */
-class PanelsSubContext extends DrupalSubContextBase implements DrupalSubContextInterface {
+class PanelsSubContext extends DrupalSubContextBase {
 
   /**
    * The Mink context.
@@ -75,30 +74,6 @@ class PanelsSubContext extends DrupalSubContextBase implements DrupalSubContextI
     $this->minkContext->uncheckOption('panelizer[enable]');
     $this->minkContext->uncheckOption('panelizer[custom]');
     $this->minkContext->pressButton('Save');
-  }
-
-  /**
-   * Places a block into a Panels layout.
-   *
-   * @param string $plugin_id
-   *   The block plugin ID.
-   * @param string $category
-   *   The block's category.
-   *
-   * @When I place the :plugin_id block from the :category category
-   */
-  public function placeBlock($plugin_id, $category) {
-    $this->lightning->clickElementBySelector('a[title = "Manage Content"]');
-    $this->minkContext->iWaitForAjaxToFinish();
-
-    $this->lightning->clickElementBySelector('a[data-category = "' . $category . '"]');
-    $this->minkContext->iWaitForAjaxToFinish();
-
-    $this->lightning->clickElementBySelector('a[data-plugin-id = "' . $plugin_id . '"]');
-    $this->minkContext->iWaitForAjaxToFinish();
-
-    $this->lightning->clickElementBySelector('[value = "Add"]');
-    $this->minkContext->iWaitForAjaxToFinish();
   }
 
   /**
@@ -238,32 +213,6 @@ class PanelsSubContext extends DrupalSubContextBase implements DrupalSubContextI
   }
 
   /**
-   * Saves the current Panels layout as a custom layout.
-   *
-   * @When I save the layout
-   */
-  public function saveCustomLayout() {
-    $this->lightning->clickElementBySelector('a[title = "Save"]');
-    $this->minkContext->iWaitForAjaxToFinish();
-
-    $this->lightning->clickElementBySelector('a.panelizer-ipe-save-custom');
-    $this->minkContext->iWaitForAjaxToFinish();
-  }
-
-  /**
-   * Saves the current Panels layout as a default layout.
-   *
-   * @When I save the layout as default
-   */
-  public function saveDefaultLayout() {
-    $this->lightning->clickElementBySelector('a[title = "Save"]');
-    $this->minkContext->iWaitForAjaxToFinish();
-
-    $this->lightning->clickElementBySelector('a.panelizer-ipe-save-default');
-    $this->minkContext->iWaitForAjaxToFinish();
-  }
-
-  /**
    * Asserts that a block with a specific plugin ID is present.
    *
    * @param string $plugin_id
@@ -276,7 +225,7 @@ class PanelsSubContext extends DrupalSubContextBase implements DrupalSubContextI
   }
 
   /**
-   * Asserts that a block with a specific plugin ID is not present.
+   * Asserts that a block with a specific plugin ID is NOT present.
    *
    * @param string $plugin_id
    *   The block plugin ID.

@@ -1,9 +1,11 @@
-name: Lightning Media
+name: 'Lightning Media'
+core: 8.x
 type: module
-description: Slick media handling for Lightning. So cool you'll make the A/C jealous.
-# core: 8.x
+description: "Slick media handling for Lightning. So cool you'll make the A/C jealous."
+version: '8.x-2.03'
 package: Lightning
 dependencies:
+  - ckeditor
   - entity_browser
   - entity_embed
   - image
@@ -12,9 +14,9 @@ dependencies:
   - media_entity
   - user
   - views_infinite_scroll
-
-# Information added by Drupal.org packaging script on 2016-10-05
-version: '8.x-1.06'
-core: '8.x'
-project: 'lightning'
-datestamp: 1475683320
+components:
+  - lightning_media_document
+  - lightning_media_image
+  - lightning_media_instagram
+  - lightning_media_twitter
+  - lightning_media_video

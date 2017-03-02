@@ -1,11 +1,14 @@
 <?php
 namespace Consolidation\TestUtils;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Consolidation\AnnotatedCommand\CommandError;
+use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\AnnotatedCommand\AnnotationData;
+use Consolidation\AnnotatedCommand\CommandError;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Test file used in the Annotation Factory tests.  It is also
@@ -18,10 +21,16 @@ use Consolidation\AnnotatedCommand\AnnotationData;
 class ExampleCommandFile
 {
     protected $state;
+    protected $output;
 
     public function __construct($state = '')
     {
         $this->state = $state;
+    }
+
+    public function setOutput($output)
+    {
+        $this->output = $output;
     }
 
     /**
@@ -36,6 +45,7 @@ class ExampleCommandFile
      * @aliases c
      * @usage bet alpha --flip
      *   Concatenate "alpha" and "bet".
+     * @arbitrary This annotation is here merely as a marker used in testing.
      */
     public function myCat($one, $two = '', $options = ['flip' => false])
     {
@@ -45,9 +55,32 @@ class ExampleCommandFile
         return "{$one}{$two}";
     }
 
+    /**
+     * @command my:repeat
+     */
     public function myRepeat($one, $two = '', $options = ['repeat' => 1])
     {
         return str_repeat("{$one}{$two}", $options['repeat']);
+    }
+
+    /**
+     * This is the my:join command
+     *
+     * This command will join its parameters together. It can also reverse and repeat its arguments.
+     *
+     * @command my:join
+     * @usage a b
+     *   Join a and b to produce "a,b"
+     * @usage
+     *   Example with no parameters or options
+     */
+    public function myJoin(array $args, $options = ['flip' => false, 'repeat' => 1])
+    {
+        if ($options['flip']) {
+            $args = array_reverse($args);
+        }
+        $result = implode('', $args);
+        return str_repeat($result, $options['repeat']);
     }
 
     /**
@@ -71,7 +104,7 @@ class ExampleCommandFile
      *
      * Return a result only if not silent.
      *
-     * @option $silent Supress output.
+     * @option silent Supress output.
      */
     public function commandWithNoArguments($opts = ['silent|s' => false])
     {
@@ -86,7 +119,7 @@ class ExampleCommandFile
      * This command defines the option shortcut on the annotation instead of in the options array.
      *
      * @param $opts The options
-     * @option $silent|s Supress output.
+     * @option silent|s Supress output.
      */
     public function shortcutOnAnnotation($opts = ['silent' => false])
     {
@@ -101,14 +134,16 @@ class ExampleCommandFile
      * This command will add one and two. If the --negate flag
      * is provided, then the result is negated.
      *
+     * @command test:arithmatic
      * @param integer $one The first number to add.
      * @param integer $two The other number to add.
-     * @option $negate Whether or not the result should be negated.
+     * @option negate Whether or not the result should be negated.
      * @aliases arithmatic
      * @usage 2 2 --negate
      *   Add two plus two and then negate.
+     * @custom
      */
-    public function testArithmatic($one, $two, $options = ['negate' => false])
+    public function testArithmatic($one, $two = 2, $options = ['negate' => false, 'unused' => 'bob'])
     {
         $result = $one + $two;
         if ($options['negate']) {
@@ -179,11 +214,71 @@ class ExampleCommandFile
      *
      * @hook alter @hookme
      */
-    public function hookTestAnnotatedHook($result, $args, AnnotationData $annotationData)
+    public function hookTestAnnotatedHook($result, CommandData $commandData)
     {
-        $before = $annotationData->get('before', '-');
-        $after = $annotationData->get('after', '-');
+        $before = $commandData->annotationData()->get('before', '-');
+        $after = $commandData->annotationData()->get('after', '-');
         return "$before$result$after";
+    }
+
+    /**
+     * Alter the results of the hook with its command name.
+     *
+     * @hook alter @addmycommandname
+     */
+    public function hookAddCommandName($result, CommandData $commandData)
+    {
+        $annotationData = $commandData->annotationData();
+        return "$result from " . $annotationData['command'];
+    }
+
+    /**
+     * Here is a hook with an explicit command annotation that we will alter
+     * with the preceeding hook
+     *
+     * @command alter-me
+     * @addmycommandname
+     */
+    public function alterMe()
+    {
+        return "splendiferous";
+    }
+
+    /**
+     * Here is another hook that has no command annotation that should be
+     * altered with the default value for the command name
+     *
+     * @addmycommandname
+     */
+    public function alterMeToo()
+    {
+        return "fantabulous";
+    }
+
+    /**
+     * @hook pre-command test:post-command
+     */
+    public function hookTestPreCommandHook(CommandData $commandData)
+    {
+        // Use 'writeln' to detect order that hooks are called
+        $this->output->writeln("foo");
+    }
+
+    /**
+     * @command test:post-command
+     */
+    public function testPostCommand($value)
+    {
+        $this->output->writeln($value);
+    }
+
+    /**
+     * @hook post-command test:post-command
+     */
+    public function hookTestPostCommandHook($result, CommandData $commandData)
+    {
+        // Use 'writeln' to detect order that hooks are called
+        $this->output->writeln("baz");
     }
 
     public function testHello($who)
@@ -197,10 +292,46 @@ class ExampleCommandFile
     }
 
     /**
+     * @hook init test:hello
+     */
+    public function initializeTestHello($input, AnnotationData $annotationData)
+    {
+        $who = $input->getArgument('who');
+        if (!$who) {
+            $input->setArgument('who', 'Huey');
+        }
+    }
+
+    /**
+     * @hook command-event test:hello
+     */
+    public function commandEventTestHello(ConsoleCommandEvent $event)
+    {
+        // Note that Symfony Console will not allow us to alter the
+        // input from this hook, so we'll just print something to
+        // show that this hook was executed.
+        $input = $event->getInput();
+        $who = $input->getArgument('who');
+        $this->output->writeln("Here comes $who!");
+    }
+
+    /**
+     * @hook interact test:hello
+     */
+    public function interactTestHello($input, $output)
+    {
+        $who = $input->getArgument('who');
+        if (!$who) {
+            $input->setArgument('who', 'Goofey');
+        }
+    }
+
+    /**
      * @hook validate test:hello
      */
-    public function validateTestHello($args)
+    public function validateTestHello($commandData)
     {
+        $args = $commandData->arguments();
         if ($args['who'] == 'Donald Duck') {
             return new CommandError("I won't say hello to Donald Duck.");
         }
@@ -225,5 +356,55 @@ class ExampleCommandFile
             return "only $one";
         }
         return "nothing provided";
+    }
+
+    /**
+     * @return string
+     */
+    public function defaultOptionOne($options = ['foo' => '1'])
+    {
+        return "Foo is " . $options['foo'];
+    }
+
+    /**
+     * @return string
+     */
+    public function defaultOptionTwo($options = ['foo' => '2'])
+    {
+        return "Foo is " . $options['foo'];
+    }
+
+    /**
+     * @return string
+     */
+    public function defaultOptionNone($options = ['foo' => InputOption::VALUE_REQUIRED])
+    {
+        return "Foo is " . $options['foo'];
+    }
+
+    /**
+     * This is the test:required-array-option command
+     *
+     * This command will print all the valused of passed option
+     *
+     * @param array $opts
+     * @return string
+     */
+    public function testRequiredArrayOption($opts = ['arr|a' => []])
+    {
+        return implode(' ', $opts['arr']);
+    }
+
+    /**
+     * This is the test:array-option command
+     *
+     * This command will print all the valused of passed option
+     *
+     * @param array $opts
+     * @return string
+     */
+    public function testArrayOption($opts = ['arr|a' => ['1', '2', '3']])
+    {
+        return implode(' ', $opts['arr']);
     }
 }

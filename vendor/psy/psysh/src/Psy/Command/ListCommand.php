@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2015 Justin Hileman
+ * (c) 2012-2017 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -133,6 +133,11 @@ HELP
         if ($input->getOption('long')) {
             $output->stopPaging();
         }
+
+        // Set some magic local variables
+        if ($reflector !== null) {
+            $this->setCommandScopeVariables($reflector);
+        }
     }
 
     /**
@@ -162,7 +167,7 @@ HELP
      * Write the list items to $output.
      *
      * @param OutputInterface $output
-     * @param null|array      $result List of enumerated items.
+     * @param null|array      $result List of enumerated items
      */
     protected function write(OutputInterface $output, array $result = null)
     {
@@ -182,7 +187,7 @@ HELP
      * Items are listed one per line, and include the item signature.
      *
      * @param OutputInterface $output
-     * @param null|array      $result List of enumerated items.
+     * @param null|array      $result List of enumerated items
      */
     protected function writeLong(OutputInterface $output, array $result = null)
     {
@@ -224,7 +229,7 @@ HELP
     /**
      * Validate that input options make sense, provide defaults when called without options.
      *
-     * @throws RuntimeException if options are inconsistent.
+     * @throws RuntimeException if options are inconsistent
      *
      * @param InputInterface $input
      */

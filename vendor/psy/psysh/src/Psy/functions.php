@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2015 Justin Hileman
+ * (c) 2012-2017 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +11,7 @@
 
 namespace Psy;
 
+use Psy\VersionUpdater\GitHubChecker;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -31,9 +32,27 @@ if (!function_exists('Psy\sh')) {
 }
 
 if (!function_exists('Psy\info')) {
-    function info()
+    /**
+     * Get a bunch of debugging info about the current PsySH environment and
+     * configuration.
+     *
+     * If a Configuration param is passed, that configuration is stored and
+     * used for the current shell session, and no debugging info is returned.
+     *
+     * @param Configuration|null $config
+     *
+     * @return array|null
+     */
+    function info(Configuration $config = null)
     {
-        $config = new Configuration();
+        static $lastConfig;
+        if ($config !== null) {
+            $lastConfig = $config;
+
+            return;
+        }
+
+        $config = $lastConfig ?: new Configuration();
 
         $core = array(
             'PsySH version'       => Shell::VERSION,
@@ -49,6 +68,15 @@ if (!function_exists('Psy\info')) {
             // 'config dir'  => $config->getConfigDir(),
             // 'data dir'    => $config->getDataDir(),
             // 'runtime dir' => $config->getRuntimeDir(),
+        );
+
+        // Use an explicit, fresh update check here, rather than relying on whatever is in $config.
+        $checker = new GitHubChecker();
+        $updates = array(
+            'update available'       => !$checker->isLatest(),
+            'latest release version' => $checker->getLatest(),
+            'update check interval'  => $config->getUpdateCheck(),
+            'update cache file'      => $config->getUpdateCheckCacheFile(),
         );
 
         if ($config->hasReadline()) {
@@ -119,7 +147,7 @@ if (!function_exists('Psy\info')) {
             'custom matchers'        => array_map('get_class', $config->getTabCompletionMatchers()),
         );
 
-        return array_merge($core, compact('pcntl', 'readline', 'history', 'docs', 'autocomplete'));
+        return array_merge($core, compact('updates', 'pcntl', 'readline', 'history', 'docs', 'autocomplete'));
     }
 }
 

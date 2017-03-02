@@ -5,11 +5,75 @@
  * Provides workflow enhancements for Drupal.
  */
 
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\lightning_workflow\Plugin\views\field\NodeBulkForm;
 use Drupal\node\NodeTypeInterface;
+use Drupal\scheduled_updates\ScheduledUpdateInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\workbench_moderation\Entity\ModerationState;
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ */
+function lightning_workflow_inline_entity_form_table_fields_alter(array &$fields, array $context) {
+  if ($context['entity_type'] == 'scheduled_update') {
+    $fields['label']['type'] = 'callback';
+    $fields['label']['callback'] = 'lightning_workflow_scheduled_update_ief_label';
+    // We're generating a pretty, informative label...so there's no need to use
+    // the spartan, default column label.
+    $fields['label']['label'] = NULL;
+  }
+}
+
+/**
+ * Generates pretty labels for scheduled updates in an IEF.
+ *
+ * @param ScheduledUpdateInterface $entity
+ *   The scheduled update entity.
+ *
+ * @return array
+ *   The entity label, as a renderable array.
+ */
+function lightning_workflow_scheduled_update_ief_label(ScheduledUpdateInterface $entity) {
+  $label = $entity->label();
+
+  if ($entity->bundle() == 'node_embargo') {
+    $when = DrupalDateTime::createFromTimestamp($entity->update_timestamp->value);
+
+    $label = t('Move to <strong>@moderation_state</strong> state on @date at @time', [
+      '@moderation_state' => $entity->field_moderation_state->entity->label(),
+      '@date' => $when->format('F j, Y'),
+      '@time' => $when->format('g:i:s A'),
+    ]);
+  }
+  return ['#markup' => $label];
+}
+
+/**
+ * Alters a moderation_state form element.
+ *
+ * Workbench Moderation's out-of-the-box UX is kind of awful, so this restores
+ * a measure of sanity by making the moderation_state widget into a select list
+ * and preventing it from messing around with the form's submit buttons.
+ *
+ * @param array $element
+ *   The element to modify.
+ */
+function lightning_workflow_alter_moderation_state(array &$element) {
+  // Allow the user to choose the moderation state.
+  $element['#access'] = TRUE;
+
+  // Show the original labels of the destination states.
+  foreach (array_keys($element['#options']) as $id) {
+    $element['#options'][$id] = ModerationState::load($id)->label();
+  }
+
+  // Do NOT rejigger the form's buttons.
+  unset($element['#process'][0]);
+}
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -20,16 +84,7 @@ function lightning_workflow_form_node_form_alter(array &$form, FormStateInterfac
   $mod_info = \Drupal::service('workbench_moderation.moderation_information');
 
   if (isset($form['moderation_state']) && $mod_info->isModeratedEntityForm($form_object)) {
-    // Allow the user to choose the moderation state.
-    $form['moderation_state']['widget'][0]['#access'] = TRUE;
-
-    // Show the original labels of the destination states.
-    foreach (array_keys($form['moderation_state']['widget'][0]['#options']) as $id) {
-      $form['moderation_state']['widget'][0]['#options'][$id] = ModerationState::load($id)->label();
-    }
-
-    // DO NOT rejigger the buttons.
-    array_shift($form['moderation_state']['widget'][0]['#process']);
+    lightning_workflow_alter_moderation_state($form['moderation_state']['widget'][0]);
 
     // Show the basic 'Save' button, but hide the confusing
     // 'Save as unpublished' and 'Save and publish' buttons.
@@ -48,8 +103,9 @@ function lightning_workflow_form_node_form_alter(array &$form, FormStateInterfac
  * Implements hook_ENTITY_TYPE_insert().
  */
 function lightning_workflow_node_type_insert(NodeTypeInterface $node_type) {
-  /** @var \Drupal\user\RoleInterface $role */
-  user_role_grant_permissions($node_type->id() . '_creator', [
+  $id = $node_type->id();
+
+  user_role_grant_permissions($id . '_creator', [
     'view any unpublished content',
     'use draft_draft transition',
     'use draft_needs_review transition',
@@ -57,12 +113,52 @@ function lightning_workflow_node_type_insert(NodeTypeInterface $node_type) {
     'view latest version',
   ]);
 
-  user_role_grant_permissions($node_type->id() . '_reviewer', [
+  user_role_grant_permissions($id . '_reviewer', [
     'use draft_published transition',
     'use needs_review_draft transition',
     'use needs_review_published transition',
     'use published_published transition',
+    'use published_archived transition',
   ]);
+
+  if ($node_type->getThirdPartySetting('lightning_workflow', 'embargo')) {
+    FieldConfig::create([
+      'field_name' => 'scheduled_update',
+      'entity_type' => 'node',
+      'bundle' => $id,
+      'label' => t('Scheduled updates'),
+      'settings' => [
+        'handler' => 'default:scheduled_update',
+        'handler_settings' => [
+          'target_bundles' => ['node_embargo'],
+        ],
+      ],
+    ])->save();
+
+    $form_display = EntityFormDisplay::load('node.' . $id . '.default');
+    if ($form_display) {
+      $form_display
+        ->setComponent('scheduled_update', [
+          'type' => 'inline_entity_form_complex',
+          'settings' => [
+            'override_labels' => FALSE,
+            'label_singular' => '',
+            'label_plural' => '',
+            'allow_new' => TRUE,
+            'allow_existing' => FALSE,
+            'match_operator' => 'CONTAINS',
+          ],
+        ])
+        ->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data().
+ */
+function lightning_workflow_views_data() {
+  return \Drupal::service('lightning_workflow.views_data')->getAll();
 }
 
 /**

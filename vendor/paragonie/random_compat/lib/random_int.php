@@ -4,8 +4,8 @@
  * for using the new PHP 7 random_* API in PHP 5 projects
  * 
  * The MIT License (MIT)
- * 
- * Copyright (c) 2015 Paragon Initiative Enterprises
+ *
+ * Copyright (c) 2015 - 2016 Paragon Initiative Enterprises
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -151,11 +151,6 @@ function random_int($min, $max)
          * Let's grab the necessary number of random bytes
          */
         $randomByteString = random_bytes($bytes);
-        if ($randomByteString === false) {
-            throw new Exception(
-                'Random number generator failure'
-            );
-        }
 
         /**
          * Let's turn $randomByteString into an integer

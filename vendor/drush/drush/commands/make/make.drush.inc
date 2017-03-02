@@ -155,13 +155,16 @@ function make_drush_command() {
       'makefile' => 'Filename of the makefile to convert.',
     ),
     'options' => array(
-      'format' => 'The format to which the make file should be converted. Accepted values include make, composer, and yml.'
+      'projects' => $projects,
+      'libraries' => $libraries,
+      'includes' => 'A list of makefiles to include at build-time.',
+      'format' => 'The format to which the make file should be converted. Accepted values include make, composer, and yml.',
     ),
     'required-arguments' => TRUE,
     'examples' => array(
-      'drush make-convert example.make --format=yml' => 'Convert example.make to example.make.yml',
-      'drush make-convert example.make --format=composer' => 'Convert example.make to composer.json',
-      'drush make-convert composer.lock --format=make' => 'Convert composer.lock example.make',
+      'drush make-convert example.make --format=composer  > composer.json' => 'Convert example.make to composer.json',
+      'drush make-convert example.make --format=yml > example.make.yml' => 'Convert example.make to example.make.yml',
+      'drush make-convert composer.lock --format=make > example.make' => 'Convert composer.lock example.make',
     ),
   );
 
@@ -377,7 +380,7 @@ function drush_make($makefile = NULL, $build_path = NULL) {
 }
 
 /**
- * Command callback; convert make file format.
+ * Command callback; convert ini makefile to YAML.
  */
 function drush_make_convert($source) {
   $dest_format = drush_get_option('format', 'yml');
@@ -439,29 +442,116 @@ function drush_make_convert($source) {
 }
 
 /**
- * Converts a drush info array to a YAML array.
+ * Converts a composer.lock array into a traditional drush make array.
  *
- * @param array $info
- *   A drush make info array.
+ * @param array $composer_lock
+ *   An array of composer.lock data.
  *
- * @return string
- *   A yaml encoded info array.
+ * @param array $composer_json
+ *   An array of composer.json data.
+ *
+ * @return array A traditional drush make info array.
+ * A traditional drush make info array.
  */
-function drush_make_convert_make_to_yml($info) {
-  // Remove incorrect value.
-  unset($info['format']);
+function drush_make_convert_composer_to_make($composer_lock, $composer_json) {
+  $info = array(
+    'core' => array(),
+    'api' => 2,
+    'defaults' => array(
+      'projects' => array(
+        'subdir' => 'contrib',
+      ),
+    ),
+    'projects' => array(),
+    'libraries' => array(),
+  );
 
-  // Replace "*" with "~" for project versions.
-  foreach ($info['projects'] as $key => $project) {
-    if ($project['version'] == '*') {
-      $info['projects'][$key]['version'] = '~';
+  // The make generation function requires that projects be grouped by type,
+  // or else duplicative project groups will be created.
+  $core = array();
+  $modules = array();
+  $themes = array();
+  $profiles = array();
+  $libraries = array();
+  foreach ($composer_lock['packages'] as $key => $package) {
+    if (strpos($package['name'], 'drupal/') === 0 && in_array($package['type'], array('drupal-core', 'drupal-theme', 'drupal-module', 'drupal-profile'))) {
+      $project_name = str_replace('drupal/', '', $package['name']);
+
+      switch ($package['type']) {
+        case 'drupal-core':
+          $project_name = 'drupal';
+          $group =& $core;
+          $group[$project_name]['type'] = 'core';
+          $info['core'] = substr($package['version'], 0, 1) . '.x';
+          break;
+        case 'drupal-theme':
+          $group =& $themes;
+          $group[$project_name]['type'] = 'theme';
+          break;
+        case 'drupal-module':
+          $group =& $modules;
+          $group[$project_name]['type'] = 'module';
+          break;
+        case 'drupal-profile':
+          $group =& $profiles;
+          $group[$project_name]['type'] = 'profile';
+          break;
+      }
+
+      $group[$project_name]['download']['type'] = 'git';
+      $group[$project_name]['download']['url'] = $package['source']['url'];
+      // Dev versions should use git branch + revision, otherwise a tag is used.
+      if (strstr($package['version'], 'dev')) {
+        // 'dev-' prefix indicates a branch-alias. Stripping the dev prefix from
+        // the branch name is sufficient.
+        // @see https://getcomposer.org/doc/articles/aliases.md
+        if (strpos($package['version'], 'dev-') === 0) {
+          $group[$project_name]['download']['branch'] = substr($package['version'], 4);
+        }
+        // Otherwise, leave as is. Version may already use '-dev' suffix.
+        else {
+          $group[$project_name]['download']['branch'] = $package['version'];
+        }
+        $group[$project_name]['download']['revision'] = $package['source']['reference'];
+      }
+      elseif ($package['type'] == 'drupal-core') {
+        // For 7.x tags, replace 7.xx.0 with 7.xx.
+        if ($info['core'] == '7.x') {
+          $group[$project_name]['download']['tag']= substr($package['version'], 0, 4);
+        }
+        else {
+          $group[$project_name]['download']['tag'] = $package['version'];
+        }
+      }
+      else {
+        // Make tag versioning drupal-friendly. 8.1.0-alpha1 => 8.x-1.0-alpha1.
+        $major_version = substr($package['version'], 0 ,1);
+        $the_rest = substr($package['version'], 2, strlen($package['version']));
+        $group[$project_name]['download']['tag'] = "$major_version.x-$the_rest";
+      }
+
+      if (!empty($package['extra']['patches_applied'])) {
+        foreach ($package['extra']['patches_applied'] as $desc => $url) {
+          $group[$project_name]['patch'][] = $url;
+        }
+      }
+    }
+    // Include any non-drupal libraries that exist in both .lock and .json.
+    elseif (!in_array($package['type'], array('composer-plugin', 'metapackage'))
+      && array_key_exists($package['name'], $composer_json['require'])) {
+      $project_name = $package['name'];
+      $libraries[$project_name]['type'] = 'library';
+      $libraries[$project_name]['download']['type'] = 'git';
+      $libraries[$project_name]['download']['url'] = $package['source']['url'];
+      $libraries[$project_name]['download']['branch'] = $package['version'];
+      $libraries[$project_name]['download']['revision'] = $package['source']['reference'];
     }
   }
 
-  $dumper = drush_load_engine('outputformat', 'yaml');
-  $output = $dumper->format($info, array());
+  $info['projects'] = $core + $modules + $themes;
+  $info['libraries'] = $libraries;
 
-  return $output;
+  return $info;
 }
 
 /**
@@ -513,7 +603,7 @@ function drush_make_convert_make_to_composer($info) {
   if (!empty($info['libraries'])) {
     foreach ($info['libraries'] as $library_name => $library) {
       $library_name = 'Verify project name: ' . $library_name;
-      $projects[$library_name] = drush_make_convert_project_to_composer($library);
+      $projects[$library_name] = drush_make_convert_project_to_composer($library, $core_major_version);
     }
   }
 
@@ -591,114 +681,29 @@ function drush_make_convert_project_to_composer($original_project, $core_major_v
 }
 
 /**
- * Converts a composer.lock array into a traditional drush make array.
+ * Converts a drush info array to a YAML array.
  *
- * @param array $composer_lock
- *   An array of composer.lock data.
+ * @param array $info
+ *   A drush make info array.
  *
- * @param array $composer_json
- *   An array of composer.json data.
- *
- * @return array A traditional drush make info array.
- * A traditional drush make info array.
+ * @return string
+ *   A yaml encoded info array.
  */
-function drush_make_convert_composer_to_make($composer_lock, $composer_json) {
-  $info = array(
-    'core' => array(),
-    'api' => 2,
-    'defaults' => array(
-      'projects' => array(
-        'subdir' => 'contrib',
-      ),
-    ),
-    'projects' => array(),
-    'libraries' => array(),
-  );
+function drush_make_convert_make_to_yml($info) {
+  // Remove incorrect value.
+  unset($info['format']);
 
-  // The make generation function requires that projects be grouped by type,
-  // or else duplicative project groups will be created.
-  $core = array();
-  $modules = array();
-  $themes = array();
-  $profiles = array();
-  $libraries = array();
-  foreach ($composer_lock['packages'] as $key => $package) {
-    if (strpos($package['name'], 'drupal/') === 0 && in_array($package['type'], array('drupal-core', 'drupal-theme', 'drupal-module', 'drupal-profile'))) {
-      $project_name = str_replace('drupal/', '', $package['name']);
-
-      switch ($package['type']) {
-        case 'drupal-core':
-          $project_name = 'drupal';
-          $group =& $core;
-          $group[$project_name]['type'] = 'core';
-          $info['core'] = substr($package['version'], 0, 1) . '.x';
-          break;
-        case 'drupal-theme':
-          $group =& $themes;
-          $group[$project_name]['type'] = 'theme';
-          break;
-        case 'drupal-module':
-          $group =& $modules;
-          $group[$project_name]['type'] = 'module';
-          break;
-        case 'drupal-profile':
-          $group =& $profiles;
-          $group[$project_name]['type'] = 'profile';
-          break;
-      }
-
-      $group[$project_name]['download']['type'] = 'git';
-      $group[$project_name]['download']['url'] = $package['source']['url'];
-      // Dev versions should use git branch + revision, otherwise a tag is used.
-      if (strstr($package['version'], 'dev')) {
-        // Change 'dev-' prefix to '-dev' suffix.
-        if (strpos($package['version'], 'dev-') === 0) {
-          $group[$project_name]['download']['branch'] = str_replace('dev-', '', $package['version']) . '-dev';
-        }
-        // Otherwise, leave as is. Version may already use '-dev' suffix.
-        else {
-          $group[$project_name]['download']['branch'] = $package['version'];
-        }
-        $group[$project_name]['download']['revision'] = $package['source']['reference'];
-      }
-      elseif ($package['type'] == 'drupal-core') {
-        // For 7.x tags, replace 7.xx.0 with 7.xx.
-        if ($info['core'] == '7.x') {
-          $group[$project_name]['download']['tag']= substr($package['version'], 0, 4);
-        }
-        else {
-          $group[$project_name]['download']['tag'] = $package['version'];
-        }
-      }
-      else {
-        // Make tag versioning drupal-friendly. 8.1.0-alpha1 => 8.x-1.0-alpha1.
-        $major_version = substr($package['version'], 0 ,1);
-        $the_rest = substr($package['version'], 2, strlen($package['version']));
-        $group[$project_name]['download']['tag'] = "$major_version.x-$the_rest";
-      }
-
-      if (!empty($package['extra']['patches_applied'])) {
-        foreach ($package['extra']['patches_applied'] as $desc => $url) {
-          $group[$project_name]['patch'][] = $url;
-        }
-      }
-    }
-    // Include any non-drupal libraries that exist in both .lock and .json.
-    elseif (!in_array($package['type'], array('composer-plugin', 'metapackage'))
-      && array_key_exists($package['name'], $composer_json['require'])) {
-      $project_name = $package['name'];
-      $libraries[$project_name]['type'] = 'library';
-      $libraries[$project_name]['download']['type'] = 'git';
-      $libraries[$project_name]['download']['url'] = $package['source']['url'];
-      $libraries[$project_name]['download']['branch'] = $package['version'];
-      $libraries[$project_name]['download']['revision'] = $package['source']['reference'];
+  // Replace "*" with "~" for project versions.
+  foreach ($info['projects'] as $key => $project) {
+    if ($project['version'] == '*') {
+      $info['projects'][$key]['version'] = '~';
     }
   }
 
-  $info['projects'] = $core + $modules + $themes;
-  $info['libraries'] = $libraries;
+  $dumper = drush_load_engine('outputformat', 'yaml');
+  $output = $dumper->format($info, array());
 
-  return $info;
+  return $output;
 }
 
 /**

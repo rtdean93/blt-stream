@@ -7,8 +7,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 use Consolidation\OutputFormatters\FormatterManager;
-use Consolidation\OutputFormatters\FormatterOptions;
+use Consolidation\OutputFormatters\Options\FormatterOptions;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
+use Consolidation\AnnotatedCommand\Options\PrepareFormatter;
+
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\InitializeHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\OptionsHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\InteractHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\ValidateHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\ProcessResultHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\StatusDeterminerHookDispatcher;
+use Consolidation\AnnotatedCommand\Hooks\Dispatchers\ExtracterHookDispatcher;
 
 /**
  * Process a command, including hooks and other callbacks.
@@ -24,6 +33,8 @@ class CommandProcessor
     protected $formatterManager;
     /** var callable */
     protected $displayErrorFunction;
+    /** var PrepareFormatterOptions[] */
+    protected $prepareOptionsList = [];
 
     public function __construct(HookManager $hookManager)
     {
@@ -39,14 +50,21 @@ class CommandProcessor
         return $this->hookManager;
     }
 
+    public function addPrepareFormatter(PrepareFormatter $preparer)
+    {
+        $this->prepareOptionsList[] = $preparer;
+    }
+
     public function setFormatterManager(FormatterManager $formatterManager)
     {
         $this->formatterManager = $formatterManager;
+        return $this;
     }
 
     public function setDisplayErrorFunction(callable $fn)
     {
         $this->displayErrorFunction = $fn;
+        return $this;
     }
 
     /**
@@ -58,62 +76,85 @@ class CommandProcessor
         return $this->formatterManager;
     }
 
+    public function initializeHook(
+        InputInterface $input,
+        $names,
+        AnnotationData $annotationData
+    ) {
+        $initializeDispatcher = new InitializeHookDispatcher($this->hookManager(), $names);
+        return $initializeDispatcher->initialize($input, $annotationData);
+    }
+
+    public function optionsHook(
+        AnnotatedCommand $command,
+        $names,
+        AnnotationData $annotationData
+    ) {
+        $optionsDispatcher = new OptionsHookDispatcher($this->hookManager(), $names);
+        $optionsDispatcher->getOptions($command, $annotationData);
+    }
+
+    public function interact(
+        InputInterface $input,
+        OutputInterface $output,
+        $names,
+        AnnotationData $annotationData
+    ) {
+        $interactDispatcher = new InteractHookDispatcher($this->hookManager(), $names);
+        return $interactDispatcher->interact($input, $output, $annotationData);
+    }
+
     public function process(
         OutputInterface $output,
         $names,
         $commandCallback,
-        AnnotationData $annotationData,
-        $args
+        CommandData $commandData
     ) {
         $result = [];
-        // Recover options from the end of the args
-        $options = end($args);
         try {
             $result = $this->validateRunAndAlter(
                 $names,
                 $commandCallback,
-                $args,
-                $annotationData
+                $commandData
             );
-            return $this->handleResults($output, $names, $result, $annotationData, $options);
+            return $this->handleResults($output, $names, $result, $commandData);
         } catch (\Exception $e) {
             $result = new CommandError($e->getMessage(), $e->getCode());
-            return $this->handleResults($output, $names, $result, $annotationData, $options);
+            return $this->handleResults($output, $names, $result, $commandData);
         }
     }
 
     public function validateRunAndAlter(
         $names,
         $commandCallback,
-        $args,
-        AnnotationData $annotationData
+        CommandData $commandData
     ) {
         // Validators return any object to signal a validation error;
         // if the return an array, it replaces the arguments.
-        $validated = $this->hookManager()->validateArguments($names, $args, $annotationData);
+        $validateDispatcher = new ValidateHookDispatcher($this->hookManager(), $names);
+        $validated = $validateDispatcher->validate($commandData);
         if (is_object($validated)) {
             return $validated;
         }
-        if (is_array($validated)) {
-            $args = $validated;
-        }
 
         // Run the command, alter the results, and then handle output and status
-        $result = $this->runCommandCallback($commandCallback, $args);
-        return $this->processResults($names, $result, $args, $annotationData);
+        $result = $this->runCommandCallback($commandCallback, $commandData);
+        return $this->processResults($names, $result, $commandData);
     }
 
-    public function processResults($names, $result, $args, $annotationData)
+    public function processResults($names, $result, CommandData $commandData)
     {
-        return $this->hookManager()->alterResult($names, $result, $args, $annotationData);
+        $processDispatcher = new ProcessResultHookDispatcher($this->hookManager(), $names);
+        return $processDispatcher->process($result, $commandData);
     }
 
     /**
      * Handle the result output and status code calculation.
      */
-    public function handleResults(OutputInterface $output, $names, $result, AnnotationData $annotationData, $options = [])
+    public function handleResults(OutputInterface $output, $names, $result, CommandData $commandData)
     {
-        $status = $this->hookManager()->determineStatusCode($names, $result);
+        $statusCodeDispatcher = new StatusDeterminerHookDispatcher($this->hookManager(), $names);
+        $status = $statusCodeDispatcher->determineStatusCode($result);
         // If the result is an integer and no separate status code was provided, then use the result as the status and do no output.
         if (is_integer($result) && !isset($status)) {
             return $result;
@@ -121,24 +162,36 @@ class CommandProcessor
         $status = $this->interpretStatusCode($status);
 
         // Get the structured output, the output stream and the formatter
-        $structuredOutput = $this->hookManager()->extractOutput($names, $result);
+        $extractDispatcher = new ExtracterHookDispatcher($this->hookManager(), $names);
+        $structuredOutput = $extractDispatcher->extractOutput($result);
         $output = $this->chooseOutputStream($output, $status);
         if ($status != 0) {
             return $this->writeErrorMessage($output, $status, $structuredOutput, $result);
         }
-        if (isset($this->formatterManager)) {
-            return $this->writeUsingFormatter($output, $structuredOutput, $annotationData, $options);
+        if ($this->dataCanBeFormatted($structuredOutput) && isset($this->formatterManager)) {
+            return $this->writeUsingFormatter($output, $structuredOutput, $commandData);
         }
         return $this->writeCommandOutput($output, $structuredOutput);
+    }
+
+    protected function dataCanBeFormatted($structuredOutput)
+    {
+        if (!isset($this->formatterManager)) {
+            return false;
+        }
+        return
+            is_object($structuredOutput) ||
+            is_array($structuredOutput);
     }
 
     /**
      * Run the main command callback
      */
-    protected function runCommandCallback($commandCallback, $args)
+    protected function runCommandCallback($commandCallback, CommandData $commandData)
     {
         $result = false;
         try {
+            $args = $commandData->getArgsAndOptions();
             $result = call_user_func_array($commandCallback, $args);
         } catch (\Exception $e) {
             $result = new CommandError($e->getMessage(), $e->getCode());
@@ -162,22 +215,21 @@ class CommandProcessor
      *
      * @return string
      */
-    protected function getFormat($options)
+    protected function getFormat(FormatterOptions $options)
     {
-        $options += [
-            'default-format' => false,
-            'pipe' => false,
-        ];
-        $options += [
-            'format' => $options['default-format'],
-            'format-pipe' => $options['default-format'],
-        ];
-
-        $format = $options['format'];
-        if ($options['pipe']) {
-            $format = $options['format-pipe'];
+        // In Symfony Console, there is no way for us to differentiate
+        // between the user specifying '--format=table', and the user
+        // not specifying --format when the default value is 'table'.
+        // Therefore, we must make --field always override --format; it
+        // cannot become the default value for --format.
+        if ($options->get('field')) {
+            return 'string';
         }
-        return $format;
+        $defaults = [];
+        if ($options->get('pipe')) {
+            return $options->get('pipe-format', [], 'tsv');
+        }
+        return $options->getFormat($defaults);
     }
 
     /**
@@ -196,10 +248,10 @@ class CommandProcessor
     /**
      * Call the formatter to output the provided data.
      */
-    protected function writeUsingFormatter(OutputInterface $output, $structuredOutput, AnnotationData $annotationData, $options)
+    protected function writeUsingFormatter(OutputInterface $output, $structuredOutput, CommandData $commandData)
     {
-        $format = $this->getFormat($options);
-        $formatterOptions = new FormatterOptions($annotationData->getArrayCopy(), $options);
+        $formatterOptions = $this->createFormatterOptions($commandData);
+        $format = $this->getFormat($formatterOptions);
         $this->formatterManager->write(
             $output,
             $format,
@@ -210,10 +262,26 @@ class CommandProcessor
     }
 
     /**
+     * Create a FormatterOptions object for use in writing the formatted output.
+     * @param CommandData $commandData
+     * @return FormatterOptions
+     */
+    protected function createFormatterOptions($commandData)
+    {
+        $options = $commandData->input()->getOptions();
+        $formatterOptions = new FormatterOptions($commandData->annotationData()->getArrayCopy(), $options);
+        foreach ($this->prepareOptionsList as $preparer) {
+            $preparer->prepare($commandData, $formatterOptions);
+        }
+        return $formatterOptions;
+    }
+
+    /**
      * Description
-     * @param type $output
-     * @param type $status
-     * @param type $structuredOutput
+     * @param OutputInterface $output
+     * @param int $status
+     * @param string $structuredOutput
+     * @param mixed $originalResult
      * @return type
      */
     protected function writeErrorMessage($output, $status, $structuredOutput, $originalResult)

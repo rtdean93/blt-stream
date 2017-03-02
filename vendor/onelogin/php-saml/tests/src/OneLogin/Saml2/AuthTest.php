@@ -71,8 +71,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->_auth->processResponse();
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('SAML Response not found', $e->getMessage());
         }
 
@@ -90,6 +90,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttributes
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
+    * @covers OneLogin_Saml2_Auth::getNameIdFormat
     * @covers OneLogin_Saml2_Auth::getErrors
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
@@ -105,6 +106,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->_auth->isAuthenticated());
         $this->assertEmpty($this->_auth->getAttributes());
         $this->assertNull($this->_auth->getNameId());
+        $this->assertNull($this->_auth->getNameIdFormat());
         $this->assertNull($this->_auth->getSessionIndex());
         $this->assertNull($this->_auth->getSessionExpiration());
         $this->assertNull($this->_auth->getAttribute('uid'));
@@ -153,6 +155,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     * @covers OneLogin_Saml2_Auth::getAttributes
     * @covers OneLogin_Saml2_Auth::getAttribute
     * @covers OneLogin_Saml2_Auth::getNameId
+    * @covers OneLogin_Saml2_Auth::getNameIdFormat
     * @covers OneLogin_Saml2_Auth::getSessionIndex
     * @covers OneLogin_Saml2_Auth::getSessionExpiration
     * @covers OneLogin_Saml2_Auth::getErrors
@@ -165,6 +168,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $this->_auth->processResponse();
         $this->assertTrue($this->_auth->isAuthenticated());
         $this->assertEquals('492882615acf31c8096b627245d76ae53036c090', $this->_auth->getNameId());
+        $this->assertEquals('urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', $this->_auth->getNameIdFormat());
         $attributes = $this->_auth->getAttributes();
         $this->assertNotEmpty($attributes);
         $this->assertEquals($this->_auth->getAttribute('mail'), $attributes['mail']);
@@ -241,7 +245,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->_auth->processSLO(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('SAML LogoutRequest/LogoutResponse not found', $e->getMessage());
         }
 
@@ -1301,8 +1306,8 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         try {
             $returnTo = 'http://example.com/returnto';
             $auth->logout($returnTo);
-            $this->assertFalse(true);
-        } catch (Exception $e) {
+            $this->fail('OneLogin_Saml2_Error was not raised');
+        } catch (OneLogin_Saml2_Error $e) {
             $this->assertContains('The IdP does not support Single Log Out', $e->getMessage());
         }
     }
@@ -1333,7 +1338,7 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
 
         try {
             $auth->setStrict('a');
-            $this->assertTrue(false);
+            $this->fail('Exception was not raised');
         } catch (Exception $e) {
             $this->assertContains('Invalid value passed to setStrict()', $e->getMessage());
         }
@@ -1365,5 +1370,96 @@ class OneLogin_Saml2_AuthTest extends PHPUnit_Framework_TestCase
         $signature = $this->_auth->buildResponseSignature($message, $relayState);
         $validSignature = 'IcyWLRX6Dz3wHBfpcUaNLVDMGM3uo6z2Z11Gjq0/APPJaHboKGljffsgMVAGBml497yckq+eYKmmz+jpURV9yTj2sF9qfD6CwX2dEzSzMdRzB40X7pWyHgEJGIhs6BhaOt5oXEk4T+h3AczERqpVYFpL00yo7FNtyQkhZFpHFhM=';
         $this->assertEquals($validSignature, $signature);
+    }
+
+    /**
+     * Tests that we can get most recently constructed
+     * SAML AuthNRequest
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastAuthNRequest()
+    {
+       $targetSSOURL = $this->_auth->login(null, array(), false, false, true, false);
+       $parsedQuery = getParamsFromUrl($targetSSOURL);
+       $decodedSamlRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+       $this->assertEquals($decodedSamlRequest, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently constructed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastLogoutRequestSent()
+    {
+       $targetSLOURL = $this->_auth->logout(null, array(), null, null, true, null);
+       $parsedQuery = getParamsFromUrl($targetSLOURL);
+       $decodedLogoutRequest = gzinflate(base64_decode($parsedQuery['SAMLRequest']));
+       $this->assertEquals($decodedLogoutRequest, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * LogoutRequest.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastRequestXML()
+     */
+    public function testGetLastLogoutRequestReceived()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml');
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals($xml, $this->_auth->getLastRequestXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * SAML Response
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastSAMLResponse()
+    {
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
+        $this->_auth->processResponse();
+        file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml');
+        $this->assertEquals($response, $this->_auth->getLastResponseXML());
+
+        $_POST['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/responses/valid_encrypted_assertion.xml.base64');
+        $decryptedResponse = file_get_contents(TEST_ROOT . '/data/responses/decrypted_valid_encrypted_assertion.xml');
+        $this->_auth->processResponse();
+        $this->assertEquals($decryptedResponse, $this->_auth->getLastResponseXML());
+    }
+
+    /**
+     * Tests that we can get most recently constructed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastLogoutResponseSent()
+    {
+        $_GET['SAMLRequest'] = file_get_contents(TEST_ROOT . '/data/logout_requests/logout_request.xml.base64');
+        $targetSLOURL = $this->_auth->processSLO(false, null, false, null, true);
+        $parsedQuery = getParamsFromUrl($targetSLOURL);
+        $decodedLogoutResponse = gzinflate(base64_decode($parsedQuery['SAMLResponse']));
+        $this->assertEquals($decodedLogoutResponse, $this->_auth->getLastResponseXML());
+    }
+
+    /**
+     * Tests that we can get most recently processed
+     * LogoutResponse.
+     *
+     * @covers OneLogin_Saml2_Auth::getLastResponseXML()
+     */
+    public function testGetLastLogoutResponseReceived()
+    {
+        $xml = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml');
+        $_GET['SAMLResponse'] = file_get_contents(TEST_ROOT . '/data/logout_responses/logout_response.xml.base64');
+        $this->_auth->processSLO(false, null, false, null, true);
+        $this->assertEquals($xml, $this->_auth->getLastResponseXML());
     }
 }

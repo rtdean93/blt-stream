@@ -6,9 +6,10 @@
  */
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\DrupalExtension\Context\DrupalContext;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
-use Drupal\DrupalExtension\Context\DrupalSubContextInterface;
 use Drupal\DrupalExtension\Hook\Scope\EntityScope;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
@@ -17,7 +18,7 @@ use Drupal\user\Entity\User;
 /**
  * Subcontext for creating and cleaning up entities of any type.
  */
-class EntitySubContext extends DrupalSubContextBase implements DrupalSubContextInterface {
+class EntitySubContext extends DrupalSubContextBase {
 
   /**
    * Entities created during the scenario, organized by type.
@@ -87,6 +88,26 @@ class EntitySubContext extends DrupalSubContextBase implements DrupalSubContextI
   }
 
   /**
+   * Marks any automatically created node as belonging to the current user.
+   *
+   * @param \Drupal\DrupalExtension\Hook\Scope\EntityScope $scope
+   *   The hook scope.
+   *
+   * @beforeNodeCreate
+   */
+  public function setNodeAuthor(EntityScope $scope) {
+    $node = $scope->getEntity();
+
+    if (!isset($node->uid)) {
+      $user = $this->getContext(DrupalContext::class)->user;
+
+      if (is_object($user)) {
+        $node->uid = $user->uid;
+      }
+    }
+  }
+
+  /**
    * Queues a node to be deleted at the end of the scenario.
    *
    * @param \Drupal\DrupalExtension\Hook\Scope\EntityScope $scope
@@ -151,8 +172,17 @@ class EntitySubContext extends DrupalSubContextBase implements DrupalSubContextI
         if ($alias != $path) {
           \Drupal::service('path.alias_storage')->delete(['alias' => $alias]);
         }
+      }
 
-        $entity->delete();
+      $storage_handler = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+      // If this is a Multiversion-aware storage handler, call purge() to do a
+      // hard delete.
+      if (method_exists($storage_handler, 'purge')) {
+        $storage_handler->purge($entities);
+      }
+      else {
+        $storage_handler->delete($entities);
       }
     }
   }
@@ -218,7 +248,57 @@ class EntitySubContext extends DrupalSubContextBase implements DrupalSubContextI
    */
   public function visitCurrentNodeRevision() {
     $this->minkContext->clickLink('Revisions');
-    $this->lightning->clickElementBySelector('tr.revision-current td:first-child a');
+
+    $session = $this->getSession();
+
+    $rows = $session->getPage()->findAll('css', '.diff-revisions tbody tr');
+    /** @var \Behat\Mink\Element\NodeElement $row */
+    foreach ($rows as $row) {
+      if ($row->find('css', 'td:last-child')->getText() == 'Current revision') {
+        return $row->find('css', 'td:first-child a')->click();
+      }
+    }
+
+    // WTF? None of the rows were the current revision.
+    throw new ExpectationException('Current revision not found.', $session->getDriver());
+  }
+
+  /**
+   * Compares two revisions of a node.
+   *
+   * @param string $a
+   *   The one-based index of a revision to compare. 1st is oldest.
+   * @param string $b
+   *   The one-based index of a revision to compare. 1st is oldest.
+   *
+   * @When I compare the :a and :b revisions
+   */
+  public function compareRevisions($a, $b) {
+    $re = '/^[0-9]+(st|nd|rd|th)$/i';
+
+    if (preg_match($re, $a)) {
+      $a = substr($a, 0, -2);
+    }
+    if (preg_match($re, $b)) {
+      $b = substr($b, 0, -2);
+    }
+    $a = ((int) $a) - 1;
+    $b = ((int) $b) - 1;
+
+    $this->minkContext->clickLink('Revisions');
+
+    /** @var \Behat\Mink\Element\NodeElement[] $rows */
+    $rows = $this->getSession()
+      ->getPage()
+      ->findAll('css', '.diff-revisions tbody tr');
+
+    $rows = array_reverse($rows);
+    $a = $rows[$a]->findField('radios_left')->getValue();
+    $b = $rows[$b]->findField('radios_right')->getValue();
+
+    $this->minkContext->selectOption('radios_left', $a);
+    $this->minkContext->selectOption('radios_right', $b);
+    $this->minkContext->pressButton('Compare');
   }
 
   /**
@@ -245,6 +325,7 @@ class EntitySubContext extends DrupalSubContextBase implements DrupalSubContextI
    *   (optional) The maximum number of entities to track. Defaults to 1.
    *
    * @When I queue the latest :entity_type entity for deletion
+   * @When I queue the latest :limit :entity_type entities for deletion
    */
   public function trackNewest($entity_type, $sort_field = 'created', $limit = 1) {
     $this->ensureBootstrap();

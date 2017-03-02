@@ -6,7 +6,7 @@ Feature: Image media assets
   Scenario: Creating an image
     Given I am logged in as a user with the media_creator role
     When I visit "/media/add/image"
-    And I attach the file "puppy.jpg" to "Image"
+    And I attach the file "test.jpg" to "Image"
     And I wait for AJAX to finish
     And I enter "Foobaz" for "Media name"
     And I press "Save and publish"
@@ -20,7 +20,7 @@ Feature: Image media assets
   Scenario: Uploading an image to be ignored by the media library
     Given I am logged in as a user with the media_creator role
     When I visit "/media/add/image"
-    And I attach the file "puppy.jpg" to "Image"
+    And I attach the file "test.jpg" to "Image"
     And I wait for AJAX to finish
     And I enter "Blorg" for "Media name"
     And I uncheck the box "Save to my media library"
@@ -29,4 +29,7 @@ Feature: Image media assets
     # test fails.
     And I queue the latest media entity for deletion
     And I visit "/entity-browser/iframe/media_browser"
+    And I enter "Blorg" for "Keywords"
+    And I press "Apply"
+    And I wait for AJAX to finish
     Then I should see "There are no media items to display."

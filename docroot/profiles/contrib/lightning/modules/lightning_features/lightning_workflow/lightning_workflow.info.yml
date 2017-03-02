@@ -1,17 +1,11 @@
-name: Lightning Workflow
+name: 'Lightning Workflow'
+core: 8.x
 type: module
-description: Tools to improve your content workflow.
-# core: 8.x
+description: 'Tools to improve your content workflow.'
+version: '8.x-2.03'
 package: Lightning
 dependencies:
   - inline_entity_form
   - lightning_core
   - scheduled_updates
   - workbench_moderation
-
-
-# Information added by Drupal.org packaging script on 2016-10-05
-version: '8.x-1.06'
-core: '8.x'
-project: 'lightning'
-datestamp: 1475683320

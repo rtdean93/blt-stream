@@ -1,3 +1,101 @@
+## 2.0.3
+* Added the Entity Blocks module, which provides block types that can display
+  any renderable entity without needing a context. This allows content editors
+  to easily embed existing content in a landing page using the in-place editor.
+  (Issue #2667896)
+* Lightning now includes Search API with an out-of-the-box site search page, a
+  database backend, and sane default configuration. (Issue #2674180)
+* Added help text to the edit form for workspaces that documents how to push a
+  workspace's content live. (Issue #2835105)
+* Fixed a bug where Lightning Media failed to declare its dependency on
+  CKEditor. (Issue #2847011)
+* Lightning Workflow now includes a column on the content list page that
+  indicates if a piece of content has unpublished edits (a.k.a forward
+  revisions). (Issue #2837788)
+* Fixed a bug that could cause an exception when translating a field.
+  (Issue #2841172)
+* It's now possible to display taxonomy terms using Panelizer. (Issue #2664574)
+
+## 2.0.2
+* Workbench Moderation was updated to 8.x-1.2. (Issue #2838896)
+* All info files supplied with Lightning's components now have consistent
+  version numbers. (Issue #2839593)
+* Lightning now installs the Diff module by default. (Issue #2762325)
+* We now verify that all Lightning YAML files are compatible with the strict
+  PECL parser.
+* Lightning now installs the core Contact module by default, and includes
+  and installs the Contact Storage contrib module to provide basic form
+  building and submission management functionality -- a pared-down Webform
+  that should suffice for many simple use cases. (Issue #2666424)
+* Fixed a problem where Lightning Extension's subcontexts for Drupal Extension
+  would not be autoloaded by Behat. (Issue #2836258)
+* Fixed a fatal error when trying to display a description for a view mode
+  that does not exist. (GitHub #254)
+* All titles, links and headings were changed to sentence case. (GitHub #252)
+
+## 2.0.1
+* Replaced test files with generic Lightning logos. (Issue #2836442)
+
+##  2.0.0
+* Switched to the official Drupal.org packagist.
+
+## 1.14
+* Added Panelizer support for view mode descriptions. (Issue #2828638)
+* Tarball releases are now built with contrib versions from drupal.org and not
+  git (Issue #2827227)
+* Updated Panelizer patch to fix a problem where it did not properly define its
+  dependency on Field UI (GitHub #226)
+* Improved the author-facing Panelizer experience by implementing "Internal"
+  View Modes for which Panelizer is always disabled. (GitHub #194 & 223)
+* Fixed a bug where Lightning assumptions + certain contrib modules would cause
+  an infinite loop. (Issue #2831550)
+* Included a script that will convert your project's root composer.json file to
+  use the official Drupal.org packagist and update your project to Lightning
+  2.0.0 which also uses the official Packagist. (See: [Lightning Packagist Switch](http://lightning.acquia.com/blog/packagist-switch))
+* Lightning no longer provides default content for the Shortcut menu.
+  (Issue #2834874)
+* Made it possible for modules and themes to pass CSS to a CKEditor instance.
+  (Issue #2729377)
+
+## 1.13
+* Tests now ensure that composer.lock is kept up to date. (GitHub #132)
+* The page title block is now properly placed in the Seven theme. (GitHub #190)
+* Twitter media entities can now be configured to automatically generate
+  thumbnails for textual tweets. (GitHub #203)
+* CI now uses database snapshots for update tests. (GitHub #201)
+* Fix Multiversion regression of node revisions list. (Issue #2824633
+  and #2825477)
+* Display modes and user roles can now have associated descriptions.
+  (GitHub #195)
+* Improved usability of the Panelizer interface. (Issue #2826071)
+* Lightning extender can now be used to exclude submodules of Lightning
+  extensions. (GitHub #220)
+* Updated all dependencies and core to their latest releases. (GitHub #219)
+
+## 1.12
+* Drupal core, and several contributed dependencies, were updated to their
+  latest stable releases.
+* Locked workflow states will now be clearly denoted with a lock icon when
+  editing a workspace. (GitHub #199)
+* The list of workspaces will no longer display a Status column. (GitHub #200
+  and #184)
+* Explained the Lightning Extender in README. (GitHub #198)
+* Node authorship is now preserved during replication between workspaces.
+  (GitHub #191, Issue #2817231)
+* File entities are now opted out of Multiversion control (i.e., all files
+  will always exist in all workspaces.) (GitHub #197)
+
+## 1.11
+* Fixed a dependency problem that was preventing Lightning from being installed
+  via Composer. (Issue #2699121)
+* Patched a core bug that could in certain circumstances result in file copies
+  failing during installation. (GitHub #179, Issue #2782239 and #2818031)
+* Lightning Preview is now compatible with Pathauto. (Issue #2817253)
+
+## 1.10
+* Drupal core updated to 8.2.1.
+* Introduced Lightning Preview module and Workspace Preview System.
+
 ## 1.06
 * Drupal core updated to 8.2.0!
 * Previously, the Metatag module could break Drush. This is now patched

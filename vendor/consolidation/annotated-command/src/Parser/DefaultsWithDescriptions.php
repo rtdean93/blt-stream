@@ -32,7 +32,9 @@ class DefaultsWithDescriptions
     public function __construct($values = [], $defaultDefault = null)
     {
         $this->values = $values;
-        $this->hasDefault = [];
+        $this->hasDefault = array_filter($this->values, function ($value) {
+            return isset($value);
+        });
         $this->descriptions = [];
         $this->defaultDefault = $defaultDefault;
     }
@@ -45,6 +47,16 @@ class DefaultsWithDescriptions
     public function getValues()
     {
         return $this->values;
+    }
+
+    /**
+     * Return true if this set of options is empty
+     *
+     * @return
+     */
+    public function isEmpty()
+    {
+        return empty($this->values);
     }
 
     /**
@@ -114,6 +126,7 @@ class DefaultsWithDescriptions
     {
         $this->values[$key] = $defaultValue;
         $this->hasDefault[$key] = true;
+        return $this;
     }
 
     /**
