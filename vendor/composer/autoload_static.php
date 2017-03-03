@@ -18,7 +18,11 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
+        'fbeead2280a8f3911a1fe6dd034f7d5e' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvancedInterface.php',
+        '96f8d8288528d52059397cad6ec61f17' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvanced.php',
+        'aca594cec0c196659a3b7d4dc2665c0b' => __DIR__ . '/..' . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -66,6 +70,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Symfony\\Cmf\\Component\\Routing\\' => 30,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
         ),
+        'R' => 
+        array (
+            'Relaxed\\LCA\\' => 12,
+        ),
         'P' => 
         array (
             'Psy\\' => 4,
@@ -82,6 +90,11 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
+            'Graphp\\Algorithms\\' => 18,
+        ),
+        'F' => 
+        array (
+            'Fhaculty\\Graph\\' => 15,
         ),
         'D' => 
         array (
@@ -98,6 +111,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Consolidation\\AnnotatedCommand\\' => 31,
             'Composer\\Semver\\' => 16,
             'Composer\\Installers\\' => 20,
+        ),
+        'A' => 
+        array (
+            'Acquia\\LightningExtension\\' => 26,
         ),
     );
 
@@ -218,6 +235,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         array (
             0 => __DIR__ . '/..' . '/symfony/psr-http-message-bridge',
         ),
+        'Relaxed\\LCA\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/relaxedws/lca/src',
+        ),
         'Psy\\' => 
         array (
             0 => __DIR__ . '/..' . '/psy/psysh/src/Psy',
@@ -249,6 +270,14 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'Graphp\\Algorithms\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/graphp/algorithms/src',
+        ),
+        'Fhaculty\\Graph\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/graph/src',
         ),
         'Drupal\\acsf\\' => 
         array (
@@ -290,6 +319,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         array (
             0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
         ),
+        'Acquia\\LightningExtension\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/docroot/profiles/contrib/lightning/src/LightningExtension',
+        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -309,6 +342,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         ),
         'S' => 
         array (
+            'Sunra\\PhpSimple\\HtmlDomParser' => 
+            array (
+                0 => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src',
+            ),
             'Stack' => 
             array (
                 0 => __DIR__ . '/..' . '/stack/builder/src',
@@ -323,6 +360,20 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'JakubOnderka\\PhpConsoleColor' => 
             array (
                 0 => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src',
+            ),
+        ),
+        'I' => 
+        array (
+            'Instagram' => 
+            array (
+                0 => __DIR__ . '/..' . '/php-instagram-api/php-instagram-api',
+            ),
+        ),
+        'H' => 
+        array (
+            'HTMLPurifier' => 
+            array (
+                0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
         ),
         'E' => 
@@ -368,6 +419,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Consolidation' => 
             array (
                 0 => __DIR__ . '/..' . '/drush/drush/lib',
+            ),
+            'Caxy\\HtmlDiff' => 
+            array (
+                0 => __DIR__ . '/..' . '/caxy/php-htmldiff/lib',
             ),
         ),
         'A' => 

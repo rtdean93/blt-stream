@@ -19,28 +19,6 @@ use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 class LightningSubContext extends DrupalSubContextBase {
 
   /**
-   * Installs the Lightning Test module before a @test_module scenario.
-   *
-   * @BeforeScenario @test_module
-   */
-  public function installTestModule() {
-    $driver = $this->getDriver();
-    if ($driver->isBootstrapped() === FALSE) {
-      $driver->bootstrap();
-    }
-    \Drupal::service('module_installer')->install(['lightning_test']);
-  }
-
-  /**
-   * Uninstalls the Lighting Test module after a @test_module scenario.
-   *
-   * @AfterScenario @test_module
-   */
-  public function uninstallTestModule() {
-    \Drupal::service('module_installer')->uninstall(['lightning_test']);
-  }
-
-  /**
    * The Mink context.
    *
    * @var \Drupal\DrupalExtension\Context\MinkContext
@@ -295,7 +273,7 @@ class LightningSubContext extends DrupalSubContextBase {
    * @param int $seconds
    *   How long to wait.
    *
-   * @When I wait :seconds second(s)
+   * @When I wait :seconds seconds
    */
   public function wait($seconds) {
     sleep($seconds);
@@ -401,11 +379,7 @@ class LightningSubContext extends DrupalSubContextBase {
    * @BeforeScenario
    */
   public function setFilePath() {
-
-    $existing = $this->minkContext->getMinkParameter('files_path');
-    if (empty($existing)) {
-      $this->minkContext->setMinkParameter('files_path', __DIR__ . '/../../files');
-    }
+    $this->minkContext->setMinkParameter('files_path', __DIR__ . '/../../files');
   }
 
   /**
@@ -462,6 +436,16 @@ class LightningSubContext extends DrupalSubContextBase {
   public function assertLinkNotExists($locator) {
     $this->assertSession()
       ->elementNotExists('named', ['link', $locator]);
+  }
+
+  /**
+   * Submits the image browser.
+   *
+   * @When I submit the entity browser
+   */
+  public function submitEntityBrowser() {
+    $this->getSession()
+      ->executeScript('window.frames["entity_browser_iframe_image_browser"].document.forms[0].op.click()');
   }
 
   /**
