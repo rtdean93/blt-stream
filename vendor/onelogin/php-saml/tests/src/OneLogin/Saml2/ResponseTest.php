@@ -22,7 +22,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
 
     /**
-    * Tests the OneLogin_Saml2_Response Constructor. 
+    * Tests the OneLogin_Saml2_Response Constructor.
     *
     * @covers OneLogin_Saml2_Response
     */
@@ -62,6 +62,30 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
         $responseDoc2 = OneLogin_Saml2_Utils::loadXML($responseDoc2, $decryptedResponse2);
         $responseParsedDoc2 = $response2->getXMLDocument();
         $this->assertEquals($responseDoc2, $responseParsedDoc2);
+    }
+
+    /**
+     * Tests that we can retrieve the ID of the Response
+     *
+     * @covers OneLogin_Saml2_Response::getId()
+     */
+    public function testGetId()
+    {
+        $encodedResponse = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $encodedResponse);
+        $this->assertEquals('pfxc3d2b542-0f7e-8767-8e87-5b0dc6913375', $response->getId());
+    }
+
+    /**
+     * Tests that we can retrieve the ID of the Response
+     *
+     * @covers OneLogin_Saml2_Response::getAssertionId()
+     */
+    public function testGetAssertionId()
+    {
+        $encodedResponse = file_get_contents(TEST_ROOT . '/data/responses/signed_message_response.xml.base64');
+        $response = new OneLogin_Saml2_Response($this->_settings, $encodedResponse);
+        $this->assertEquals('_cccd6024116641fe48e0ae2c51220d02755f96c98d', $response->getAssertionId());
     }
 
     public function testNamespaces()
@@ -466,12 +490,8 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
         $xml4 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_issuer_response.xml.base64');
         $response4 = new OneLogin_Saml2_Response($this->_settings, $xml4);
-        try {
-            $issuers = $response4->getIssuers();
-            $this->fail('OneLogin_Saml2_ValidationError was not raised');
-        } catch (OneLogin_Saml2_ValidationError $e) {
-            $this->assertContains('Issuer of the Response not found or multiple.', $e->getMessage());
-        }
+        $issuers = $response4->getIssuers();
+        $this->assertEquals(array('http://idp.example.com/'), $response4->getIssuers());
 
         $xml5 = file_get_contents(TEST_ROOT . '/data/responses/invalids/no_issuer_assertion.xml.base64');
         $response5 = new OneLogin_Saml2_Response($this->_settings, $xml5);
@@ -551,7 +571,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
     * The Assertion is unsigned, the response is invalid but is able to retrieve the NameID
-    * 
+    *
     * @covers OneLogin_Saml2_Response::getNameId
     */
     public function testOnlyRetrieveAssertionWithIDThatMatchesSignatureReference()
@@ -590,7 +610,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
     * Tests the getNameId method of the OneLogin_Saml2_Response
     *
     * Test that the SignatureWrappingAttack is not allowed
-    * 
+    *
     * @covers OneLogin_Saml2_Response::getNameId
     */
     public function testDoesNotAllowSignatureWrappingAttack()
@@ -712,7 +732,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the isValid method of the OneLogin_Saml2_Response
-    * Case invalid version    
+    * Case invalid version
     *
     * @covers OneLogin_Saml2_Response::isValid
     */
@@ -727,7 +747,7 @@ class OneLogin_Saml2_ResponseTest extends PHPUnit_Framework_TestCase
 
     /**
     * Tests the isValid method of the OneLogin_Saml2_Response
-    * Case invalid no ID    
+    * Case invalid no ID
     *
     * @covers OneLogin_Saml2_Response::isValid
     */

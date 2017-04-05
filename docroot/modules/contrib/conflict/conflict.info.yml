@@ -3,8 +3,8 @@ description: Fieldwise conflict prevention and resolution.
 type: module
 # core: 8.x
 
-# Information added by Drupal.org packaging script on 2016-10-19
-version: '8.x-1.0-alpha1'
+# Information added by Drupal.org packaging script on 2017-03-31
+version: '8.x-1.0-beta1'
 core: '8.x'
 project: 'conflict'
-datestamp: 1476873904
+datestamp: 1490940187

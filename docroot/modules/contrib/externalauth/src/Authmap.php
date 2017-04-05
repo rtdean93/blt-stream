@@ -37,6 +37,10 @@ class Authmap implements AuthmapInterface {
       $data = serialize($data);
     }
 
+    // If a mapping (for the same provider) from this authname to a different
+    // account already exists, this throws an exception. If a mapping (for the
+    // same provider) to this account already exists, the currently stored
+    // authname is overwritten.
     $this->connection->merge('authmap')
       ->keys(array(
         'uid' => $account->id(),

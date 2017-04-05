@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the externalauth module.
  */
 
+use Drupal\Core\Database\Database;
+
 /**
  * Implements hook_schema().
  */
@@ -28,7 +30,7 @@ function externalauth_schema() {
       ),
       'authname' => array(
         'description' => 'Unique authentication name provided by authentication provider',
-        'type' => 'varchar_ascii',
+        'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
         'default' => '',
@@ -43,7 +45,9 @@ function externalauth_schema() {
     'primary key' => array('uid', 'provider'),
     'indexes' => array(
       'uid' => array('uid'),
-      'auth_provider' => array('authname', 'provider'),
+    ),
+    'unique keys' => array(
+      'authname_provider' => array('authname', 'provider'),
     ),
     'foreign keys' => array(
       'uid' => array('users' => 'uid'),
@@ -51,4 +55,31 @@ function externalauth_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Change {authmap}.authname type from varchar_ascii to varchar.
+ */
+function externalauth_update_8101() {
+  $schema = Database::getConnection()->schema();
+  $schema->changeField('authmap', 'authname', 'authname', array(
+    'description' => 'Unique authentication name provided by authentication provider',
+    'type' => 'varchar',
+    'length' => 128,
+    'not null' => TRUE,
+    'default' => '',
+  ));
+}
+
+/**
+ * Make index on authname+provider unique.
+ */
+function externalauth_update_8102() {
+  /** @var \Drupal\Core\Database\Schema $schema */
+  $schema = \Drupal::service('database')->schema();
+  // This 'add' can potentially fail, if duplicate authnames are registered
+  // already. This is why we do it before the 'remove'. If this happens, the
+  // website maintainer is required to fix the table contents themselves.
+  $schema->addUniqueKey('authmap', 'authname_provider', array('authname', 'provider'));
+  $schema->dropIndex('authmap', 'auth_provider');
 }

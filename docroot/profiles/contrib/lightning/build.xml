@@ -26,6 +26,7 @@
   <property name="site" value="${docroot}/sites/default" />
   <property name="version" value="HEAD" />
   <property name="fixture" value="${project.basedir}/tests/fixtures/${version}.sql" />
+  <property name="cloud.subscription" value="cloudlightning201" />
 
   <!-- Finds required binaries. -->
   <target name="env">
@@ -106,6 +107,7 @@
   <target name="install" depends="env">
     <!-- Use passthru() when executing drush site-install so that we'll know if errors occur. -->
     <exec command="${drush} site-install lightning --yes --account-pass=admin --db-url=${db.url}" dir="${docroot}" passthru="true" />
+    <chmod file="${site}" mode="0755" />
 
     <!-- Install Lightning Dev. -->
     <exec command="${drush} pm-enable lightning_dev --yes" dir="${docroot}" passthru="true" />
@@ -113,6 +115,7 @@
     <!-- Prepare PHPUnit. -->
     <mkdir dir="${docroot}/modules" />
     <mkdir dir="${docroot}/themes" />
+    <mkdir dir="${docroot}/sites/simpletest" />
     <if>
       <not>
         <available property="phpunit.xml" file="${docroot}/core/phpunit.xml" />
@@ -197,7 +200,7 @@
   </target>
 
   <!-- Imports an existing database snapshot. -->
-  <target name="remember" depends="env">
+  <target name="recall" depends="env">
     <if>
       <!-- Check if the fixture exists and exit gracefully if it doesn't. -->
       <available property="fixture_exists" file="${fixture}.bz2" />
@@ -209,19 +212,6 @@
         <pdosqlexec url="${db.type}:host=${db.host};dbname=${db.database}" userid="${db.user}" password="${db.password}" src="${fixture}" />
         <!-- Delete the inflated fixture. -->
         <delete file="${fixture}" />
-
-        <!--
-        Lightning 2.0.3 introduced Lightning Dev, which contains automated
-        versions of all our manual update steps. If the imported fixture
-        predates Lightning 2.0.3, we'll need to install Lightning Dev. We can
-        ice this when 2.0.3 is the oldest tested version of Lightning.
-        -->
-        <if>
-          <versioncompare desiredVersion="2.0.3" version="${version}" operator="lt" />
-          <then>
-            <exec command="${drush} pm-enable lightning_dev --yes" dir="${docroot}" passthru="true" />
-          </then>
-        </if>
       </then>
       <else>
         <echo message="${version} fixture does not exist." />
@@ -235,6 +225,13 @@
     <echo message="DROP DATABASE ${db.database}; CREATE DATABASE ${db.database};" file=".reset.sql" />
     <pdosqlexec url="${db.type}:host=${db.host}" userid="${db.user}" password="${db.password}" src=".reset.sql" />
     <delete file=".reset.sql" />
+  </target>
+
+  <!-- Writes the cloud database snippet to the settings file. -->
+  <target name="cloud-db-snippet">
+    <chmod file="${docroot}/sites/default/settings.php" mode="0644" verbose="true" />
+    <append destFile="${docroot}/sites/default/settings.php" text="${line.separator}if (file_exists('/var/www/site-php')) {${line.separator}  require '/var/www/site-php/${cloud.subscription}/${cloud.subscription}-settings.inc';${line.separator}}${line.separator}">
+    </append>
   </target>
 
 </project>

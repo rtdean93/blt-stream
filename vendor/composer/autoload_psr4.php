@@ -56,5 +56,6 @@ return array(
     'Consolidation\\AnnotatedCommand\\' => array($vendorDir . '/consolidation/annotated-command/src'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
     'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
+    'Acquia\\Lightning\\' => array($baseDir . '/docroot/profiles/contrib/lightning/src'),
     'Acquia\\LightningExtension\\' => array($baseDir . '/docroot/profiles/contrib/lightning/src/LightningExtension'),
 );

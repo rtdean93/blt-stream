@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\Extension\ProfileHandlerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Extension\ExtensionDiscovery;
 
@@ -42,9 +43,11 @@ class ExtensionInstallStorage extends InstallStorage {
    * @param bool $include_profile
    *   (optional) Whether to include the install profile in extensions to
    *   search and to get overrides from.
+   * @param \Drupal\Core\Extension\ProfileHandlerInterface $profile_handler
+   *   (optional) The profile handler.
    */
-  public function __construct(StorageInterface $config_storage, $directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION, $include_profile = TRUE) {
-    parent::__construct($directory, $collection);
+  public function __construct(StorageInterface $config_storage, $directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION, $include_profile = TRUE, ProfileHandlerInterface $profile_handler = NULL) {
+    parent::__construct($directory, $collection, $profile_handler);
     $this->configStorage = $config_storage;
     $this->includeProfile = $include_profile;
   }
@@ -81,19 +84,11 @@ class ExtensionInstallStorage extends InstallStorage {
       $profile = drupal_get_profile();
       $extensions = $this->configStorage->read('core.extension');
       // @todo Remove this scan as part of https://www.drupal.org/node/2186491
-      $listing = new ExtensionDiscovery(\Drupal::root());
+      $listing = new ExtensionDiscovery(\Drupal::root(), TRUE, NULL, NULL, $this->profileHandler);
       if (!empty($extensions['module'])) {
         $modules = $extensions['module'];
         // Remove the install profile as this is handled later.
         unset($modules[$install_profile]);
-        $profile_list = $listing->scan('profile');
-        if ($profile && isset($profile_list[$profile])) {
-          // Prime the drupal_get_filename() static cache with the profile info
-          // file location so we can use drupal_get_path() on the active profile
-          // during the module scan.
-          // @todo Remove as part of https://www.drupal.org/node/2186491
-          drupal_get_filename('profile', $profile, $profile_list[$profile]->getPathname());
-        }
         $module_list_scan = $listing->scan('module');
         $module_list = array();
         foreach (array_keys($modules) as $module) {
@@ -114,18 +109,11 @@ class ExtensionInstallStorage extends InstallStorage {
       }
 
       if ($this->includeProfile) {
-        // The install profile can override module default configuration. We do
-        // this by replacing the config file path from the module/theme with the
-        // install profile version if there are any duplicates.
-        if (isset($profile)) {
-          if (!isset($profile_list)) {
-            $profile_list = $listing->scan('profile');
-          }
-          if (isset($profile_list[$profile])) {
-            $profile_folders = $this->getComponentNames(array($profile_list[$profile]));
-            $this->folders = $profile_folders + $this->folders;
-          }
-        }
+        // The install profile (and any parent profiles) can override module
+        // default configuration. We do this by replacing the config file path
+        // from the module/theme with the install profile version if there are
+        // any duplicates.
+        $this->folders += $this->getComponentNames($this->profileHandler->getProfiles($profile));
       }
     }
     return $this->folders;

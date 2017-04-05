@@ -5,7 +5,9 @@
  * Contains install and update routines for Lightning Media Image.
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\entity_browser\Entity\EntityBrowser;
+use Drupal\lightning_core\ConfigHelper as Config;
 use Drupal\views\Entity\View;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -25,7 +27,9 @@ function lightning_media_image_install() {
  * Creates the media_browser form display.
  */
 function lightning_media_image_update_8001() {
-  lightning_core_create_config('entity_form_display', 'media.image.media_browser', 'lightning_media_image');
+  Config::forModule('lightning_media_image')
+    ->getEntity('entity_form_display', 'media.image.media_browser')
+    ->save();
 }
 
 /**
@@ -43,7 +47,9 @@ function lightning_media_image_update_8002() {
     lightning_core_rebuild_container();
   }
 
-  lightning_core_create_config('entity_browser', 'image_browser', 'lightning_media_image');
+  Config::forModule('lightning_media_image')
+    ->getEntity('entity_browser', 'image_browser')
+    ->save();
 }
 
 /**
@@ -571,6 +577,35 @@ function lightning_media_image_update_8004() {
 }
 
 /**
+ * Uses the static_image widget on the media_browser form display.
+ */
+function lightning_media_image_update_8005() {
+  $display = EntityFormDisplay::load('media.image.media_browser');
+
+  if ($display) {
+    $component = $display->getComponent('image');
+
+    if ($component && $component['type'] == 'image_image') {
+      // Just in case Drupal is under the mistaken impression that the
+      // image_immutable plugin doesn't exist...
+      \Drupal::service('plugin.manager.field.widget')->clearCachedDefinitions();
+
+      $component['type'] = 'image_immutable';
+      $display->setComponent('image', $component)->save();
+    }
+  }
+}
+
+/**
+ * Creates the thumbnail display for images.
+ */
+function lightning_media_image_update_8006() {
+  Config::forModule('lightning_media_image')
+    ->getEntity('entity_view_display', 'media.image.thumbnail')
+    ->save();
+}
+
+/**
  * Implements hook_update_dependencies().
  */
 function lightning_media_image_update_dependencies() {
@@ -585,6 +620,11 @@ function lightning_media_image_update_dependencies() {
         // 8004 grants access the image_browser entity browser, which is created
         // by Lightning Media Image 8002.
         'lightning_media_image' => 8002,
+      ],
+      // 8006 depends on the thumbnail view mode, which is created by
+      // lightning_media 8015.
+      8006 => [
+        'lightning_media' => 8015,
       ],
     ],
   ];
