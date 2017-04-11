@@ -142,7 +142,7 @@ class InstallStorage extends FileStorage {
       return $names;
     }
     else {
-      $return = array();
+      $return = [];
       foreach ($names as $index => $name) {
         if (strpos($name, $prefix) === 0 ) {
           $return[$index] = $names[$index];
@@ -160,7 +160,7 @@ class InstallStorage extends FileStorage {
    */
   protected function getAllFolders() {
     if (!isset($this->folders)) {
-      $this->folders = array();
+      $this->folders = [];
       $this->folders += $this->getCoreNames();
       // Get dependent profiles and add the extension components.
       $this->folders += $this->getComponentNames($this->profileHandler->getProfiles());
@@ -187,7 +187,7 @@ class InstallStorage extends FileStorage {
   public function getComponentNames(array $list) {
     $extension = '.' . $this->getFileExtension();
     $pattern = '/' . preg_quote($extension, '/') . '$/';
-    $folders = array();
+    $folders = [];
     foreach ($list as $extension_object) {
       // We don't have to use ExtensionDiscovery here because our list of
       // extensions was already obtained through an ExtensionDiscovery scan.
@@ -218,7 +218,7 @@ class InstallStorage extends FileStorage {
   public function getCoreNames() {
     $extension = '.' . $this->getFileExtension();
     $pattern = '/' . preg_quote($extension, '/') . '$/';
-    $folders = array();
+    $folders = [];
     $directory = $this->getCoreFolder();
     if (is_dir($directory)) {
       // glob() directly calls into libc glob(), which is not aware of PHP

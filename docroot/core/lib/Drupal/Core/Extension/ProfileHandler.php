@@ -166,6 +166,7 @@ class ProfileHandler implements ProfileHandlerInterface {
         }
         // Ensure each theme is listed only once.
         $info['themes'] = array_unique($info['themes']);
+
       }
       $profile_list[$profile] = $profile;
       $info['profile_list'] = $profile_list;

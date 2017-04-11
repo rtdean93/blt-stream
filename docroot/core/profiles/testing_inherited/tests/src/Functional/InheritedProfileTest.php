@@ -21,7 +21,7 @@ class InheritedProfileTest extends BrowserTestBase {
   /**
    * Tests inherited installation profile.
    */
-  function testInheritedProfile() {
+  public function testInheritedProfile() {
     // Check that the stable_login block exists.
     $this->assertInstanceOf(BlockInterface::class, Block::load('stable_login'));
 

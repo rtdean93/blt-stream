@@ -70,10 +70,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Symfony\\Cmf\\Component\\Routing\\' => 30,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
         ),
-        'R' => 
-        array (
-            'Relaxed\\LCA\\' => 12,
-        ),
         'P' => 
         array (
             'Psy\\' => 4,
@@ -90,11 +86,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
-            'Graphp\\Algorithms\\' => 18,
-        ),
-        'F' => 
-        array (
-            'Fhaculty\\Graph\\' => 15,
         ),
         'D' => 
         array (
@@ -104,6 +95,7 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Drupal\\Component\\' => 17,
             'DrupalComposer\\DrupalScaffold\\' => 30,
             'Doctrine\\Common\\Cache\\' => 22,
+            'Doctrine\\Common\\' => 16,
         ),
         'C' => 
         array (
@@ -236,10 +228,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         array (
             0 => __DIR__ . '/..' . '/symfony/psr-http-message-bridge',
         ),
-        'Relaxed\\LCA\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/relaxedws/lca/src',
-        ),
         'Psy\\' => 
         array (
             0 => __DIR__ . '/..' . '/psy/psysh/src/Psy',
@@ -272,14 +260,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'Graphp\\Algorithms\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/graphp/algorithms/src',
-        ),
-        'Fhaculty\\Graph\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/clue/graph/src',
-        ),
         'Drupal\\acsf\\' => 
         array (
             0 => __DIR__ . '/../..' . '/docroot/modules/contrib/acsf/src',
@@ -303,6 +283,10 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         'Doctrine\\Common\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache',
+        ),
+        'Doctrine\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/common/lib/Doctrine/Common',
         ),
         'Consolidation\\OutputFormatters\\' => 
         array (
@@ -413,10 +397,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
             'Doctrine\\Common\\Annotations\\' => 
             array (
                 0 => __DIR__ . '/..' . '/doctrine/annotations/lib',
-            ),
-            'Doctrine\\Common\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/common/lib',
             ),
         ),
         'C' => 
