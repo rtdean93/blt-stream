@@ -2,9 +2,9 @@
 
 namespace Drupal\search_api;
 
-use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Logger\RfcLogLevel;
+use Psr\Log\LoggerInterface;
 
 /**
  * Provides helper methods for logging with dependency injection.
@@ -14,14 +14,14 @@ trait LoggerTrait {
   /**
    * The logging channel to use.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface|null
+   * @var \Psr\Log\LoggerInterface|null
    */
   protected $logger;
 
   /**
    * Retrieves the logger.
    *
-   * @return \Drupal\Core\Logger\LoggerChannelInterface
+   * @return \Psr\Log\LoggerInterface
    *   The logger.
    */
   public function getLogger() {
@@ -31,12 +31,12 @@ trait LoggerTrait {
   /**
    * Sets the logger.
    *
-   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   The new logger.
    *
    * @return $this
    */
-  public function setLogger(LoggerChannelInterface $logger) {
+  public function setLogger(LoggerInterface $logger) {
     $this->logger = $logger;
     return $this;
   }
@@ -62,7 +62,7 @@ trait LoggerTrait {
    * @see watchdog_exception()
    * @see \Drupal\Core\Utility\Error::decodeException()
    */
-  protected function logException(\Exception $exception, $message = NULL, $variables = array(), $severity = RfcLogLevel::ERROR, $link = NULL) {
+  protected function logException(\Exception $exception, $message = NULL, $variables = [], $severity = RfcLogLevel::ERROR, $link = NULL) {
     // Use a default value if $message is not set.
     if (empty($message)) {
       $message = '%type: @message in %function (line %line of %file).';

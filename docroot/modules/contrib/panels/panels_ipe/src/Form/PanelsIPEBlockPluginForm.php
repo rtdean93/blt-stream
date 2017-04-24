@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @file
- */
-
 namespace Drupal\panels_ipe\Form;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -18,7 +14,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 use Drupal\panels_ipe\PanelsIPEBlockRendererTrait;
-use Drupal\panels_ipe\TempStoreTrait;
 use Drupal\user\SharedTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -33,7 +28,6 @@ class PanelsIPEBlockPluginForm extends FormBase {
   use ContextAwarePluginAssignmentTrait;
 
   use PanelsIPEBlockRendererTrait;
-  use TempStoreTrait;
 
   /**
    * @var \Drupal\Component\Plugin\PluginManagerInterface $blockManager
@@ -267,7 +261,7 @@ class PanelsIPEBlockPluginForm extends FormBase {
     }
 
     // If a temporary configuration for this variant exists, use it.
-    $temp_store_key = $this->getTempStoreId($this->panelsDisplay);
+    $temp_store_key = $this->panelsDisplay->getTempStoreId();
     if ($variant_config = $this->tempStore->get($temp_store_key)) {
       $this->panelsDisplay->setConfiguration($variant_config);
     }
@@ -290,7 +284,7 @@ class PanelsIPEBlockPluginForm extends FormBase {
     }
 
     // Set the tempstore value.
-    $this->tempStore->set($temp_store_key, $this->panelsDisplay->getConfiguration());
+    $this->tempStore->set($this->panelsDisplay->getTempStoreId(), $this->panelsDisplay->getConfiguration());
 
     // Assemble data required for our App.
     $build = $this->buildBlockInstance($block_instance, $this->panelsDisplay);
@@ -383,7 +377,7 @@ class PanelsIPEBlockPluginForm extends FormBase {
     // If a UUID is provided, the Block should already exist.
     if ($uuid = $form_state->getValue('uuid')) {
       // If a temporary configuration for this variant exists, use it.
-      $temp_store_key = $this->getTempStoreId($this->panelsDisplay);
+      $temp_store_key = $this->panelsDisplay->getTempStoreId();
       if ($variant_config = $this->tempStore->get($temp_store_key)) {
         $this->panelsDisplay->setConfiguration($variant_config);
       }

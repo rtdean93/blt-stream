@@ -13,8 +13,8 @@ dependencies:
   - drupal:views
   - search_api:search_api_db
 
-# Information added by Drupal.org packaging script on 2017-04-02
-version: '8.x-1.0-beta5'
+# Information added by Drupal.org packaging script on 2017-04-21
+version: '8.x-1.0-rc4'
 core: '8.x'
 project: 'search_api'
-datestamp: 1491153788
+datestamp: 1492764854
