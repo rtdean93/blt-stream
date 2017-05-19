@@ -527,7 +527,6 @@ EOT;
     function testTableWithWordWrapping()
     {
         $options = new FormatterOptions();
-        $options->setWidth(42);
 
         $data = [
             [
@@ -538,19 +537,143 @@ EOT;
         $data = new RowsOfFields($data);
 
         $expected = <<<EOT
- ------------------- --------------------
-  First               Second
- ------------------- --------------------
-  This is a really    This is the second
-  long cell that      column of the same
-  contains a lot of   table. It is also
-  data. When it is    very long, and
-  rendered, it        should be wrapped
-  should be wrapped   across multiple
-  across multiple     lines, just like
-  lines.              the first column.
- ------------------- --------------------
+ ------------------ --------------------
+  First              Second
+ ------------------ --------------------
+  This is a really   This is the second
+  long cell that     column of the same
+  contains a lot     table. It is also
+  of data. When it   very long, and
+  is rendered, it    should be wrapped
+  should be          across multiple
+  wrapped across     lines, just like
+  multiple lines.    the first column.
+ ------------------ --------------------
 EOT;
+        $options->setWidth(42);
+        $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
+
+        $expected = <<<EOT
+ ----------------------------------- ---------------------------------------
+  First                               Second
+ ----------------------------------- ---------------------------------------
+  This is a really long cell that     This is the second column of the same
+  contains a lot of data. When it     table. It is also very long, and
+  is rendered, it should be wrapped   should be wrapped across multiple
+  across multiple lines.              lines, just like the first column.
+ ----------------------------------- ---------------------------------------
+EOT;
+        $options->setWidth(78);
+        $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
+    }
+
+    function testTableWithWordWrapping2()
+    {
+        $options = new FormatterOptions();
+
+        $data = [
+            [
+                'id' => 42,
+                'vid' => 321,
+                'description' => 'Life, the Universe and Everything.',
+            ],
+            [
+                'id' => 13,
+                'vid' => 789,
+                'description' => 'Why is six afraid of seven?',
+            ],
+        ];
+        $data = new RowsOfFields($data);
+        $expected = <<<EOT
+ ---- ----- -----------------------------
+  Id   Vid   Description
+ ---- ----- -----------------------------
+  42   321   Life, the Universe and
+             Everything.
+  13   789   Why is six afraid of seven?
+ ---- ----- -----------------------------
+EOT;
+        $options->setWidth(42);
+        $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
+    }
+
+    function testTableWithWordWrapping3()
+    {
+        $options = new FormatterOptions();
+        $data = [
+            'name' => 'Rex',
+            'species' => 'dog',
+            'food' => 'kibble',
+            'legs' => '4',
+            'description' => 'Rex is a very good dog, Brett. He likes kibble, and has four legs.',
+        ];
+        $data = new PropertyList($data);
+
+        $expected = <<<EOT
+ ------------- -------------------------
+  Name          Rex
+  Species       dog
+  Food          kibble
+  Legs          4
+  Description   Rex is a very good dog,
+                Brett. He likes kibble,
+                and has four legs.
+ ------------- -------------------------
+EOT;
+        $options->setWidth(42);
+        $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
+    }
+
+    function testTableWithWordWrapping4()
+    {
+        $options = new FormatterOptions();
+
+        $data = [
+            'name' => ['label' => 'Name', 'sep' => ':', 'value' => 'Rex', ],
+            'species' => ['label' => 'Species', 'sep' => ':', 'value' => 'dog', ],
+            'food' => ['label' => 'Food', 'sep' => ':', 'value' => 'kibble', ],
+            'legs' => ['label' => 'Legs', 'sep' => ':', 'value' => '4', ],
+            'description' => ['label' => 'Description', 'sep' => ':', 'value' => 'Rex is a very good dog, Brett. He likes kibble, and has four legs.', ],
+        ];
+        $data = new RowsOfFields($data);
+        $expected = <<<EOT
+ ------------- ----- -----------------------------------------------------
+  Label         Sep   Value
+ ------------- ----- -----------------------------------------------------
+  Name          :     Rex
+  Species       :     dog
+  Food          :     kibble
+  Legs          :     4
+  Description   :     Rex is a very good dog, Brett. He likes kibble, and
+                      has four legs.
+ ------------- ----- -----------------------------------------------------
+EOT;
+        $options->setWidth(78);
+        $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
+    }
+
+    function testTableWithWordWrapping5()
+    {
+        $options = new FormatterOptions();
+        $data = [
+            'name' => ['Name', ':', 'Rex', ],
+            'species' => ['Species', ':', 'dog', ],
+            'food' => ['Food', ':', 'kibble', ],
+            'legs' => ['Legs', ':', '4', ],
+            'description' => ['Description', ':', 'Rex is a very good dog, Brett. He likes kibble, and has four legs.', ],
+        ];
+        $data = new RowsOfFields($data);
+        $expected = <<<EOT
+ Name        : Rex
+ Species     : dog
+ Food        : kibble
+ Legs        : 4
+ Description : Rex is a very good dog, Brett. He likes kibble, and has
+               four legs.
+EOT;
+        $options->setWidth(78);
+        $options->setIncludeFieldLables(false);
+        $options->setTableStyle('compact');
         $this->assertFormattedOutputMatches($expected, 'table', $data, $options);
     }
 

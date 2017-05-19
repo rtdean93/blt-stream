@@ -1,4 +1,0 @@
-# List of additional modules to enable after Lightning is installed.
-modules:
-  - acsf
-  - acsf_sso

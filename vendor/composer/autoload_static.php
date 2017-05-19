@@ -21,7 +21,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'fbeead2280a8f3911a1fe6dd034f7d5e' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvancedInterface.php',
         '96f8d8288528d52059397cad6ec61f17' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvanced.php',
-        'aca594cec0c196659a3b7d4dc2665c0b' => __DIR__ . '/..' . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
     );
 
@@ -356,13 +355,6 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
                 0 => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src',
             ),
         ),
-        'I' => 
-        array (
-            'Instagram' => 
-            array (
-                0 => __DIR__ . '/..' . '/php-instagram-api/php-instagram-api',
-            ),
-        ),
         'H' => 
         array (
             'HTMLPurifier' => 
@@ -432,6 +424,7 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         'OneLogin_Saml2_AuthnRequest' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/AuthnRequest.php',
         'OneLogin_Saml2_Constants' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/Constants.php',
         'OneLogin_Saml2_Error' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/Error.php',
+        'OneLogin_Saml2_IdPMetadataParser' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/IdPMetadataParser.php',
         'OneLogin_Saml2_LogoutRequest' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/LogoutRequest.php',
         'OneLogin_Saml2_LogoutResponse' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/LogoutResponse.php',
         'OneLogin_Saml2_Metadata' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/Metadata.php',
@@ -446,6 +439,7 @@ class ComposerStaticInita56f9069071442c7b352fa6e79f585e5
         'OneLogin_Saml_XmlSec' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml/XmlSec.php',
         'RecursiveCallbackFilterIterator' => __DIR__ . '/..' . '/symfony/polyfill-php54/Resources/stubs/RecursiveCallbackFilterIterator.php',
         'SessionHandlerInterface' => __DIR__ . '/..' . '/symfony/polyfill-php54/Resources/stubs/SessionHandlerInterface.php',
+        'TwitterAPIExchange' => __DIR__ . '/..' . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
         'XMLSecEnc' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
         'XMLSecurityDSig' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
         'XMLSecurityKey' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
