@@ -32,6 +32,7 @@ install_d8 () {
   rm -rf docroot/sites
   php bin/composer install -n --no-dev
   mkdir -p docroot/sites/all
+  cp -rp acquia/profiles/ docroot/profiles/
   cd docroot/modules
   find . -type d -name '.git' | xargs rm -rvf
   cd -
