@@ -6,7 +6,6 @@
  */
 
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,12 +16,22 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\image\Plugin\ImageEffect\ResizeImageEffect;
 use Drupal\lightning_core\BundleEntityStorage;
 use Drupal\lightning_media\Exception\IndeterminateBundleException;
+use Drupal\lightning_media\Plugin\Field\FieldWidget\EntityReferenceBrowserWidget;
 use Drupal\lightning_media\MediaHelper;
 use Drupal\lightning_core\OverrideHelper as Override;
 use Drupal\lightning_media\Form\MediaForm;
 use Drupal\media_entity\Entity\MediaBundle;
 use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaBundleInterface;
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function lightning_media_field_widget_info_alter(array &$info) {
+  if (isset($info['entity_browser_entity_reference'])) {
+    Override::pluginClass($info['entity_browser_entity_reference'], EntityReferenceBrowserWidget::class);
+  }
+}
 
 /**
  * Implements hook_modules_installed().
@@ -87,13 +96,16 @@ function lightning_media_inline_entity_form_entity_form_alter(array &$entity_for
  *
  * @param \Drupal\file\FileInterface $file
  *   The file to validate.
+ * @param string[] $bundles
+ *   (optional) A set of media bundle IDs which might match the input. If
+ *   omitted, all bundles to which the user has create access will be checked.
  *
  * @return string[]
  *   An array of errors. If empty, the file passed validation.
  */
-function lightning_media_validate_upload(FileInterface $file) {
+function lightning_media_validate_upload(FileInterface $file, array $bundles = []) {
   try {
-    $entity = \Drupal::service('lightning.media_helper')->createFromInput($file);
+    $entity = \Drupal::service('lightning.media_helper')->createFromInput($file, $bundles);
   }
   catch (IndeterminateBundleException $e) {
     return [];
@@ -287,7 +299,7 @@ function lightning_media_form_entity_embed_dialog_alter(array &$form, FormStateI
 /**
  * Implements hook_js_settings_alter().
  */
-function lightning_media_js_settings_alter(array &$settings, AttachedAssetsInterface $assets) {
+function lightning_media_js_settings_alter(array &$settings) {
   if (empty($settings['ajax'])) {
     $settings['ajax'] = [];
   }
@@ -389,6 +401,7 @@ function lightning_media_entity_form_display_presave(EntityFormDisplayInterface 
         ],
         'open' => TRUE,
       ],
+      'region' => 'content',
     ]);
   }
 }

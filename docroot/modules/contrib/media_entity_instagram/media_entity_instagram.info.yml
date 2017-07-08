@@ -6,8 +6,8 @@ package: Media
 dependencies:
   - media_entity:media_entity
 
-# Information added by Drupal.org packaging script on 2017-05-09
-version: '8.x-1.3'
+# Information added by Drupal.org packaging script on 2017-05-23
+version: '8.x-1.4'
 core: '8.x'
 project: 'media_entity_instagram'
-datestamp: 1494333192
+datestamp: 1495556288

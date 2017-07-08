@@ -35,8 +35,9 @@ class SearchApiSolrAcquiaConnector extends SolrConnectorPluginBase {
   public function defaultConfiguration() {
     $configuration = parent::defaultConfiguration();
 
-    $configuration['index_id'] = Storage::getIdentifier();
-    $configuration['path'] = '/solr/' . Storage::getIdentifier();
+    $storage = new Storage();
+    $configuration['index_id'] = $storage->getIdentifier();
+    $configuration['path'] = '/solr/' . $storage->getIdentifier();
     $configuration['host'] = acquia_search_get_search_host();
     $configuration['port'] = '80';
     $configuration['scheme'] = 'http';
@@ -166,10 +167,9 @@ class SearchApiSolrAcquiaConnector extends SolrConnectorPluginBase {
   protected function connect() {
     if (!$this->solr) {
       $this->solr = new Client();
-      $this->solr->createEndpoint($this->configuration + [
-        'key' => 'core',
-        'port' => ($this->configuration['scheme'] == 'https') ? 443 : 80,
-      ], TRUE);
+      $this->configuration['port'] = ($this->configuration['scheme'] == 'https') ? 443 : 80;
+      $this->configuration['key'] = 'core';
+      $this->solr->createEndpoint($this->configuration, TRUE);
       $this->attachServerEndpoint();
       $this->eventDispatcher = $this->solr->getEventDispatcher();
       $plugin = new SearchSubscriber();
@@ -203,6 +203,27 @@ class SearchApiSolrAcquiaConnector extends SolrConnectorPluginBase {
       throw new \Exception($message);
     }
     return $this->solr->createUpdate();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExtractQuery() {
+    $this->connect();
+    $query = $this->solr->createExtract();
+    $query->setHandler('extract/tika');
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMoreLikeThisQuery() {
+    $this->connect();
+    $query = $this->solr->createMoreLikeThis();
+    $query->setHandler('select');
+    $query->addParam('qt', 'mlt');
+    return $query;
   }
 
   /**
