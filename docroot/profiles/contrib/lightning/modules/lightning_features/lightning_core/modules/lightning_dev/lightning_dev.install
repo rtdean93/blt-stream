@@ -50,6 +50,10 @@ function lightning_dev_install() {
   $widgets['8b142f33-59d1-47b1-9e3a-4ae85d8376fa']['label'] = 'Create embed';
   $entity_browser->set('widgets', $widgets);
   $entity_browser->save();
+
+  if (\Drupal::moduleHandler()->moduleExists('lightning_api')) {
+    lightning_dev_modules_installed(['lightning_api']);
+  }
 }
 
 /**
@@ -210,4 +214,21 @@ function lightning_dev_update_8006() {
   $configuration = $format->filters('filter_html')->getConfiguration();
   $configuration['settings']['allowed_html'] = str_replace('<drupal-entity data-*>', '<drupal-entity data-* title alt>', $configuration['settings']['allowed_html']);
   $format->setFilterConfig('filter_html', $configuration)->save();
+}
+
+/**
+ * Executes manual updates for Lightning 2.1.6 --> 2.1.7.
+ */
+function lightning_dev_update_8007() {
+  \Drupal::service('lightning.content_roles')
+    ->grantPermissions('creator', [
+      'access in-place editing',
+      'access contextual links',
+      'access toolbar',
+    ]);
+
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $installer */
+  $installer = \Drupal::service('module_installer');
+  $installer->uninstall(['page_manager']);
+  $installer->install(['lightning_api']);
 }

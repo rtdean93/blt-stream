@@ -482,7 +482,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     // Install profiles can not have config clashes. Configuration that
     // has the same name as a module's configuration will be used instead.
-    $profiles = $this->profileHandler->getProfiles();
+    $profiles = $this->profileHandler->getProfileInheritance();
     if (!isset($profiles[$name])) {
       // Throw an exception if the module being installed contains configuration
       // that already exists. Additionally, can not continue installing more

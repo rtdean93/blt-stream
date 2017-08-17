@@ -444,7 +444,7 @@ function install_begin_request($class_loader, &$install_state) {
       $install_state['theme'] = $install_state['profile_info']['distribution']['install']['theme'];
     }
     // Ensure all profile directories are registered.
-    $profiles = \Drupal::service('profile_handler')->getProfiles($profile);
+    $profiles = \Drupal::service('profile_handler')->getProfileInheritance($profile);
     $profile_directories = array_map(function($extension) {
       return $extension->getPath();
     }, $profiles);
@@ -1575,7 +1575,7 @@ function install_profile_themes(&$install_state) {
  */
 function install_install_profile(&$install_state) {
   // Install all the profiles.
-  $profiles = \Drupal::service('profile_handler')->getProfiles();
+  $profiles = \Drupal::service('profile_handler')->getProfileInheritance();
   \Drupal::service('module_installer')->install(array_keys($profiles), FALSE);
 
   // Install all available optional config. During installation the module order

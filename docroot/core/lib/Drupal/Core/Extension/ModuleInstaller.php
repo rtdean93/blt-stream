@@ -330,7 +330,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     if ($uninstall_dependents) {
       // Add dependent modules to the list. The new modules will be processed as
       // the while loop continues.
-      $profiles = \Drupal::service('profile_handler')->getProfiles();
+      $profiles = \Drupal::service('profile_handler')->getProfileInheritance();
       while (list($module) = each($module_list)) {
         foreach (array_keys($module_data[$module]->required_by) as $dependent) {
           if (!isset($module_data[$dependent])) {

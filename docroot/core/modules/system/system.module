@@ -1000,7 +1000,7 @@ function _system_rebuild_module_data() {
   // Find profiles.
   /** @var \Drupal\Core\Extension\ProfileHandlerInterface $profile_handler */
   $profile_handler = \Drupal::service('profile_handler');
-  $modules = array_merge($modules, $profile_handler->getProfiles());
+  $modules = array_merge($modules, $profile_handler->getProfileInheritance());
 
   // Set defaults for module info.
   $defaults = [
@@ -1044,7 +1044,7 @@ function _system_rebuild_module_data() {
   }
 
   // This must be done after _system_rebuild_module_data_ensure_required().
-  $profiles = \Drupal::service('profile_handler')->getProfiles();
+  $profiles = \Drupal::service('profile_handler')->getProfileInheritance();
   foreach ($profiles as $profile_name => $profile) {
     if (isset($modules[$profile_name])) {
       // Installation profiles are required, if it's a valid module.

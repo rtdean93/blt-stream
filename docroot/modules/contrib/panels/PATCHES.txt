@@ -5,10 +5,6 @@ Patches applied to this directory:
 Source: https://www.drupal.org/files/issues/panels-ipe-2878684-3.patch
 
 
-2878650 - Improve Layout Picker styling in Panels IPE
-Source: https://www.drupal.org/files/issues/panels-ipe-layout-picker-styling.patch
-
-
 2825034 - Form error messages do not appear in IPE
 Source: https://www.drupal.org/files/issues/panels-ipe-propogate-errors-2825034-5.patch
 

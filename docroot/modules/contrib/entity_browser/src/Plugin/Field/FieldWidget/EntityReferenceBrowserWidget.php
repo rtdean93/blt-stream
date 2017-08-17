@@ -486,9 +486,14 @@ class EntityReferenceBrowserWidget extends WidgetBase implements ContainerFactor
       $this->getSetting('field_widget_display_settings') + ['entity_type' => $this->fieldDefinition->getFieldStorageDefinition()->getSetting('target_type')]
     );
 
+    $classes = ['entities-list'];
+    if ($this->fieldDefinition->getFieldStorageDefinition()->getCardinality() != 1) {
+      $classes[] = 'sortable';
+    }
+
     return [
       '#theme_wrappers' => ['container'],
-      '#attributes' => ['class' => ['entities-list']],
+      '#attributes' => ['class' => $classes],
       '#prefix' => '<p>' . $this->getCardinalityMessage($entities) . '</p>',
       'items' => array_map(
         function (ContentEntityInterface $entity, $row_id) use ($field_widget_display, $details_id, $field_parents) {
