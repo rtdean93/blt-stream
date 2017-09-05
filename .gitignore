@@ -2,7 +2,7 @@
 .idea
 .idea/**
 bin/
-!vendor/
+!vendor/**
 !docroot/**
 !docroot/vendor/**
 !docroot/**/vendor/**
