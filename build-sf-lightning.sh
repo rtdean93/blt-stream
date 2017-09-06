@@ -14,6 +14,22 @@ install_composer () {
   curl -sS https://getcomposer.org/installer | php -- --install-dir=bin --filename=composer
 }
 
+# This is only necessary if the default binary path is ./bin, but won't destroy
+# anything if it changes to ./vendor/bin (except the credibility of the README).
+create_vendor_bin() {
+  mkdir -p vendor/bin
+  ln -s ../drush/drush/drush vendor/bin/drush
+  cat << EOF > vendor/bin/README.md
+The default bin-dir (as configured in composer.json) for this project is 
+REPO-ROOT/bin, which is not committed to the repository. With this setup, Drush
+(tested with 8.1.12) does not find the site-local drush version, which can lead
+to all kinds of problems depending on the drush/library versions of site-local
+system-wide drush. To prevent these problems, the drush executable (symlink) is
+committed in a place where the system-wide drush will find it (if called with
+the --root parameter): vendor/bin/drush.
+EOF
+}
+
 check_drush_version () {
   DRUSH_VERSION=`$DRUSH_PATH/drush --version --pipe`
   if ! [[ $DRUSH_VERSION =~ ^[8]\.[0-9].+$ ]]; then
@@ -55,6 +71,7 @@ commit_changes () {
 
 install_composer
 install_d8
+create_vendor_bin
 check_drush_version
 init_acsf
 if [[ -n $COMMIT_CHANGES ]]; then
