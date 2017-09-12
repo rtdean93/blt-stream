@@ -5264,18 +5264,18 @@
     },
     {
         "name": "drupal/search_api",
-        "version": "1.3.0",
-        "version_normalized": "1.3.0.0",
+        "version": "1.4.0",
+        "version_normalized": "1.4.0.0",
         "source": {
             "type": "git",
             "url": "https://git.drupal.org/project/search_api",
-            "reference": "8.x-1.3"
+            "reference": "8.x-1.4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.3.zip",
-            "reference": "8.x-1.3",
-            "shasum": "e064dc8769a95ce3ebb3f30cdfe0fba8ea661dfb"
+            "url": "https://ftp.drupal.org/files/projects/search_api-8.x-1.4.zip",
+            "reference": "8.x-1.4",
+            "shasum": "750555dee199d8ab62a609b394fb11206b8fbe4c"
         },
         "require": {
             "drupal/core": "^8.3"
@@ -5289,8 +5289,8 @@
                 "dev-1.x": "1.x-dev"
             },
             "drupal": {
-                "version": "8.x-1.3",
-                "datestamp": "1500483242",
+                "version": "8.x-1.4",
+                "datestamp": "1504799343",
                 "security-coverage": {
                     "status": "covered",
                     "message": "Covered by Drupal's security advisory policy"
@@ -6459,18 +6459,18 @@
     },
     {
         "name": "drupal/jsonapi",
-        "version": "1.1.0",
-        "version_normalized": "1.1.0.0",
+        "version": "1.2.0",
+        "version_normalized": "1.2.0.0",
         "source": {
             "type": "git",
             "url": "https://git.drupal.org/project/jsonapi",
-            "reference": "8.x-1.1"
+            "reference": "8.x-1.2"
         },
         "dist": {
             "type": "zip",
-            "url": "https://ftp.drupal.org/files/projects/jsonapi-8.x-1.1.zip",
-            "reference": "8.x-1.1",
-            "shasum": "f44ad78e1234b8b077d3f8ebc2265967d72d9812"
+            "url": "https://ftp.drupal.org/files/projects/jsonapi-8.x-1.2.zip",
+            "reference": "8.x-1.2",
+            "shasum": "8c41dfd1aa6569e55d11f5ade5867e36168c493a"
         },
         "require": {
             "drupal/core": "^8.2"
@@ -6484,8 +6484,8 @@
                 "dev-1.x": "1.x-dev"
             },
             "drupal": {
-                "version": "8.x-1.1",
-                "datestamp": "1499586843",
+                "version": "8.x-1.2",
+                "datestamp": "1504763044",
                 "security-coverage": {
                     "status": "covered",
                     "message": "Covered by Drupal's security advisory policy"
@@ -6498,6 +6498,10 @@
             "GPL-2.0+"
         ],
         "authors": [
+            {
+                "name": "Wim Leers",
+                "homepage": "https://www.drupal.org/user/99777"
+            },
             {
                 "name": "dawehner",
                 "homepage": "https://www.drupal.org/user/99340"
