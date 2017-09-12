@@ -18,7 +18,7 @@ install_composer () {
 # anything if it changes to ./vendor/bin (except the credibility of the README).
 create_vendor_bin() {
   mkdir -p vendor/bin
-  ln -s ../drush/drush/drush vendor/bin/drush
+  ln -sf ../drush/drush/drush vendor/bin/drush
   cat << EOF > vendor/bin/README.md
 The default bin-dir (as configured in composer.json) for this project is 
 REPO-ROOT/bin, which is not committed to the repository. With this setup, Drush
