@@ -45,6 +45,8 @@
 # Define binary file attributes.
 # - Do not treat them as text.
 # - Include binary diff in patches instead of "binary files differ."
+*.bz2     -text diff
+*.BZ2     -text diff
 *.gif     -text diff
 *.GIF     -text diff
 *.gz      -text diff
