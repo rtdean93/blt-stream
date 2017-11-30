@@ -4,7 +4,7 @@ set -e
 
 # Builds some version of d8 with acsf initialized
 DRUSH_PATH="./bin"
-DRUSH_VERSION='8.1.14'
+DRUSH_VERSION='8.1.15'
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 

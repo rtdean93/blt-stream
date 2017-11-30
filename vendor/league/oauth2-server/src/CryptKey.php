@@ -49,13 +49,11 @@ class CryptKey
             // Verify the permissions of the key
             $keyPathPerms = decoct(fileperms($keyPath) & 0777);
             if (in_array($keyPathPerms, ['600', '660'], true) === false) {
-                // @codeCoverageIgnoreStart
                 trigger_error(sprintf(
                     'Key file "%s" permissions are not correct, should be 600 or 660 instead of %s',
                     $keyPath,
                     $keyPathPerms
                 ), E_USER_NOTICE);
-                // @codeCoverageIgnoreEnd
             }
         }
 
@@ -77,19 +75,19 @@ class CryptKey
 
         if (!file_exists($keyPath) && !touch($keyPath)) {
             // @codeCoverageIgnoreStart
-            throw new \RuntimeException('"%s" key file could not be created', $keyPath);
+            throw new \RuntimeException(sprintf('"%s" key file could not be created', $keyPath));
             // @codeCoverageIgnoreEnd
         }
 
         if (file_put_contents($keyPath, $key) === false) {
             // @codeCoverageIgnoreStart
-            throw new \RuntimeException('Unable to write key file to temporary directory "%s"', $tmpDir);
+            throw new \RuntimeException(sprintf('Unable to write key file to temporary directory "%s"', $tmpDir));
             // @codeCoverageIgnoreEnd
         }
 
         if (chmod($keyPath, 0600) === false) {
             // @codeCoverageIgnoreStart
-            throw new \RuntimeException('The key file "%s" file mode could not be changed with chmod to 600', $keyPath);
+            throw new \RuntimeException(sprintf('The key file "%s" file mode could not be changed with chmod to 600', $keyPath));
             // @codeCoverageIgnoreEnd
         }
 

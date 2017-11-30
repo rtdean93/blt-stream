@@ -34,14 +34,15 @@ class TokenAuthUser implements TokenAuthUserInterface {
    *
    * @param \Drupal\simple_oauth\Entity\Oauth2TokenInterface $token
    *   The underlying token.
+   *
    * @throws \Exception
    *   When there is no user.
    */
   public function __construct(Oauth2TokenInterface $token) {
     if (!$this->subject = $token->get('auth_user_id')->entity) {
-      /** @var \Drupal\simple_oauth\Entity\Oauth2ClientInterface $client */
+      /** @var \Drupal\consumers\Entity\Consumer $client */
       if ($client = $token->get('client')->entity) {
-        $this->subject = $client->getDefaultUser();
+        $this->subject = $client->get('user_id')->entity;
       }
     }
     if (!$this->subject) {
@@ -67,7 +68,7 @@ class TokenAuthUser implements TokenAuthUserInterface {
   }
 
   /* ---------------------------------------------------------------------------
-     All the methods below are delegated to the decorated user.
+  All the methods below are delegated to the decorated user.
   --------------------------------------------------------------------------- */
 
   /**
@@ -281,14 +282,14 @@ class TokenAuthUser implements TokenAuthUserInterface {
   /**
    * {@inheritdoc}
    */
-  public function urlInfo($rel = 'canonical', array $options = array()) {
+  public function urlInfo($rel = 'canonical', array $options = []) {
     return $this->subject->urlInfo($rel, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function url($rel = 'canonical', $options = array()) {
+  public function url($rel = 'canonical', $options = []) {
     return $this->subject->url($rel, $options);
   }
 
@@ -330,7 +331,7 @@ class TokenAuthUser implements TokenAuthUserInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(array $values = array()) {
+  public static function create(array $values = []) {
     return User::create($values);
   }
 
@@ -666,7 +667,7 @@ class TokenAuthUser implements TokenAuthUserInterface {
   /**
    * {@inheritdoc}
    */
-  public function addTranslation($langcode, array $values = array()) {
+  public function addTranslation($langcode, array $values = []) {
     return $this->subject->addTranslation($langcode, $values);
   }
 
@@ -820,7 +821,7 @@ class TokenAuthUser implements TokenAuthUserInterface {
   /**
    * {@inheritdoc}
    */
-  public function toUrl($rel = 'canonical', array $options = array()) {
+  public function toUrl($rel = 'canonical', array $options = []) {
     $this->subject->toUrl($rel, $options);
   }
 

@@ -9,3 +9,7 @@ Source: https://www.drupal.org/files/issues/panels-ipe-2878684-3.patch
 Source: https://www.drupal.org/files/issues/panels-ipe-propogate-errors-2825034-5.patch
 
 
+2908897 - CategoryView leaves AJAX request marked active
+Source: https://www.drupal.org/files/issues/2908897-2.patch
+
+
