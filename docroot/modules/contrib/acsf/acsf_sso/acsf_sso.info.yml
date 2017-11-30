@@ -8,8 +8,8 @@ dependencies:
  - acsf
  - samlauth (>= 8.x-2.0-alpha1)
 
-# Information added by Drupal.org packaging script on 2017-08-30
-version: '8.x-1.40'
+# Information added by Drupal.org packaging script on 2017-11-22
+version: '8.x-1.41'
 core: '8.x'
 project: 'acsf'
-datestamp: 1504093461
+datestamp: 1511345298
