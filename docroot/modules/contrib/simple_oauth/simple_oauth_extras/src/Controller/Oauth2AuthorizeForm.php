@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\simple_oauth_extras\Controller;
 
 use Drupal\Component\Utility\UrlHelper;
@@ -93,7 +92,7 @@ class Oauth2AuthorizeForm extends FormBase {
    *   The form structure.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-      if (!$this->currentUser()->isAuthenticated()) {
+    if (!$this->currentUser()->isAuthenticated()) {
       $form['redirect_params'] = ['#type' => 'hidden', '#value' => $this->getRequest()->getQueryString()];
       $form['description'] = [
         '#type' => 'html_tag',
@@ -133,7 +132,7 @@ class Oauth2AuthorizeForm extends FormBase {
     ];
 
     $client_uuid = $request->get('client_id');
-    $client_drupal_entities = $manager->getStorage('oauth2_client')->loadByProperties([
+    $client_drupal_entities = $manager->getStorage('consumer')->loadByProperties([
       'uuid' => $client_uuid,
     ]);
     if (empty($client_drupal_entities)) {
@@ -149,7 +148,7 @@ class Oauth2AuthorizeForm extends FormBase {
       }, $client_drupal_entity->get('roles')->getValue())
     );
     $user_roles = $manager->getStorage('user_role')->loadMultiple($scope_ids);
-    $form['client'] = $manager->getViewBuilder('oauth2_client')->view($client_drupal_entity);
+    $form['client'] = $manager->getViewBuilder('consumer')->view($client_drupal_entity);
     $client_drupal_entity->addCacheableDependency($form['client']);
     $form['scopes'] = [
       '#title' => $this->t('Permissions'),
@@ -164,8 +163,8 @@ class Oauth2AuthorizeForm extends FormBase {
     $form['redirect_uri'] = [
       '#type' => 'hidden',
       '#value' => $request->get('redirect_uri') ?
-        $request->get('redirect_uri') :
-        $client_drupal_entity->get('redirect')->value,
+      $request->get('redirect_uri') :
+      $client_drupal_entity->get('redirect')->value,
     ];
     $form['submit'] = [
       '#type' => 'submit',

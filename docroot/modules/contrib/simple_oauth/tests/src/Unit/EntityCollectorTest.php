@@ -7,12 +7,10 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\simple_oauth\Entity\Oauth2Client;
-use Drupal\simple_oauth\Entity\Oauth2ClientInterface;
+use Drupal\consumers\Entity\Consumer;
 use Drupal\simple_oauth\Entity\Oauth2Token;
 use Drupal\simple_oauth\ExpiredCollector;
 use Drupal\Tests\UnitTestCase;
-use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\simple_oauth\ExpiredCollector
@@ -36,7 +34,7 @@ class EntityCollectorTest extends UnitTestCase {
    */
   public function testCollectForClient() {
     list($expired_collector, $query,) = $this->buildProphecies();
-    $client = $this->prophesize(Oauth2ClientInterface::class);
+    $client = $this->prophesize(Consumer::class);
     $client->id()->willReturn(35);
     $query->condition('client', 35)->shouldBeCalledTimes(1);
     $tokens = $expired_collector->collectForClient($client->reveal());
@@ -92,14 +90,14 @@ class EntityCollectorTest extends UnitTestCase {
     $client_query = $this->prophesize(QueryInterface::class);
     $client_query->execute()->willReturn([6 => '6']);
     $client_storage->getQuery()->willReturn($client_query->reveal());
-    $client6 = $this->prophesize(Oauth2Client::class);
+    $client6 = $this->prophesize(Consumer::class);
     $client6->id()->willReturn(6);
     $client_storage->loadByProperties([
       'user_id' => 22,
     ])->willReturn([6 => $client6->reveal()]);
 
     $entity_type_manager->getStorage('oauth2_token')->willReturn($token_storage->reveal());
-    $entity_type_manager->getStorage('oauth2_client')->willReturn($client_storage->reveal());
+    $entity_type_manager->getStorage('consumer')->willReturn($client_storage->reveal());
 
     $date_time = $this->prophesize(TimeInterface::class);
     $date_time->getRequestTime()->willReturn(42);

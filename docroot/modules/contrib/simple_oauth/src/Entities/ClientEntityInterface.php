@@ -1,9 +1,8 @@
 <?php
 
-
 namespace Drupal\simple_oauth\Entities;
 
-use \League\OAuth2\Server\Entities\ClientEntityInterface as LeagueClientEntityInterface;
+use League\OAuth2\Server\Entities\ClientEntityInterface as LeagueClientEntityInterface;
 
 interface ClientEntityInterface extends LeagueClientEntityInterface {
 
@@ -18,7 +17,7 @@ interface ClientEntityInterface extends LeagueClientEntityInterface {
   /**
    * Returns the associated Drupal entity.
    *
-   * @return \Drupal\simple_oauth\Entity\Oauth2ClientInterface
+   * @return \Drupal\consumers\Entity\Consumer
    *   The Drupal entity.
    */
   public function getDrupalEntity();

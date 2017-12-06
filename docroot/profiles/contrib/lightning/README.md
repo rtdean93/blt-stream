@@ -15,6 +15,7 @@ The preferred way to install Lightning is using our
 [Composer-based project template][template]. It's easy!
 
 ```
+$ composer self-update
 $ composer create-project acquia/lightning-project MY_PROJECT
 ```
 
@@ -45,7 +46,8 @@ The current version of media includes the following functionality:
   * Instagram posts
   * Videos (YouTube and Vimeo supported out of the box)
   * Images
-* Drag-and-drop image uploads
+* Drag-and-drop bulk image uploads.
+* Image cropping.
 * Ability to create new media through the media library (/media/add)
 * Ability to embed tweets, Instagrams, and YouTube/Vimeo videos directly into
   CKEditor by pasting the video URL
@@ -95,10 +97,8 @@ any of these modules, because it does not make any assumptions about how the
 API data will be consumed, but we might add support for standard use cases as
 they present themselves.
 
-If you have PHP's OpenSSL extension enabled, Lightning will attempt to create
-an asymmetric key pair for use with OAuth. You should generate a new key pair
-before putting your site into production; instructions for that can be found
-[here](https://www.drupal.org/project/simple_oauth).
+If you have PHP's OpenSSL extension enabled, Lightning can automatically create
+an asymmetric key pair for use with OAuth.
 
 ## Project Roadmap
 We publish sprint plans for each patch release. You can find a link to the
@@ -144,6 +144,17 @@ your environment, but generally you will not need to do this.
   stable, most likely in Drupal 8.4.0. But for now, installing Content
   Moderation alongside Lightning Workflow may have unpredictable and dangerous
   effects, and is best avoided.
+  
+### Inherited profiles
+Neither Drush nor Drupal Console are aware of the concept of inherited profiles
+and as a result, you will be unable to uninstall dependencies of any parent
+profile using either of those tools. You can still uninstall these dependencies
+via the UI at "/admin/modules/uninstall". We have provided patches [here](https://www.drupal.org/node/2902643)
+for both Drush and Drupal Console which allow you to uninstall dependencies of
+parent profiles.
+
+* [Drupal Console inherited profile dependencies patch](https://www.drupal.org/files/issues/2902643-3-drupalconsole-master.patch).
+* [Drush 9 inherited profile dependencies patch](https://www.drupal.org/files/issues/2902643-2--drush-master.patch).
 
 [issue_queue]: https://www.drupal.org/project/issues/lightning "Lightning Issue Queue"
 [meta_release]: https://www.drupal.org/node/2670686 "Lightning Meta Releases Issue"

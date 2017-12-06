@@ -25,3 +25,7 @@ Source: https://www.drupal.org/files/issues/2869592-remove-update-warning-7.patc
 Source: https://www.drupal.org/files/issues/2885441-2.patch
 
 
+2904798 - 8.3.7 Views SA patch should use ajaxEnabled() and not check option 'use_ajax' directly
+Source: https://www.drupal.org/files/issues/2904798-7.patch
+
+

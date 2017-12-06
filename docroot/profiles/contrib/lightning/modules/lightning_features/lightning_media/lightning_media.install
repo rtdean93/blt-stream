@@ -5,6 +5,7 @@
  * Contains install and update routines for Lightning Media.
  */
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\editor\Entity\Editor;
 use Drupal\embed\Entity\EmbedButton;
 use Drupal\entity_browser\Entity\EntityBrowser;
@@ -278,16 +279,30 @@ function lightning_media_update_8016() {
 }
 
 /**
- * Implements hook_update_dependencies().
+ * Changes all image_immutable field widgets to image_image.
  */
-function lightning_media_update_dependencies() {
-  return [
-    'lightning_media' => [
-      // 8012 adds the field_media_in_library filter to the Entity Browser
-      // display of the media view, which is created by 8008.
-      8012 => [
-        'lightning_media' => 8008,
-      ],
-    ],
-  ];
+function lightning_media_update_8017() {
+  if (\Drupal::service('module_handler')->moduleExists('lightning_api')) {
+    // simple_oauth_update_8200 will also enable the Consumers module, but it
+    // might not have run yet.
+    \Drupal::service('module_installer')->install(['consumers']);
+  }
+
+  \Drupal::service('plugin.manager.field.widget')->clearCachedDefinitions();
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+  foreach (EntityFormDisplay::loadMultiple() as $form_display) {
+    foreach ($form_display->getComponents() as $key => $component) {
+      if ($component['type'] == 'image_immutable') {
+        $component['third_party_settings']['lightning_media'] = [
+          'file_links' => FALSE,
+          'remove_button' => FALSE,
+        ];
+        $component['type'] = 'image_image';
+
+        $form_display->setComponent($key, $component);
+      }
+    }
+    $form_display->save();
+  }
 }
