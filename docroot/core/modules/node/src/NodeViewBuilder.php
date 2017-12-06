@@ -29,12 +29,14 @@ class NodeViewBuilder extends EntityViewBuilder {
 
       if ($display->getComponent('links')) {
         $build[$id]['links'] = [
-          '#lazy_builder' => [get_called_class() . '::renderLinks', [
-            $entity->id(),
-            $view_mode,
-            $entity->language()->getId(),
-            !empty($entity->in_preview),
-          ]],
+          '#lazy_builder' => [
+            get_called_class() . '::renderLinks', [
+              $entity->id(),
+              $view_mode,
+              $entity->language()->getId(),
+              !empty($entity->in_preview),
+            ],
+          ],
         ];
       }
 
@@ -146,7 +148,7 @@ class NodeViewBuilder extends EntityViewBuilder {
     /** @var \Drupal\node\NodeInterface $entity */
     parent::alterBuild($build, $entity, $display, $view_mode);
     if ($entity->id()) {
-      if ($entity->isDefaultRevision()) {
+      if ($entity->isDefaultRevision() || $entity->isLatestRevision()) {
         $build['#contextual_links']['node'] = [
           'route_parameters' => ['node' => $entity->id()],
           'metadata' => ['changed' => $entity->getChangedTime()],

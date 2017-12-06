@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Acquia\\Lightning\\ScriptHandler' => $baseDir . '/scripts/ScriptHandler.php',
-    'CallbackFilterIterator' => $vendorDir . '/symfony/polyfill-php54/Resources/stubs/CallbackFilterIterator.php',
     'Console_Table' => $vendorDir . '/pear/console_table/Table.php',
     'Drupal' => $baseDir . '/docroot/core/lib/Drupal.php',
     'Drupal\\Component\\Utility\\Timer' => $baseDir . '/docroot/core/lib/Drupal/Component/Utility/Timer.php',
@@ -33,8 +32,6 @@ return array(
     'OneLogin_Saml_Response' => $vendorDir . '/onelogin/php-saml/lib/Saml/Response.php',
     'OneLogin_Saml_Settings' => $vendorDir . '/onelogin/php-saml/lib/Saml/Settings.php',
     'OneLogin_Saml_XmlSec' => $vendorDir . '/onelogin/php-saml/lib/Saml/XmlSec.php',
-    'RecursiveCallbackFilterIterator' => $vendorDir . '/symfony/polyfill-php54/Resources/stubs/RecursiveCallbackFilterIterator.php',
-    'SessionHandlerInterface' => $vendorDir . '/symfony/polyfill-php54/Resources/stubs/SessionHandlerInterface.php',
     'TwitterAPIExchange' => $vendorDir . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
     'XMLSecEnc' => $vendorDir . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
     'XMLSecurityDSig' => $vendorDir . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',

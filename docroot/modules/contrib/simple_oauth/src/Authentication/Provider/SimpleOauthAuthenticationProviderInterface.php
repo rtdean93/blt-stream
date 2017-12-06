@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface SimpleOauthAuthenticationProviderInterface extends AuthenticationProviderInterface {
 
+
   /**
    * Gets the access token from the request.
    *

@@ -13,3 +13,7 @@ Source: https://www.drupal.org/files/issues/panels-ipe-propogate-errors-2825034-
 Source: https://www.drupal.org/files/issues/2908897-2.patch
 
 
+2913353 - IPE attaches behaviors a bit too quickly
+Source: https://www.drupal.org/files/issues/2913353-2.patch
+
+
