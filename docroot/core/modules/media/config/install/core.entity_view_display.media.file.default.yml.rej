@@ -1,27 +1,19 @@
-***************
-*** 16,23 ****
-      settings: {  }
-      third_party_settings: {  }
-      type: file_default
-      weight: 0
-      region: content
-  hidden:
-    created: true
-    thumbnail: true
---- 16,31 ----
-      settings: {  }
-      third_party_settings: {  }
-      type: file_default
-+     weight: 1
-+     region: content
-+   name:
-+     label: hidden
-+     type: string
-      weight: 0
-      region: content
-+     settings:
-+       link_to_entity: false
-+     third_party_settings: {  }
-  hidden:
-    created: true
-    thumbnail: true
+--- modules/media/config/install/core.entity_view_display.media.file.default.yml
++++ modules/media/config/install/core.entity_view_display.media.file.default.yml
+@@ -16,8 +16,16 @@ content:
+     settings: {  }
+     third_party_settings: {  }
+     type: file_default
++    weight: 1
++    region: content
++  name:
++    label: hidden
++    type: string
+     weight: 0
+     region: content
++    settings:
++      link_to_entity: false
++    third_party_settings: {  }
+ hidden:
+   created: true
+   thumbnail: true
