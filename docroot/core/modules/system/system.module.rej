@@ -1,0 +1,36 @@
+***************
+*** 1064,1078 ****
+      _system_rebuild_module_data_ensure_required($module, $modules);
+    }
+  
+- 
+-   if ($profile && isset($modules[$profile])) {
+-     // The installation profile is required, if it's a valid module.
+-     $modules[$profile]->info['required'] = TRUE;
+-     // Add a default distribution name if the profile did not provide one.
+-     // @see install_profile_info()
+-     // @see drupal_install_profile_distribution_name()
+-     if (!isset($modules[$profile]->info['distribution']['name'])) {
+-       $modules[$profile]->info['distribution']['name'] = 'Drupal';
+      }
+    }
+  
+--- 1051,1068 ----
+      _system_rebuild_module_data_ensure_required($module, $modules);
+    }
+  
++   // This must be done after _system_rebuild_module_data_ensure_required().
++   $profiles = \Drupal::service('profile_handler')->getProfileInheritance();
++   foreach ($profiles as $profile_name => $profile) {
++     if (isset($modules[$profile_name])) {
++       // Installation profiles are required, if it's a valid module.
++       $modules[$profile_name]->info['required'] = TRUE;
++       // Add a default distribution name if the profile did not provide one.
++       // @see install_profile_info()
++       // @see drupal_install_profile_distribution_name()
++       if (!isset($modules[$profile_name]->info['distribution']['name'])) {
++         $modules[$profile_name]->info['distribution']['name'] = 'Drupal';
++       }
+      }
+    }
+  

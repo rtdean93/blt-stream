@@ -89,9 +89,14 @@ else {
 }
 
 $acsf_host = implode('.', array_reverse(explode(':', $host)));
+// Build an array with maximum one path fragment. Since the paths always start
+// with a '/' and we are splitting them by the '/', the array will always start
+// with an empty string.
 $acsf_uri_path_fragments = explode('/', $acsf_uri_path);
 $acsf_uri_path_fragments = array_diff($acsf_uri_path_fragments, array('index.php'));
 $acsf_uri_path_fragments = array_slice($acsf_uri_path_fragments, 0, 2);
+// Check whether we can find site data for the hostname suffixed by one
+// fragment, or for only the hostname.
 $data = NULL;
 for ($i = count($acsf_uri_path_fragments); $i > 0; $i--) {
   $dir = $acsf_host . implode('.', array_slice($acsf_uri_path_fragments, 0, $i));
@@ -103,8 +108,6 @@ for ($i = count($acsf_uri_path_fragments); $i > 0; $i--) {
   }
   elseif (($data = gardens_site_data_cache_get($acsf_uri)) !== 0) {
     if (empty($data)) {
-      // Note - when set to use APC, we never parse the whole file on a web
-      // request, but we do attempt to parse out the one requested.
       $data = gardens_site_data_refresh_one($acsf_uri);
     }
   }

@@ -1,0 +1,27 @@
+***************
+*** 19,26 ****
+        image_link: file
+      third_party_settings: {  }
+      type: image
+      weight: 0
+      region: content
+  hidden:
+    created: true
+    thumbnail: true
+--- 19,34 ----
+        image_link: file
+      third_party_settings: {  }
+      type: image
++     weight: 1
++     region: content
++   name:
++     label: hidden
++     type: string
+      weight: 0
+      region: content
++     settings:
++       link_to_entity: false
++     third_party_settings: {  }
+  hidden:
+    created: true
+    thumbnail: true
