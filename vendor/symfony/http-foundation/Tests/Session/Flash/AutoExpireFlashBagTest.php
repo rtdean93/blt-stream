@@ -26,6 +26,9 @@ class AutoExpireFlashBagTest extends TestCase
      */
     private $bag;
 
+    /**
+     * @var array
+     */
     protected $array = array();
 
     protected function setUp()

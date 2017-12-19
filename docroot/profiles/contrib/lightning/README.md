@@ -53,7 +53,10 @@ The current version of media includes the following functionality:
   CKEditor by pasting the video URL
 
 #### Extending Lightning Media (Contributed Modules)
-Drupal community members have contributed several modules which integrate Lightning Media with additional third-party media services. These modules are not packaged with Lightning or maintained by Acquia, but they are stable and you can use them in your Lightning site:
+Drupal community members have contributed several modules which integrate
+Lightning Media with additional third-party media services. These modules are
+not packaged with Lightning or maintained by Acquia, but they are stable and you
+can use them in your Lightning site:
 
   * [Facebook](https://www.drupal.org/project/lightning_media_facebook)
   * [Imgur](https://www.drupal.org/project/lightning_media_imgur)
@@ -135,15 +138,13 @@ your environment, but generally you will not need to do this.
   can set the image's alt text at upload time, but that text will not be
   replicated to the image field. This is due to a limitation of Entity Browser's
   API.
-
-### Workflow
-* Lightning Workflow is based on Workbench Moderation, which is incompatible
-  with the experimental Content Moderation module included with Drupal core
-  8.3.0 and later and serves the same purpose as Workbench Moderation. We plan
-  to seamlessly migrate Lightning Workflow to Content Moderation once it is
-  stable, most likely in Drupal 8.4.0. But for now, installing Content
-  Moderation alongside Lightning Workflow may have unpredictable and dangerous
-  effects, and is best avoided.
+* Some of the Lightning contributed media module listed above might not yet be
+  compatible with the Core Media entity.
+* The Video Embed Field module, a dependency of Lightning Media, might report
+  that it is unsupported. We're working with the module maintainer to remove
+  this warning.
+* Using the bulk upload feature in environments with a load balancer might
+  result in some images not being saved.
   
 ### Inherited profiles
 Neither Drush nor Drupal Console are aware of the concept of inherited profiles

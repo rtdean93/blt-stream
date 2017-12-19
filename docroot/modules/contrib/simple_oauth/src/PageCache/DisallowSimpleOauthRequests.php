@@ -4,6 +4,7 @@ namespace Drupal\simple_oauth\PageCache;
 
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\simple_oauth\Authentication\Provider\SimpleOauthAuthenticationProvider;
+use Drupal\simple_oauth\Server\ResourceServerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
