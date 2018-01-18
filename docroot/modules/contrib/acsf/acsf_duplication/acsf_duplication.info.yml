@@ -2,5 +2,11 @@ name: ACSF Duplication
 type: module
 description: 'Helper module for duplicating Acquia Cloud Site Factory sites.'
 package: Acquia Cloud Site Factory
-version: VERSION
-core: 8.x
+# version: VERSION
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2017-12-20
+version: '8.x-1.42'
+core: '8.x'
+project: 'acsf'
+datestamp: 1513772303

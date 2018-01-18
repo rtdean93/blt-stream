@@ -53,7 +53,14 @@ class Wbm2cmCommands extends DrushCommands {
     array_walk($messages, [$out, 'writeln']);
 
     $out->writeln('Installing Content Moderation...');
+    // Module installation or uninstallation modifies the container, and
+    // potentially every service in it. We do not want to be holding on to
+    // outdated services and their implict dependency trees.
     $this->moduleInstaller->uninstall(['workbench_moderation']);
+    if (\Drupal::hasContainer()) {
+      $this->controller = $this->reloadService($this->controller);
+      $this->moduleInstaller = $this->reloadService($this->moduleInstaller);
+    }
     $this->moduleInstaller->install(['content_moderation']);
 
     $out->writeln('Restoring moderation states from temporary tables...');
@@ -61,6 +68,10 @@ class Wbm2cmCommands extends DrushCommands {
     array_walk($messages, [$out, 'writeln']);
 
     $out->writeln('Yay! You have been migrated to Content Moderation.');
+  }
+
+  protected function reloadService($service) {
+    return \Drupal::service($service->_serviceId);
   }
 
 }

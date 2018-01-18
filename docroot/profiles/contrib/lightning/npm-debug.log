@@ -8,7 +8,7 @@
 4 verbose stack Error: ENOENT: no such file or directory, open '/Users/nik/sandbox/engineering/sf-lightning/docroot/profiles/contrib/lightning/package.json'
 4 verbose stack     at Error (native)
 5 verbose cwd /Users/nik/sandbox/engineering/sf-lightning/docroot/profiles/contrib/lightning
-6 error Darwin 15.6.0
+6 error Darwin 17.3.0
 7 error argv "/Users/nik/.nvm/versions/node/v4.4.1/bin/node" "/Users/nik/.nvm/versions/node/v4.4.1/bin/npm" "run" "install-libraries"
 8 error node v4.4.1
 9 error npm  v2.14.20
