@@ -35,7 +35,7 @@ class OneLogin_Saml2_IdPMetadataParser
 
             $xml = curl_exec($ch);
             if ($xml !== false) {
-                $metadataInfo = self::parseXML($xml, $entityId, $desiredSSOBinding, $desiredSLOBinding);
+                $metadataInfo = self::parseXML($xml, $entityId, $desiredNameIdFormat, $desiredSSOBinding, $desiredSLOBinding);
             } else {
                 throw new Exception(curl_error($ch), curl_errno($ch));
             }
@@ -65,7 +65,7 @@ class OneLogin_Saml2_IdPMetadataParser
         try {
             if (file_exists($filepath)) {
                 $data = file_get_contents($filepath);
-                $metadataInfo = self::parseXML($data, $entityId, $desiredSSOBinding, $desiredSLOBinding);
+                $metadataInfo = self::parseXML($data, $entityId, $desiredNameIdFormat, $desiredSSOBinding, $desiredSLOBinding);
             }
         } catch (Exception $e) {
         }
@@ -161,8 +161,8 @@ class OneLogin_Saml2_IdPMetadataParser
                     }
 
                     $idpCertdata = $metadataInfo['idp']['x509certMulti'];
-                    if (count($idpCertdata) == 1 and
-                        ((isset($idpCertdata['signing']) and count($idpCertdata['signing']) == 1) or (isset($idpCertdata['encryption']) and count($idpCertdata['encryption']) == 1)) or
+                    if ((count($idpCertdata) == 1 and
+                        ((isset($idpCertdata['signing']) and count($idpCertdata['signing']) == 1) or (isset($idpCertdata['encryption']) and count($idpCertdata['encryption']) == 1))) or
                         ((isset($idpCertdata['signing']) && count($idpCertdata['signing']) == 1) && isset($idpCertdata['encryption']) && count($idpCertdata['encryption']) == 1 && strcmp($idpCertdata['signing'][0], $idpCertdata['encryption'][0]) == 0)) {
                         if (isset($metadataInfo['idp']['x509certMulti']['signing'][0])) {
                             $metadataInfo['idp']['x509cert'] = $metadataInfo['idp']['x509certMulti']['signing'][0];

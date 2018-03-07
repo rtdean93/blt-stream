@@ -10,11 +10,12 @@ use Drupal\jsonapi\Normalizer\ConfigEntityNormalizer;
 use Drupal\jsonapi\LinkManager\LinkManager;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @coversDefaultClass \Drupal\jsonapi\Normalizer\ConfigEntityNormalizer
  * @group jsonapi
+ *
+ * @internal
  */
 class ConfigEntityNormalizerTest extends UnitTestCase {
 
@@ -73,10 +74,13 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
         ['ipsum' => 'dolor', 'ra' => 'foo'],
         ['ipsum' => 'dolor', 'ra' => 'foo'],
       ],
-      [['ipsum' => 'dolor'], 'dolor'],
+      [
+        ['ipsum' => 'dolor'],
+        ['ipsum' => 'dolor'],
+      ],
       [
         ['lorem' => ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']]],
-        ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']],
+        ['lorem' => ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']]],
       ],
     ];
   }

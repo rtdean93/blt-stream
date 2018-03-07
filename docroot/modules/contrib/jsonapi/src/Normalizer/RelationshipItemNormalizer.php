@@ -2,18 +2,17 @@
 
 namespace Drupal\jsonapi\Normalizer;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\jsonapi\Normalizer\Value\RelationshipItemNormalizerValue;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\jsonapi\Controller\EntityResource;
-use Drupal\serialization\EntityResolver\UuidReferenceInterface;
 
 /**
  * Converts the Drupal entity reference item object to a JSON API structure.
  *
  * @todo Remove the dependency on \Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer
+ *
+ * @internal
  */
 class RelationshipItemNormalizer extends FieldItemNormalizer {
 

@@ -66,6 +66,12 @@ if (!function_exists('gardens_site_data_load_file')) {
   require_once dirname(__FILE__) . '/g/sites.inc';
 }
 
+// Prevents to run further if the sites.json file doesn't exists.
+// This step also tries to prevent errors on a none acsf environment.
+if (empty($_ENV['AH_SITE_GROUP']) || empty($_ENV['AH_SITE_ENVIRONMENT']) || !function_exists('gardens_site_data_get_filepath') || !file_exists(gardens_site_data_get_filepath())) {
+  return;
+}
+
 // Drush site-install gets confused about the uri when we specify the
 // --sites-subdir option. The HTTP_HOST is set incorrectly and we can't
 // find it in the sites.json. By specifying the --acsf-install-uri option

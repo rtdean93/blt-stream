@@ -51,7 +51,7 @@ class RequestHandler implements ContainerAwareInterface, ContainerInjectionInter
 
     // Deserialize incoming data if available.
     /* @var \Symfony\Component\Serializer\SerializerInterface $serializer */
-    $serializer = $this->container->get('serializer');
+    $serializer = $this->container->get('jsonapi.serializer_do_not_use_removal_imminent');
     /* @var \Drupal\jsonapi\Context\CurrentContext $current_context */
     $current_context = $this->container->get('jsonapi.current_context');
     $current_context->reset();
@@ -88,6 +88,7 @@ class RequestHandler implements ContainerAwareInterface, ContainerInjectionInter
       ->executeInRenderContext($context, function () use ($resource, $action, $parameters, $extra_parameters) {
         return call_user_func_array([$resource, $action], array_merge($parameters, $extra_parameters));
       });
+    $response->getCacheableMetadata()->addCacheContexts(static::$requiredCacheContexts);
     if (!$context->isEmpty()) {
       $response->addCacheableDependency($context->pop());
     }
@@ -115,11 +116,10 @@ class RequestHandler implements ContainerAwareInterface, ContainerInjectionInter
     if (empty($received) || $request->isMethodCacheable()) {
       return NULL;
     }
-    $format = $request->getContentType();
     $resource_type = $current_context->getResourceType();
     $field_related = $resource_type->getInternalName($request->get('related'));
     try {
-      return $serializer->deserialize($received, $serialization_class, $format, [
+      return $serializer->deserialize($received, $serialization_class, 'api_json', [
         'related' => $field_related,
         'target_entity' => $request->get($current_context->getResourceType()->getEntityTypeId()),
         'resource_type' => $resource_type,

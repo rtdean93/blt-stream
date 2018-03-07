@@ -5,13 +5,14 @@ namespace Drupal\Tests\jsonapi\Kernel\Normalizer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Query\Sort;
-use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\jsonapi\Normalizer\SortNormalizer
  * @group jsonapi
  * @group jsonapi_normalizers
  * @group legacy
+ *
+ * @internal
  */
 class SortNormalizerTest extends KernelTestBase {
 

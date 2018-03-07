@@ -26,7 +26,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @see \Drupal\rest\EventSubscriber\ResourceResponseSubscriber
  * @internal
  *
- * This is 99% identical to \Drupal\rest\EventSubscriber\ResourceResponseSubscriber
+ * This is 99% identical to:
+ *
+ * \Drupal\rest\EventSubscriber\ResourceResponseSubscriber
+ *
  * but with a few differences:
  * 1. It has the @jsonapi.serializer service injected instead of @serializer
  * 2. It has the @current_route_match service no longer injected
@@ -66,7 +69,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    *
    * This property will only be set if the validator library is available.
    *
-   * @var \JsonSchema\Validator|NULL
+   * @var \JsonSchema\Validator|null
    */
   protected $validator;
 
@@ -75,7 +78,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    *
    * This property will only be set if the schemata module is installed.
    *
-   * @var \Drupal\schemata\SchemaFactory|NULL
+   * @var \Drupal\schemata\SchemaFactory|null
    */
   protected $schemaFactory;
 
@@ -119,7 +122,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    // Run before \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber.
+    // This needs to be run before the dynamic_page_cache subscriber.
     $events[KernelEvents::RESPONSE][] = ['onResponse', 110];
     return $events;
   }
@@ -139,7 +142,8 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * Injects the schema factory.
    *
-   * @param \Drupal\schemata\SchemaFactory
+   * @param \Drupal\schemata\SchemaFactory $schema_factory
+   *   The schema factory service.
    */
   public function setSchemaFactory(SchemaFactory $schema_factory) {
     $this->schemaFactory = $schema_factory;
@@ -160,7 +164,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
     $request = $event->getRequest();
     $format = 'api_json';
     $this->renderResponseBody($request, $response, $this->serializer, $format);
-    $event->setResponse($this->flattenResponse($response));
+    $event->setResponse($this->flattenResponse($response, $request));
 
     $this->doValidateResponse($response, $request);
   }
@@ -235,12 +239,14 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\jsonapi\ResourceResponse $response
    *   A fully rendered resource response.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request for which this response is generated.
    *
    * @return \Drupal\Core\Cache\CacheableResponse|\Symfony\Component\HttpFoundation\Response
    *   The flattened response.
    */
-  protected function flattenResponse(ResourceResponse $response) {
-    $final_response = ($response instanceof CacheableResponseInterface) ? new CacheableResponse() : new Response();
+  protected static function flattenResponse(ResourceResponse $response, Request $request) {
+    $final_response = ($response instanceof CacheableResponseInterface && $request->isMethodCacheable()) ? new CacheableResponse() : new Response();
     $final_response->setContent($response->getContent());
     $final_response->setStatusCode($response->getStatusCode());
     $final_response->setProtocolVersion($response->getProtocolVersion());
@@ -280,7 +286,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
       'file://%s/schema.json',
       implode('/', [
         $this->appRoot,
-        $this->moduleHandler->getModule('jsonapi')->getPath()
+        $this->moduleHandler->getModule('jsonapi')->getPath(),
       ])
     );
     $generic_jsonapi_schema = (object) ['$ref' => $schema_ref];

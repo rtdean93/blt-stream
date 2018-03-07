@@ -727,7 +727,7 @@ class OneLogin_Saml2_Utils
 
         /* Parse the duration. We use a very strict pattern. */
         $durationRegEx = '#^(-?)P(?:(?:(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?)|(?:(\\d+)W))$#D';
-        $matches = [];
+        $matches = array();
         if (!preg_match($durationRegEx, $duration, $matches)) {
             throw new Exception('Invalid ISO 8601 duration: ' . $duration);
         }
@@ -894,27 +894,30 @@ class OneLogin_Saml2_Utils
     {
         assert('is_string($x509cert)');
 
-        $lines = explode("\n", $x509cert);
-
+        $arCert = explode("\n", $x509cert);
         $data = '';
+        $inData = false;
 
-        foreach ($lines as $line) {
-            /* Remove '\r' from end of line if present. */
-            $line = rtrim($line);
-            if ($line === '-----BEGIN CERTIFICATE-----') {
-                /* Delete junk from before the certificate. */
-                $data = '';
-            } elseif ($line === '-----END CERTIFICATE-----') {
-                /* Ignore data after the certificate. */
-                break;
-            } elseif ($line === '-----BEGIN PUBLIC KEY-----' || $line === '-----BEGIN RSA PRIVATE KEY-----') {
-                /* This isn't an X509 certificate. */
-                return null;
+        foreach ($arCert as $curData) {
+            if (! $inData) {
+                if (strncmp($curData, '-----BEGIN CERTIFICATE', 22) == 0) {
+                    $inData = true;
+                } elseif ((strncmp($curData, '-----BEGIN PUBLIC KEY', 21) == 0) || (strncmp($curData, '-----BEGIN RSA PRIVATE KEY', 26) == 0)) {
+                    /* This isn't an X509 certificate. */
+                    return null;
+                }
             } else {
-                /* Append the current line to the certificate data. */
-                $data .= $line;
+                if (strncmp($curData, '-----END CERTIFICATE', 20) == 0) {
+                    break;
+                }
+                $data .= trim($curData);
             }
         }
+
+        if (empty($data)) {
+            return null;
+        }
+
         $decodedData = base64_decode($data);
 
         switch ($alg) {
@@ -1185,6 +1188,11 @@ class OneLogin_Saml2_Utils
         if ($key->type === $algorithm) {
             return $key;
         }
+
+        if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($algorithm)) {
+            throw new \Exception('Unsupported signing algorithm.');
+        }
+
         $keyInfo = openssl_pkey_get_details($key->key);
         if ($keyInfo === false) {
             throw new Exception('Unable to get key details from XMLSecurityKey.');
@@ -1195,6 +1203,20 @@ class OneLogin_Saml2_Utils
         $newKey = new XMLSecurityKey($algorithm, array('type'=>$type));
         $newKey->loadKey($keyInfo['key']);
         return $newKey;
+    }
+
+    public static function isSupportedSigningAlgorithm($algorithm)
+    {
+        return in_array(
+            $algorithm,
+            array(
+                XMLSecurityKey::RSA_1_5,
+                XMLSecurityKey::RSA_SHA1,
+                XMLSecurityKey::RSA_SHA256,
+                XMLSecurityKey::RSA_SHA384,
+                XMLSecurityKey::RSA_SHA512
+            )
+        );
     }
 
     /**
@@ -1306,6 +1328,10 @@ class OneLogin_Saml2_Utils
         $objKey = $objXMLSecDSig->locateKey();
         if (!$objKey) {
             throw new Exception('We have no idea about the key');
+        }
+
+        if (!OneLogin_Saml2_Utils::isSupportedSigningAlgorithm($objKey->type)) {
+            throw new \Exception('Unsupported signing algorithm.');
         }
 
         $objXMLSecDSig->canonicalizeSignedInfo();

@@ -354,13 +354,6 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
     );
 
     public static $prefixesPsr0 = array (
-        'p' => 
-        array (
-            'phpDocumentor' => 
-            array (
-                0 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
-            ),
-        ),
         'T' => 
         array (
             'Twig_' => 
