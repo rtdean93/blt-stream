@@ -97,10 +97,15 @@ class ResponsiveImageStyleTest extends ResourceTestBase {
         'attributes' => [
           'breakpoint_group' => 'test_group',
           'dependencies' => [
-            'config' => [
-              'image.style.large',
-              'image.style.medium',
-            ],
+            // @todo Remove this first 2 lines in favor of the 4 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'image.style.large',
+            'image.style.medium',
+//            'config' => [
+//              'image.style.large',
+//              'image.style.medium',
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'fallback_image_style' => 'fallback',
           'id' => 'camelids',

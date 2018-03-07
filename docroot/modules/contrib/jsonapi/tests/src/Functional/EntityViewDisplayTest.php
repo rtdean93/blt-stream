@@ -91,10 +91,15 @@ class EntityViewDisplayTest extends ResourceTestBase {
         'attributes' => [
           'bundle' => 'camelids',
           'content' => [
-            'links' => [
-              'region' => 'content',
-              'weight' => 100,
-            ],
+            // @todo Remove the first 2 lines in favor of the 4 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'region' => 'content',
+            'weight' => 100,
+//            'links' => [
+//              'region' => 'content',
+//              'weight' => 100,
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'dependencies' => [
             'config' => [

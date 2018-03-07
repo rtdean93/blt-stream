@@ -103,22 +103,37 @@ class TourTest extends ResourceTestBase {
           'langcode' => 'en',
           'module' => 'tour',
           'routes' => [
-            [
-              'route_name' => '<front>',
-            ],
+            // @todo Remove the first line in favor of the 3 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'route_name' => '<front>',
+//            [
+//              'route_name' => '<front>',
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'status' => TRUE,
           'tips' => [
-            'tour-llama-1' => [
-              'id' => 'tour-llama-1',
-              'plugin' => 'text',
-              'label' => 'Llama',
-              'body' => 'Who handle the awesomeness of llamas?',
-              'weight' => 100,
-              'attributes' => [
-                'data-id' => 'tour-llama-1',
-              ],
+            // @todo Remove the first 8 lines in favor of the 10 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'id' => 'tour-llama-1',
+            'plugin' => 'text',
+            'label' => 'Llama',
+            'body' => 'Who handle the awesomeness of llamas?',
+            'weight' => 100,
+            'attributes' => [
+              'data-id' => 'tour-llama-1',
             ],
+//            'tour-llama-1' => [
+//              'id' => 'tour-llama-1',
+//              'plugin' => 'text',
+//              'label' => 'Llama',
+//              'body' => 'Who handle the awesomeness of llamas?',
+//              'weight' => 100,
+//              'attributes' => [
+//                'data-id' => 'tour-llama-1',
+//              ],
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'uuid' => $this->entity->uuid(),
         ],

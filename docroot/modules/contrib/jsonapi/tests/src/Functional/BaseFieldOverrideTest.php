@@ -90,9 +90,13 @@ class BaseFieldOverrideTest extends ResourceTestBase {
           'default_value' => [],
           'default_value_callback' => '',
           'dependencies' => [
-            'config' => [
-              'node.type.camelids',
-            ],
+            // @todo Remove this first line in favor of the 3 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'node.type.camelids',
+//            'config' => [
+//              'node.type.camelids',
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'description' => '',
           'entity_type' => 'node',

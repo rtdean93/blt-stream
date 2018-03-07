@@ -74,13 +74,10 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
         ['ipsum' => 'dolor', 'ra' => 'foo'],
         ['ipsum' => 'dolor', 'ra' => 'foo'],
       ],
-      [
-        ['ipsum' => 'dolor'],
-        ['ipsum' => 'dolor'],
-      ],
+      [['ipsum' => 'dolor'], 'dolor'],
       [
         ['lorem' => ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']]],
-        ['lorem' => ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']]],
+        ['ipsum' => ['dolor' => 'sid', 'amet' => 'ra']],
       ],
     ];
   }

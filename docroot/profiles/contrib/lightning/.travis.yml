@@ -13,10 +13,10 @@ php:
   - 7.0.22
 env:
   - VERSION=HEAD
-  - VERSION=2.2.4
-  - VERSION=2.2.3
-  - VERSION=2.2.2
-  - VERSION=2.2.1
+  - VERSION=3.0.3
+  - VERSION=3.0.2
+  - VERSION=3.0.1
+  - VERSION=3.0.0
 
 addons:
   apt:
@@ -53,7 +53,7 @@ before_install:
 install:
   # Add Composer's local bin directory to the PATH so that we will be running
   # our installed versions of Drush, PHPCS, Behat, PhantomJS, etc.
-  - export PATH="$HOME/.composer/vendor/bin:$TRAVIS_BUILD_DIR/bin:$PATH"
+  - export PATH="$HOME/.composer/vendor/bin:$TRAVIS_BUILD_DIR/vendor/bin:$PATH"
 
   # composer install should fail on bad patches.
   - export COMPOSER_EXIT_ON_PATCH_FAILURE=1
@@ -70,26 +70,25 @@ install:
   - phpenv config-add drupal.php.ini
   - phpenv rehash
 
-  # We need Phing to execute our build steps.
-  - composer global require phing/phing
-  # Build the Lightning code base.
-  - composer install
+  # Build the Lightning code base with the latest dependencies.
+  - composer update
   # Install Lightning cleanly so that settings.php will be created properly.
-  - phing install -Ddb.database=drupal -Ddb.user=lightning -Ddb.password=lightning -Ddb.host=127.0.0.1 -Durl=http://127.0.0.1:8080
+  - lightning install 'mysql\://lightning:lightning@127.0.0.1/drupal' lightning 'http://127.0.0.1:8080'
   # Restore and update from the previous version.
-  - robo update $VERSION
+  - lightning update $VERSION
 
 before_script:
   - drush runserver --default-server=builtin 8080 &>/dev/null &
   - jdk_switcher use oraclejdk8
   - sleep 5
+  - selenium-server-standalone -port 4444 -log selenium.log &
 
 script:
   - composer validate composer.json --no-check-all --ansi --no-interaction
   - cd docroot
-  - phpunit --configuration ./core --group lightning
+  - phpunit --configuration ./core --group lightning,profiles
   - cd ..
-  - bin/robo test:behat -- --stop-on-failure
+  - behat --config .behat.yml --stop-on-failure
 
 after_failure:
   - cd docroot

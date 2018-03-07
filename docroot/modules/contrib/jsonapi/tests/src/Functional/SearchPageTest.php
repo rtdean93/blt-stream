@@ -90,12 +90,19 @@ class SearchPageTest extends ResourceTestBase {
         ],
         'attributes' => [
           'configuration' => [
-            'rankings' => [],
+            // @todo Uncomment this line in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+//            'rankings' => [],
+            // @codingStandardsIgnoreEnd
           ],
           'dependencies' => [
-            'module' => [
-              'node',
-            ],
+            // @todo Remove the first line in favor of the 3 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'node',
+//            'module' => [
+//              'node'
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'id' => 'hinode_search',
           'label' => 'Search of magnetic activity of the Sun',

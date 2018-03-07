@@ -31,17 +31,15 @@ services:
     tags:
       - { name: drupal.command }
 
-  lightning.command.update:
-    class: '\Drupal\lightning\Command\UpdateCommand'
-    arguments:
-      - '@class_resolver'
-      - '@container.namespaces'
-      - '@config.factory'
-    tags:
-      - { name: drupal.command }
-
   lightning.subprofile_generator:
     class: '\Drupal\lightning\Generator\SubProfileGenerator'
     arguments: []
     tags:
       - { name: drupal.generator }
+
+  lightning.version_command:
+    class: 'Drupal\lightning\Command\VersionCommand'
+    arguments:
+      - '@app.root'
+    tags:
+      - { name: drupal.command }

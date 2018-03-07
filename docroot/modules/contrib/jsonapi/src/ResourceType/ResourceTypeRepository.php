@@ -73,13 +73,6 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     $this->entityFieldManager = $entity_field_manager;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPathPrefix() {
-    return 'jsonapi';
-  }
-
   // @codingStandardsIgnoreStart
   // @todo implement \Drupal\Core\Plugin\CachedDiscoveryClearerInterface?
   // @todo implement \Drupal\Component\Plugin\Discovery\DiscoveryInterface?

@@ -80,8 +80,7 @@ class Routes implements ContainerInjectionInterface {
   public function entryPoint() {
     $collection = new RouteCollection();
 
-    $path_prefix = $this->resourceTypeRepository->getPathPrefix();
-    $route_collection = (new Route('/' . $path_prefix, [
+    $route_collection = (new Route('/jsonapi', [
       RouteObjectInterface::CONTROLLER_NAME => '\Drupal\jsonapi\Controller\EntryPoint::index',
     ]))
       ->setRequirement('_permission', 'access jsonapi resource list')
@@ -105,9 +104,7 @@ class Routes implements ContainerInjectionInterface {
         continue;
       }
 
-      $path_prefix = $this->resourceTypeRepository->getPathPrefix();
-      $resource_path = $resource_type->getPath();
-      $route_base_path = sprintf('/%s/%s', $path_prefix, $resource_path);
+      $route_base_path = sprintf('/jsonapi/%s/%s', $resource_type->getEntityTypeId(), $resource_type->getBundle());
       $build_route_name = function ($key) use ($resource_type) {
         return sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $key);
       };

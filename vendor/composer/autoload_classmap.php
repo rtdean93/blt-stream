@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Acquia\\Lightning\\ScriptHandler' => $baseDir . '/scripts/ScriptHandler.php',
+    'AwaitTrait' => $baseDir . '/docroot/modules/contrib/lightning_core/tests/contexts/AwaitTrait.inc',
     'Console_Table' => $vendorDir . '/pear/console_table/Table.php',
     'Drupal' => $baseDir . '/docroot/core/lib/Drupal.php',
     'Drupal\\Component\\Utility\\Timer' => $baseDir . '/docroot/core/lib/Drupal/Component/Utility/Timer.php',

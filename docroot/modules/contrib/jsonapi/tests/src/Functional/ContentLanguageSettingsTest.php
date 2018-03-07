@@ -90,9 +90,13 @@ class ContentLanguageSettingsTest extends ResourceTestBase {
         'attributes' => [
           'default_langcode' => 'site_default',
           'dependencies' => [
-            'config' => [
-              'node.type.camelids',
-            ],
+            // @todo Remove this first line in favor of the 3 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'node.type.camelids',
+//            'config' => [
+//              'node.type.camelids',
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'id' => 'node.camelids',
           'langcode' => 'en',

@@ -19,7 +19,7 @@
     "require": {
         "composer/installers": "^1.0",
         "drupal-composer/drupal-scaffold": "^2.0.0",
-        "cweagans/composer-patches": "1.5.0",
+        "cweagans/composer-patches": "^1.6.4",
         "acquia/lightning": "~3.0",
         "drupal/externalauth": "1.x-dev",
         "drupal/samlauth": "~2.0",

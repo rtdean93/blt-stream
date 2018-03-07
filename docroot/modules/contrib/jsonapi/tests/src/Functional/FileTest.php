@@ -141,12 +141,15 @@ class FileTest extends ResourceTestBase {
           'filesize' => (int) $this->entity->getSize(),
           'langcode' => 'en',
           'status' => TRUE,
-          // @todo Decide what to do with this in https://www.drupal.org/project/jsonapi/issues/2926463
+          // @todo Remove the first 2 lines with the 4 commented lines in https://www.drupal.org/project/jsonapi/issues/2926463
+          // @codingStandardsIgnoreStart
           'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
-          'uri' => [
-            'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
-            'value' => 'public://drupal.txt',
-          ],
+          'uri' => 'public://drupal.txt',
+//          'uri' => [
+//            'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
+//            'value' => 'public://drupal.txt',
+//          ],
+          // @codingStandardsIgnoreEnd
           'uuid' => $this->entity->uuid(),
         ],
         'relationships' => [

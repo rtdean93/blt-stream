@@ -3,7 +3,7 @@
 namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\jsonapi\Normalizer\Value\ConfigFieldItemNormalizerValue;
+use Drupal\jsonapi\Normalizer\Value\FieldItemNormalizerValue;
 use Drupal\jsonapi\Normalizer\Value\FieldNormalizerValue;
 use Drupal\jsonapi\ResourceType\ResourceType;
 
@@ -26,7 +26,7 @@ class ConfigEntityNormalizer extends EntityNormalizer {
    */
   protected function getFields($entity, $bundle, ResourceType $resource_type) {
     $enabled_public_fields = [];
-    $fields = static::getDataWithoutInternals($entity->toArray());
+    $fields = $entity->toArray();
     // Filter the array based on the field names.
     $enabled_field_names = array_filter(
       array_keys($fields),
@@ -46,32 +46,15 @@ class ConfigEntityNormalizer extends EntityNormalizer {
    * {@inheritdoc}
    */
   protected function serializeField($field, array $context, $format) {
+    if (!is_array($field)) {
+      $field = [$field];
+    }
     $output = new FieldNormalizerValue(
-      [new ConfigFieldItemNormalizerValue($field)],
+      [new FieldItemNormalizerValue($field)],
       1
     );
     $output->setPropertyType('attributes');
     return $output;
-  }
-
-  /**
-   * Gets the given data without the internal implementation details.
-   *
-   * @param array $data
-   *   The data that is either currently or about to be stored in configuration.
-   *
-   * @return array
-   *   The same data, but without internals. Currently, that is only the '_core'
-   *   key, which is reserved by Drupal core to handle complex edge cases
-   *   correctly. Data in the '_core' key is irrelevant to clients reading
-   *   configuration, and is not allowed to be set by clients writing
-   *   configuration: it is for Drupal core only, and managed by Drupal core.
-   *
-   * @see https://www.drupal.org/node/2653358
-   * @see \Drupal\serialization\Normalizer\ConfigEntityNormalizer::getDataWithoutInternals
-   */
-  protected static function getDataWithoutInternals(array $data) {
-    return array_diff_key($data, ['_core' => TRUE]);
   }
 
 }

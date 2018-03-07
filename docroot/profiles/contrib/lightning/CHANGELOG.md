@@ -1,3 +1,91 @@
+## 3.0.3
+* Lightning API has been updated to rc3 which:
+  * Only sets up developer-specific settings when Lightning's internal developer
+    tools are installed.
+  * The Entity CRUD test no longer tries to write to config entities via the
+    JSON API because it is insecure and unsupported, at least for now.
+* Lightning Core has been updated to rc2 which:
+  * Moves the Behat contexts used for testing into Lightning Core.
+  * Renames the lightning.versions config object to lightning_core.versions.
+* Lightning Media has been updated to rc3 which only sets up developer-specific
+  settings when Lightning's internal developer tools are installed.
+
+## 3.0.2
+* Drupal Core has been security updated to 8.4.5.
+* The `update:lightning` command:
+  * Has been ported to Drush 9.
+  * Reads the previous version from config and, as a result, no longer requires
+    nor accepts the `version` argument.
+  * Usage:
+  
+  ```
+  drush update:lightning
+  # To run all available configuration updates without any prompting, use:
+  drush update:lightning --no-inetraction 
+  ```
+  * Note: Configuration updates from versions of Lightning < 3.0.0 will not be
+    run when using the updated command. You should update to the last available
+    2.2.x release before updating to 3.x.
+* All Lightning components have been updated to RC1 or greater and are no longer
+  pinned to specific releases.
+* Component updates:
+  * Lightning API has updated JSON API to 1.10.0. See Lightning API's CHANGELOG
+    for more information. (Issue #2933279 and SA-CONTRIB-2018-15)
+  * Lightning Layout has fixed a configuration problem that caused an unneeded
+    dependency on the Lightning profile. This means that Lightning Profile is
+    now fully compatible with the
+    [Config Installer](https://www.drupal.org/project/config_installer).
+    (Issue #2933445)
+  * Lightning Media now allows media types to be configured without a Source
+    field. (Issue #2928658)
+  * Lightning Workflow can now be installed without the Views module.
+    (Issue #2938769)
+* Note: This is the last release on the 8.4.x branch of Drupal Core. The next
+  Lightning release will be 3.1.0 and will require core ~8.5.0.
+
+## 3.0.1
+* Drupal Core has been updated to 8.4.4 (Issue #2934239)
+
+## 3.0.0
+* Lightning's components are no longer bundled with the profile. They are now
+  packaged as separate components and located alongside other Drupal modules.
+  (Issue #2925010) 
+* The following unused modules have been removed from the build manifest
+  (Issue #2927527):
+  * Scheduled Updates
+  * Lighting Scheduled Updates
+  * Features
+  * Configuration Update Manager
+  * Media Entity
+  * Media Entity Document
+  * Media Entity Image
+
+## 2.2.6
+* Fixed a problem that caused errors when placing blocks that contained date
+  fields via IPE. (Issue #2825028)
+* Fixed a problem with CKEditor caused by a bug in the new Lightning Scheduler.
+  (Issue #2929997)
+* Lightning and Lightning Project no longer override the default location of
+  Composer's "bin" directory. (Issue #2927504)
+* Made the Moderation History view compatible with Content Moderation.
+  (Issue #2930288)
+* Added a Console command that will return the current version of Lightning in
+  SemVer format. (GitHub #543)
+* Upadated the following modules:
+  * DropzoneJS
+  * Media Entity (Only used by sites that have not migrated to core Media.)
+  * JSON API
+  * Simple OAuth
+  * Video Embed Field
+
+## 2.2.5
+* The `since` option used with the `update:lightning` console command has
+  been converted to an argument and is now required. See
+  "Automated configuration updates" in the UPDATE.md file for more information.
+* Drupal core has been updated to 8.4.3. (Issue #2929035)
+* Security updated Configuration Update Manager module to 8.x-1.5.
+  (SA-CONTRIB-2017-091)
+
 ## 2.2.4
 * Lightning Workflow has been updated to use core Workflows and Content
   moderation modules and existing sites will be migrated. (Issue #2863059)

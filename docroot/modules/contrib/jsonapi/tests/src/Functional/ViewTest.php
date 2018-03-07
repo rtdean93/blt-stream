@@ -83,23 +83,41 @@ class ViewTest extends ResourceTestBase {
           'dependencies' => [],
           'description' => '',
           'display' => [
-            'default' => [
-              'display_plugin' => 'default',
-              'id' => 'default',
-              'display_title' => 'Master',
-              'position' => 0,
-              'display_options' => [
-                'display_extenders' => [],
-              ],
-              'cache_metadata' => [
-                'max-age' => -1,
-                'contexts' => [
-                  'languages:language_interface',
-                  'url.query_args',
-                ],
-                'tags' => [],
-              ],
+            // @todo Remove the first 15 lines in favor of the 17 commented lines in https://www.drupal.org/project/jsonapi/issues/2942979
+            // @codingStandardsIgnoreStart
+            'display_plugin' => 'default',
+            'id' => 'default',
+            'display_title' => 'Master',
+            'position' => 0,
+            'display_options' => [
+              'display_extenders' => [],
             ],
+            'cache_metadata' => [
+              'max-age' => -1,
+              'contexts' => [
+                'languages:language_interface',
+                'url.query_args',
+              ],
+              'tags' => [],
+            ],
+//            'default' => [
+//              'display_plugin' => 'default',
+//              'id' => 'default',
+//              'display_title' => 'Master',
+//              'position' => 0,
+//              'display_options' => [
+//                'display_extenders' => [],
+//              ],
+//              'cache_metadata' => [
+//                'max-age' => -1,
+//                'contexts' => [
+//                  'languages:language_interface',
+//                  'url.query_args',
+//                ],
+//                'tags' => [],
+//              ],
+//            ],
+            // @codingStandardsIgnoreEnd
           ],
           'id' => 'test_rest',
           'label' => 'Test REST',

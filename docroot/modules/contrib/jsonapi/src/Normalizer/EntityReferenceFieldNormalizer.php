@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
-use Drupal\Core\TypedData\TypedDataInternalPropertiesHelper;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\jsonapi\Resource\EntityCollection;
 use Drupal\jsonapi\LinkManager\LinkManager;
@@ -99,10 +98,7 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer implements Denormal
       // Prepare a list of additional properties stored by the field.
       $metadata = [];
       /** @var \Drupal\Core\TypedData\TypedDataInterface[] $properties */
-      // @todo Remove this when JSON API requires Drupal 8.5 or newer.
-      $properties = (floatval(\Drupal::VERSION) < 8.5)
-        ? $item->getProperties()
-        : TypedDataInternalPropertiesHelper::getNonInternalProperties($item);
+      $properties = $item->getProperties();
       foreach ($properties as $property_key => $property) {
         if ($property_key !== $main_property) {
           $metadata[$property_key] = $property->getValue();

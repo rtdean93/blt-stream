@@ -243,14 +243,4 @@ class ResourceType {
       [];
   }
 
-  /**
-   * Get the resource path.
-   *
-   * @return string
-   *   The path to access this resource type. Defaults to entity_type_id/bundle.
-   */
-  public function getPath() {
-    return sprintf('%s/%s', $this->getEntityTypeId(), $this->getBundle());
-  }
-
 }
