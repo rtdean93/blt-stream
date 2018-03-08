@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
 /**

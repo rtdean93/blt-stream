@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Component\Serialization\Json;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;

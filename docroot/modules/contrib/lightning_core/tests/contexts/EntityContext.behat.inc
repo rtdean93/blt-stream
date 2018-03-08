@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Core\Entity\EntityInterface;
@@ -265,7 +267,7 @@ class EntityContext extends DrupalSubContextBase {
       ->elementExists('named', ['link', 'Revisions'])
       ->click();
 
-    $this->getContext('ElementContext')
+    $this->getContext(ElementContext::class)
       ->click("main table tr:nth-child($n) td:first-child a");
   }
 

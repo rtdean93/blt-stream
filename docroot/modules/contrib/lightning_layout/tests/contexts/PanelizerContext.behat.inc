@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;

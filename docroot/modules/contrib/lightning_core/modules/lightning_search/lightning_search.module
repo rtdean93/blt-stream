@@ -129,3 +129,12 @@ function lightning_search_views_data_alter(array &$data) {
   // @TODO: Remove this when #2843724 is fixed.
   $data['search_api_index_content']['rendered']['field']['id'] = 'search_api';
 }
+
+/**
+ * Implements hook_entity_insert().
+ */
+function lightning_search_entity_insert() {
+  if (PHP_SAPI === 'cli') {
+    \Drupal::service('search_api.post_request_indexing')->onKernelTerminate();
+  }
+}

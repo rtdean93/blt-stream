@@ -7,7 +7,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\lightning_core\Annotation\Update;
-use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 
 class UpdateManager {
@@ -48,6 +49,13 @@ class UpdateManager {
   protected $configFactory;
 
   /**
+   * The doc block factory.
+   *
+   * @var \phpDocumentor\Reflection\DocBlockFactoryInterface
+   */
+  protected $docBlockFactory;
+
+  /**
    * UpdateCommand constructor.
    *
    * @param \Traversable $namespaces
@@ -58,11 +66,14 @@ class UpdateManager {
    *   The config factory service.
    * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
    *   (optional) The update discovery handler.
+   * @param \phpDocumentor\Reflection\DocBlockFactoryInterface $doc_block_factory
+   *   (optional) The doc block factory.
    */
-  public function __construct(\Traversable $namespaces, ClassResolverInterface $class_resolver, ConfigFactoryInterface $config_factory, DiscoveryInterface $discovery = NULL) {
+  public function __construct(\Traversable $namespaces, ClassResolverInterface $class_resolver, ConfigFactoryInterface $config_factory, DiscoveryInterface $discovery = NULL, DocBlockFactoryInterface $doc_block_factory = NULL) {
     $this->classResolver = $class_resolver;
     $this->configFactory = $config_factory;
     $this->discovery = $discovery ?: new AnnotatedClassDiscovery('Update', $namespaces, Update::class);
+    $this->docBlockFactory = $doc_block_factory ?: DocBlockFactory::createInstance();
   }
 
   /**
@@ -167,7 +178,7 @@ class UpdateManager {
       $doc_comment = trim($method->getDocComment());
 
       if ($doc_comment) {
-        $doc_block = new DocBlock($doc_comment);
+        $doc_block = $this->docBlockFactory->create($doc_comment);
 
         if ($doc_block->hasTag('update')) {
           yield new UpdateTask($handler, $method, $doc_block);

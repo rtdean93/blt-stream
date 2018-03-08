@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 use Drupal\DrupalExtension\Context\MinkContext;
 
@@ -35,7 +37,7 @@ class MediaBrowserContext extends DrupalSubContextBase {
    */
   public function open($button = 'media_browser') {
     $this
-      ->getContext('CkEditorContext')
+      ->getContext(CkEditorContext::class)
       ->execute('editdrupalentity', NULL, ['id' => $button]);
 
     $this->awaitAjax();
@@ -56,7 +58,7 @@ class MediaBrowserContext extends DrupalSubContextBase {
    */
   public function selectN($n) {
     sleep(5);
-    $this->getContext('EntityBrowserContext')->select($n, 'media_browser');
+    $this->getContext(EntityBrowserContext::class)->select($n, 'media_browser');
   }
 
   /**

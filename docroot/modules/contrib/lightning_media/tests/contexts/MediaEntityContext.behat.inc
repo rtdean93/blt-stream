@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\UnsupportedDriverActionException;
@@ -19,7 +21,7 @@ class MediaEntityContext extends DrupalSubContextBase {
    * @Given media items:
    */
   public function createMultiple(TableNode $table) {
-    $this->getContext('EntityContext')->createMultiple('media', $table);
+    $this->getContext(EntityContext::class)->createMultiple('media', $table);
   }
 
   /**
@@ -57,7 +59,7 @@ class MediaEntityContext extends DrupalSubContextBase {
       'embed_code' => (string) $embed_code,
       'field_media_in_library' => TRUE,
     ]);
-    $this->getContext('EntityContext')->save($media->setPublished());
+    $this->getContext(EntityContext::class)->save($media->setPublished());
   }
 
   /**
@@ -80,8 +82,8 @@ class MediaEntityContext extends DrupalSubContextBase {
   public function randomImage($n = 1, $name = NULL, $alt = NULL) {
     $random = new Random();
 
-    /** @var \EntityContext $context */
-    $context = $this->getContext('EntityContext');
+    /** @var EntityContext $context */
+    $context = $this->getContext(EntityContext::class);
 
     for ($i = 0; $i < $n; $i++) {
       $uri = $random->image(uniqid('public://random_') . '.png', '240x240', '640x480');
@@ -118,8 +120,8 @@ class MediaEntityContext extends DrupalSubContextBase {
   public function randomDocument($n = 1) {
     $random = new Random();
 
-    /** @var \EntityContext $context */
-    $context = $this->getContext('EntityContext');
+    /** @var EntityContext $context */
+    $context = $this->getContext(EntityContext::class);
 
     for ($i = 0; $i < $n; $i++) {
       $uri = uniqid('public://random_') . '.txt';

@@ -9,18 +9,23 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
-        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'fbeead2280a8f3911a1fe6dd034f7d5e' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvancedInterface.php',
         '96f8d8288528d52059397cad6ec61f17' => __DIR__ . '/..' . '/mkalkbrenner/php-htmldiff-advanced/src/HtmlDiffAdvanced.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'p' => 
+        array (
+            'phpDocumentor\\Reflection\\' => 25,
+        ),
         'c' => 
         array (
             'cweagans\\Composer\\' => 18,
@@ -47,6 +52,7 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php70\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Symfony\\Component\\Yaml\\' => 23,
@@ -72,6 +78,7 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
             'Psy\\' => 4,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
             'PhpParser\\' => 10,
         ),
         'O' => 
@@ -123,6 +130,12 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
     );
 
     public static $prefixDirsPsr4 = array (
+        'phpDocumentor\\Reflection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+        ),
         'cweagans\\Composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
@@ -158,6 +171,10 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
         'Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/twig/twig/src',
+        ),
+        'Symfony\\Polyfill\\Php70\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php70',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -246,6 +263,10 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
         ),
         'PhpParser\\' => 
         array (
@@ -430,9 +451,12 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
     );
 
     public static $classMap = array (
+        'Acquia\\LightningExtension\\Context\\AwaitTrait' => __DIR__ . '/../..' . '/docroot/modules/contrib/lightning_core/tests/contexts/AwaitTrait.inc',
         'Acquia\\Lightning\\ScriptHandler' => __DIR__ . '/../..' . '/scripts/ScriptHandler.php',
-        'AwaitTrait' => __DIR__ . '/../..' . '/docroot/modules/contrib/lightning_core/tests/contexts/AwaitTrait.inc',
+        'ArithmeticError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ArithmeticError.php',
+        'AssertionError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/AssertionError.php',
         'Console_Table' => __DIR__ . '/..' . '/pear/console_table/Table.php',
+        'DivisionByZeroError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/DivisionByZeroError.php',
         'Drupal' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal.php',
         'Drupal\\Component\\Utility\\Timer' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal/Component/Utility/Timer.php',
         'Drupal\\Component\\Utility\\Unicode' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal/Component/Utility/Unicode.php',
@@ -440,6 +464,7 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
         'Drupal\\Core\\DrupalKernel' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal/Core/DrupalKernel.php',
         'Drupal\\Core\\DrupalKernelInterface' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal/Core/DrupalKernelInterface.php',
         'Drupal\\Core\\Site\\Settings' => __DIR__ . '/../..' . '/docroot/core/lib/Drupal/Core/Site/Settings.php',
+        'Error' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/Error.php',
         'OneLogin_Saml2_Auth' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/Auth.php',
         'OneLogin_Saml2_AuthnRequest' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/AuthnRequest.php',
         'OneLogin_Saml2_Constants' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml2/Constants.php',
@@ -457,7 +482,10 @@ class ComposerStaticInit0abc5e81284bdef57d508cf77a601555
         'OneLogin_Saml_Response' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml/Response.php',
         'OneLogin_Saml_Settings' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml/Settings.php',
         'OneLogin_Saml_XmlSec' => __DIR__ . '/..' . '/onelogin/php-saml/lib/Saml/XmlSec.php',
+        'ParseError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ParseError.php',
+        'SessionUpdateTimestampHandlerInterface' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/SessionUpdateTimestampHandlerInterface.php',
         'TwitterAPIExchange' => __DIR__ . '/..' . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
+        'TypeError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/TypeError.php',
         'XMLSecEnc' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
         'XMLSecurityDSig' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',
         'XMLSecurityKey' => __DIR__ . '/..' . '/onelogin/php-saml/extlib/xmlseclibs/xmlseclibs.php',

@@ -26,11 +26,11 @@
         "cweagans/composer-patches": "^1.6.4",
         "drupal-composer/drupal-scaffold": "^2.0.0",
         "oomphinc/composer-installers-extender": "^1.1",
-        "drupal/lightning_core": "^1.0 || ^2.0",
+        "drupal/lightning_core": "^1.0 || ^2.1",
         "drupal/ctools": "^3.0",
         "drupal/panels": "4.2.0",
         "drupal/panelizer": "4.0.0",
-        "drupal/entity_block": "1.0.0-alpha2"
+        "drupal/entity_block": "^1.0"
     },
     "scripts": {
         "post-install-cmd": [
@@ -71,12 +71,6 @@
             ]
         },
         "patches": {
-            "drupal/entity_block": {
-                "2844068 - Create derivatives for any viewable entity.":
-                "https://www.drupal.org/files/issues/entity_block-view-builder-class.patch",
-                "2846004 - Entity Block does not perform any access control":
-                "https://www.drupal.org/files/issues/2846004-2.patch"
-            },
             "drupal/panels": {
                 "2878684 - Use String.match to correlate regions when switching Layouts in Panels IPE":
                 "https://www.drupal.org/files/issues/panels-ipe-2878684-3.patch",

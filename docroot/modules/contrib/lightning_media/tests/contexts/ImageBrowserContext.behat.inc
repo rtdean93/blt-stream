@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 
 class ImageBrowserContext extends DrupalSubContextBase {
@@ -15,8 +17,8 @@ class ImageBrowserContext extends DrupalSubContextBase {
    * @When I open the :field image browser
    */
   public function open($field) {
-    /** @var \ElementContext $context */
-    $context = $this->getContext('ElementContext');
+    /** @var ElementContext $context */
+    $context = $this->getContext(ElementContext::class);
 
     $context->assertDetails($field)->pressButton('Select Image(s)');
     $this->awaitAjax();

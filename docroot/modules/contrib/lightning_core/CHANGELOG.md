@@ -1,3 +1,10 @@
+## 2.1.0
+* Behat contexts used for testing were moved into the
+  `Acquia\LightningExtension\Context` namespace.
+
+## 2.0.0
+* Updated core to 8.5.x.
+
 ## 1.0.0-rc3
 * Fixed a problem in the 8006 update that caused problems for users that had an
   existing `lightning.versions` config object.
@@ -14,4 +21,4 @@
   with the `update:lightning` command. 
 
 ## 1.0.0-alpha3
-* Update to core 8.4.4
+* Updated core to 8.4.4.

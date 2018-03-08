@@ -1,3 +1,7 @@
+## 1.1.0
+* Behat contexts used for testing were moved into the
+  `Acquia\LightningExtension\Context` namespace.
+
 ## 1.0.0
 * No changes since last release.
 

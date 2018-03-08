@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/reflection-docblock/src', $vendorDir . '/phpdocumentor/type-resolver/src'),
     'cweagans\\Composer\\' => array($vendorDir . '/cweagans/composer-patches/src'),
     'Zend\\Stdlib\\' => array($vendorDir . '/zendframework/zend-stdlib/src'),
     'Zend\\Feed\\' => array($vendorDir . '/zendframework/zend-feed/src'),
@@ -15,6 +16,7 @@ return array(
     'Webmozart\\PathUtil\\' => array($vendorDir . '/webmozart/path-util/src'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
     'Twig\\' => array($vendorDir . '/twig/twig/src'),
+    'Symfony\\Polyfill\\Php70\\' => array($vendorDir . '/symfony/polyfill-php70'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Iconv\\' => array($vendorDir . '/symfony/polyfill-iconv'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
@@ -37,6 +39,7 @@ return array(
     'Psy\\' => array($vendorDir . '/psy/psysh/src/Psy'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'OomphInc\\ComposerInstallersExtender\\' => array($vendorDir . '/oomphinc/composer-installers-extender/src'),
     'Masterminds\\' => array($vendorDir . '/masterminds/html5/src'),

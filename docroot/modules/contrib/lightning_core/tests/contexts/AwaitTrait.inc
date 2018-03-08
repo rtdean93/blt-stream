@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Drupal\DrupalExtension\Context\MinkContext;
 

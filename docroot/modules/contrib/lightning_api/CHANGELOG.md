@@ -1,3 +1,7 @@
+## 2.0.0
+* Updated JSON API to 1.12.
+* Updated core to 8.5.x and patched Simple OAuth to make it compatible.
+
 ## 1.0.0-rc3
 * Lightning API will only set up developer-specific settings when our internal
   developer tools are installed.

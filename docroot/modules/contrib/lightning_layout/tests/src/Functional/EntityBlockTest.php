@@ -46,6 +46,9 @@ class EntityBlockTest extends BrowserTestBase {
     }
   }
 
+  /**
+   * Tests that entity blocks do proper access control.
+   */
   public function testAccessControl() {
     $node_type = $this->drupalCreateContentType();
 
@@ -65,8 +68,7 @@ class EntityBlockTest extends BrowserTestBase {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access content']);
 
     // The node is unpublished, so the anonymous user cannot access the block.
-    $access = $block->getPlugin()->access($account);
-    $this->assertFalse($access);
+    $this->assertEmpty($block->getPlugin()->build());
 
     // Publish the node, reset static caches, and ensure that the anonymous
     // user can now access the block.
@@ -77,8 +79,7 @@ class EntityBlockTest extends BrowserTestBase {
     $entity_type_manager->getStorage('node')->resetCache();
     $entity_type_manager->getAccessControlHandler('node')->resetCache();
 
-    $access = $block->getPlugin()->access($account);
-    $this->assertTrue($access);
+    $this->assertNotEmpty($block->getPlugin()->build());
   }
 
 }

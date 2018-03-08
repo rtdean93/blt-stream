@@ -1,5 +1,7 @@
 <?php
 
+namespace Acquia\LightningExtension\Context;
+
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Exception\ElementNotFoundException;

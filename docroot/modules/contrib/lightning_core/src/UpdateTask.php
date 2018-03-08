@@ -47,7 +47,7 @@ class UpdateTask {
   /**
    * Asks for confirmation before executing the task.
    *
-   * @param \Symfony\Component\Console\Style\StyleInterface $out
+   * @param \Symfony\Component\Console\Style\StyleInterface $io
    *   The output style.
    *
    * @return bool
@@ -56,9 +56,8 @@ class UpdateTask {
   protected function confirm(StyleInterface $io) {
     if ($this->docBlock->hasTag('ask')) {
       $tags = $this->docBlock->getTagsByName('ask');
-      $tag = reset($tags);
 
-      return $io->confirm($tag->getContent());
+      return $io->confirm(reset($tags)->getDescription());
     }
     return TRUE;
   }
