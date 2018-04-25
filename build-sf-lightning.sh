@@ -32,7 +32,7 @@ EOF
 
 check_drush_version () {
   DRUSH_VERSION=`$DRUSH_PATH/drush --version --pipe`
-  if ! [[ $DRUSH_VERSION =~ ^[8]\.[0-9].+$ ]]; then
+  if ! [[ $DRUSH_VERSION =~ [8]\.[0-9].+$ ]]; then
   echo "You must be running drush 8 for d8 to work"
   exit 1
   fi
