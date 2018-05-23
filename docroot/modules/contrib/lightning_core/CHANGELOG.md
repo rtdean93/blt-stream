@@ -1,3 +1,7 @@
+## 2.6.0
+* Added a Drush 9 command hook which will clear all cached plugin definitions before
+  database updates begin. (GitHub #55)
+
 ## 2.5.0
 * Security updated Drupal core to 8.5.3.
 
