@@ -1,6 +1,3 @@
-## 2.3.0
-No changes since last release.
-
 ## 2.2.0
 * Updated to Video Embed Field 2.0.
 
