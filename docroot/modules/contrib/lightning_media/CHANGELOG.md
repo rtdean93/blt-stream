@@ -1,6 +1,3 @@
-## 2.2.0
-* Updated to Video Embed Field 2.0.
-
 ## 2.1.0
 * Behat contexts used for testing were moved into the
   `Acquia\LightningExtension\Context` namespace.

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\panels\Unit;
 
 use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\panels\Plugin\DisplayBuilder\StandardDisplayBuilder;
@@ -30,9 +29,7 @@ class StandardDisplayBuilderTest extends UnitTestCase {
       ->reveal();
     $account = $this->prophesize(AccountInterface::class)
       ->reveal();
-    $module_handler = $this->prophesize(ModuleHandlerInterface::class)
-      ->reveal();
-    $this->builder = new StandardDisplayBuilder(array(), 'standard', array(), $context_handler, $account, $module_handler);
+    $this->builder = new StandardDisplayBuilder(array(), 'standard', array(), $context_handler, $account);
   }
 
   /**

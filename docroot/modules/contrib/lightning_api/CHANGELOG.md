@@ -1,6 +1,3 @@
-## 2.3.0
-* Updated Simple OAuth to 3.6.
-
 ## 2.2.0
 * Security updated JSON API to 1.16 (SA-CONTRIB-2018-021)
 

@@ -7,7 +7,7 @@ use Drupal\system\Tests\Update\UpdatePathTestBase;
 /**
  * Tests the updating of Layout IDs.
  *
- * @group panelizer
+ * @group Panelizer
  */
 class PanelizerLayoutIDUpdateTest extends UpdatePathTestBase {
 

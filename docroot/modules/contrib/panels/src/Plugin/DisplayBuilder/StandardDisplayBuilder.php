@@ -3,7 +3,6 @@
 namespace Drupal\panels\Plugin\DisplayBuilder;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
@@ -44,13 +43,6 @@ class StandardDisplayBuilder extends DisplayBuilderBase implements PluginWizardI
   protected $account;
 
   /**
-    * The module handler.
-    *
-    * @var \Drupal\Core\Extension\ModuleHandlerInterface
-    */
-   protected $moduleHandler;
-
-  /**
    * Constructs a new PanelsDisplayVariant.
    *
    * @param array $configuration
@@ -63,15 +55,12 @@ class StandardDisplayBuilder extends DisplayBuilderBase implements PluginWizardI
    *   The context handler.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextHandlerInterface $context_handler, AccountInterface $account, ModuleHandlerInterface $module_handler) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextHandlerInterface $context_handler, AccountInterface $account) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->contextHandler = $context_handler;
     $this->account = $account;
-    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -83,8 +72,7 @@ class StandardDisplayBuilder extends DisplayBuilderBase implements PluginWizardI
       $plugin_id,
       $plugin_definition,
       $container->get('context.handler'),
-      $container->get('current_user'),
-      $container->get('module_handler')
+      $container->get('current_user')
     );
   }
 
@@ -133,7 +121,6 @@ class StandardDisplayBuilder extends DisplayBuilderBase implements PluginWizardI
           // allows modules like Quickedit to function.
           // See \Drupal\block\BlockViewBuilder::preRender() for reference.
           $content = $block->build();
-          $this->moduleHandler->alter(['block_build', 'block_build_' . $block->getBaseId()], $content, $block);
           if ($content !== NULL && !Element::isEmpty($content)) {
             foreach (['#attributes', '#contextual_links'] as $property) {
               if (isset($content[$property])) {
@@ -157,7 +144,6 @@ class StandardDisplayBuilder extends DisplayBuilderBase implements PluginWizardI
 
           $block_render_array['content'] = $content;
 
-          $this->moduleHandler->alter(['block_view', 'block_view_' . $block->getBaseId()], $block_render_array, $block);
           $build[$region][$block_id] = $block_render_array;
         }
       }
