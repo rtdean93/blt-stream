@@ -130,18 +130,23 @@ To update Lightning safely:
    Lightning.
 4. Visit ```update.php``` or run ```drush updatedb``` to perform any necessary
    database updates.
-5. Perform any necessary configuration updates (see below).
+5. Perform any necessary configuration updates and/or migrations (see below).
 
-## Configuration updates
+## Update instructions
 
-These instructions describe how to update your site's configuration to bring it
-in line with a newer version of Lightning. Lightning does not make these changes
-automatically, because they may change the way your site works.
+These instructions describe how to update your site to bring it in line with a
+newer version of Lightning. Lightning does not make these changes automatically
+because they may change the way your site works.
 
 However, as of version 3.0.2, Lightning provides a Drush 9 command which *can*
-perform these updates automatically, confirming each change interactively as it
-goes. If you intend to perform all the configuration updates documented here,
-this can save quite a bit of time!
+perform updates automatically, confirming each change interactively as it goes.
+If you intend to perform all the updates documented here, this can save quite
+a bit of time!
+
+That said, though, some of these updates involve complicated data migrations.
+Due to their complexity, Lightning *never* automates them -- you will need to
+take some manual action to complete these updates, which are denoted as such
+below.
 
 ### Automatic configuration updates
 
@@ -165,9 +170,73 @@ are currently running 2.2.0 and are trying to update to 2.2.6, you will need to
 follow the instructions for updating from 2.2.0 to 2.2.1, then from 2.2.1 to
 2.2.2, in that order.
 
+### 3.1.6 to 3.1.7
+* There are no manual update steps for this version.
+
+### 3.1.5 to 3.1.6
+* If you would like to create media items for audio files, enable the new
+  Media Audio module (lightning_media_audio).
+* Rename every instance of the "Save to media library" field (present on all
+  media types by default) to "Show in media library".
+* If you would like to create media items for video files, create a new
+  media type called "Video file", using the "Video file" source. Then, create
+  two new view displays for this media type: one called "Thumbnail", which
+  only displays the media thumbnail using the "Medium" image style, and one
+  called "Embedded", which displays the "Video file" field using the "Video"
+  formatter. Additionally, create a form display for this media type, using
+  the "Media browser" form mode, which displays, in order:
+  1. The "Name" field using the "Text field" widget
+  2. The "Video file" field using the "File" widget
+  3. The "Show in media library" field using the "Single on/off checkbox" widget
+  4. The "Published" field using the "Single on/off checkbox" widget
+* If you would like to be able to change the moderation states of content
+  without having to visit the edit form, install the Moderation Sidebar module.
+* If you'd like to streamline the Editorial workflow, edit it and make the
+  following modifications:
+  1. Rename the "Review" transition to "Send to review".
+  2. Rename the "Restore" transition to "Restore from archive".
+  3. Remove the "Restore to draft" transition, and edit the "Create new draft"
+     transition to allow content to be transitioned from the Archived state to
+     the Draft state.
+
+### 3.1.4 to 3.1.5
+There are no manual update steps for this version.
+
+Note that this release includes an update to Drupal core which security updates
+some of its dependencies. As such, you might need to include `drupal/core` in
+the list of arguments you pass to `composer update` if any of its dependencies
+are locked at older versions in your project. For example:
+
+```
+$ composer update acquia/lightning drupal/core --with-all-dependencies
+```
+
+### 3.1.3 to 3.1.4
+* **NOTE: This is a _fully manual update_ that involves a data migration!**
+  Lightning Scheduler has been completely rewritten, and now stores scheduled
+  moderation state transitions in a pair of new base fields. You will need to
+  migrate any existing scheduled transitions from the old base fields to the
+  new ones. After completing database updates, Lightning Scheduler will link
+  you to a UI where you can run the migration. Alternatively, you can do it
+  at the command line (Drush 9 only) by running
+  `drush lightning:scheduler:migrate`.
+
+  If you have scheduled transitions attached to a specific entity type and
+  you'd like to discard those transitions without migrating them (test data,
+  for example), you can "purge" it in the UI, or at the command line by running
+  `drush lightning:scheduler:purge ENTITY_TYPE_ID`. Purging must be done one
+  entity type at a time, e.g. `drush lightning:scheduler:purge paragraph`.
+  
+  Once all entity types have been migrated or purged, the old base fields will
+  need to be uninstalled. You can perform this clean-up work automatically by
+  running `drush entity-updates`.
+
+**Note:** The Lightning Scheduler migration in Lightning 3.1.4 affects actual
+  content entities. As such, it will need to be run on your production
+  database.
+
 ### 3.1.2 to 3.1.3
-* If you have Lightning API enabled, you should clear all caches after updating
-  Lightning, due to changes in JSON API that may require a cache rebuild.
+There are no manual update steps for this version.
 
 ### 3.1.1 to 3.1.2
 There are no manual update steps for this version.

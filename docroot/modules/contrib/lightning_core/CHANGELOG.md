@@ -1,3 +1,30 @@
+## 2.9.0
+* Fixed a bug where administrative roles were shipped with null values for the
+  'is_admin' flag. (Issue #2882197)
+* The Basic Page content type now supports Pathauto out of the box. (#74)
+* Fixed a bug where the Basic Page content type would not work with workflows
+  out of the box. (Issue #2990048)
+
+## 2.8.0
+* Security updated Drupal core to 8.5.6.
+* Fixed a bug where user 1 could not access Lightning's administrative screens.
+  (Issue #2933520)
+* Lightning Page now enables moderation if Lightning Workflow is installed, not
+  Content Moderation. (Issue #2984737)
+* Lightning Roles now has an explicit dependency on the Node module.
+  (Issue 2984738)
+* Removed defunct default configuration from bundled Search API database
+  backend. (#70)
+
+## 2.7.0
+* Updated Drupal core to 8.5.4.
+* Drush updb failure from drush_lightning_core_pre_updatedb (Issue #2972217)
+* Tests: "When I visit" step definition is too general (Issue #2955092)
+
+## 2.6.0
+* Added a Drush 9 command hook which will clear all cached plugin definitions before
+  database updates begin. (GitHub #55)
+
 ## 2.5.0
 * Security updated Drupal core to 8.5.3.
 

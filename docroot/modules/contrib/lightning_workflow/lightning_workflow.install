@@ -33,7 +33,7 @@ function lightning_workflow_install() {
   // Anything in the review state can be sent back to draft, kept in review,
   // or published.
   $configuration['transitions']['review'] = [
-    'label' => 'Review',
+    'label' => 'Send to review',
     'from' => [
       'draft',
       'review',
@@ -43,6 +43,15 @@ function lightning_workflow_install() {
   ];
   $configuration['transitions']['create_new_draft']['from'][] = 'review';
   $configuration['transitions']['publish']['from'][] = 'review';
+
+  // Give the archived_published transition a clearer name.
+  $configuration['transitions']['archived_published']['label'] = 'Restore from archive';
+
+  // Allow transitioning from the archived to draft states, rendering the
+  // archived_draft transition redundant.
+  unset($configuration['transitions']['archived_draft']);
+  $configuration['transitions']['create_new_draft']['from'][] = 'archived';
+
   $workflow->set('type_settings', $configuration);
   $workflow->save();
 

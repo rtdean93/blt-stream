@@ -10,6 +10,14 @@ use Drupal\DrupalExtension\Context\DrupalSubContextBase;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 
+/**
+ * Contains step definitions for interacting with media entities.
+ *
+ * @internal
+ * This class is part of Lightning's internal testing code. It is not an API and
+ * should not be extended. This class will be marked final, and all protected
+ * members will be made private, in Lightning Media 3.x.
+ */
 class MediaEntityContext extends DrupalSubContextBase {
 
   /**
@@ -30,7 +38,7 @@ class MediaEntityContext extends DrupalSubContextBase {
    * @Then I should be visiting a media item
    */
   public function assertMediaItemPage() {
-    $this->assertSession()->addressMatches('/\/media\/[0-9]+$/');
+    $this->assertSession()->addressMatches('#^/media/([\w-]+/)?\d+$#');
 
     try {
       $this->assertSession()->statusCodeEquals(200);
